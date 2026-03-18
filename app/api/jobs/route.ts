@@ -70,7 +70,15 @@ export async function GET() {
     // Fetch user profile once
     const profile = await getUserProfile(supabase, user.id)
 
-    const searchTerms = ['typescript developer', 'C# developer', 'flutter developer', 'full stack developer']
+    const { data: profileData } = await supabase
+  .from('profiles')
+  .select('search_terms')
+  .eq('id', user.id)
+  .single()
+
+const searchTerms = profileData?.search_terms?.length
+  ? profileData.search_terms
+  : ['typescript developer', 'C# developer', 'flutter developer', 'full stack developer']
     const allResults: any[] = []
 
     for (const term of searchTerms) {
