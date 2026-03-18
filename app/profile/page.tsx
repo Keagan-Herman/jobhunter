@@ -29,6 +29,7 @@ export default function ProfilePage() {
   const [skills, setSkills] = useState('')
   const [experience, setExperience] = useState('')
   const [projects, setProjects] = useState('')
+  const [searchTerms, setSearchTerms] = useState('')
 
   const supabase = createClient()
   const router = useRouter()
