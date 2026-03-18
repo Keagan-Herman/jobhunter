@@ -22,7 +22,6 @@ Projects: ${data.projects || ''}
   `.trim()
 }
 
-
 async function scoreJob(title: string, description: string, stack: string[], profile: string): Promise<{ score: number, reason: string }> {
   try {
     const prompt = `
@@ -44,7 +43,6 @@ Respond ONLY with valid JSON, no markdown, no explanation:
     return JSON.parse(clean)
   } catch (err: any) {
     console.log('GROQ ERROR:', err.message?.slice(0, 80))
-    // Return 75 so the job still gets saved — we can rescore later
     return { score: 75, reason: 'Scoring unavailable — saved for manual review' }
   }
 }
@@ -64,6 +62,13 @@ function extractStack(description: string): string[] {
 export async function GET() {
   try {
     const supabase = await createClient()
+
+    // Auth check once at the top
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+    // Fetch user profile once
+    const profile = await getUserProfile(supabase, user.id)
 
     const searchTerms = ['typescript developer', 'C# developer', 'flutter developer', 'full stack developer']
     const allResults: any[] = []
@@ -103,11 +108,12 @@ export async function GET() {
       const company = job.company?.display_name || 'Unknown'
       const description = job.description || ''
 
-      // Skip duplicates
+      // Check duplicate per user — same job shouldn't appear twice for same user
       const { data: existing } = await supabase
         .from('jobs')
         .select('id')
         .eq('external_id', externalId)
+        .eq('user_id', user.id)
         .single()
 
       if (existing) {
@@ -116,12 +122,6 @@ export async function GET() {
       }
 
       const stack = extractStack(description)
-
-      const { data: { user } } = await supabase.auth.getUser()
-if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-const profile = await getUserProfile(supabase, user.id)
-
-      // Wait 4 seconds between Gemini calls (max 15/min on free tier)
       const { score, reason } = await scoreJob(job.title, description, stack, profile)
 
       await supabase.from('jobs').insert({
@@ -163,4 +163,4 @@ const profile = await getUserProfile(supabase, user.id)
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
-}
+        }
