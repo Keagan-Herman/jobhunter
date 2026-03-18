@@ -30,6 +30,12 @@ export default function ProfilePage() {
   const [experience, setExperience] = useState('')
   const [projects, setProjects] = useState('')
   const [searchTerms, setSearchTerms] = useState('')
+  const [importing, setImporting] = useState(false)
+  const [importError, setImportError] = useState('')
+  const [emailNotifications, setEmailNotifications] = useState(true)
+  const [coverLetterTone, setCoverLetterTone] = useState('professional')
+const [coverLetterLength, setCoverLetterLength] = useState('short')
+const [careerContext, setCareerContext] = useState('experienced')
 
   const supabase = createClient()
   const router = useRouter()
@@ -54,11 +60,53 @@ export default function ProfilePage() {
         setExperience(data.experience || '')
         setProjects(data.projects || '')
         setSearchTerms((data.search_terms || []).join(', '))
+        setEmailNotifications(data.email_notifications ?? true)
+        setCoverLetterTone(data.cover_letter_tone || 'professional')
+setCoverLetterLength(data.cover_letter_length || 'short')
+setCareerContext(data.career_context || 'experienced')
       }
       setLoading(false)
     }
     load()
   }, [])
+
+  const handleImportCV = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setImporting(true)
+    setImportError('')
+
+    const formData = new FormData()
+    formData.append('cv', file)
+
+    try {
+      const res = await fetch('/api/parse-cv', {
+        method: 'POST',
+        body: formData
+      })
+      const data = await res.json()
+
+      if (data.success) {
+        const p = data.profile
+        if (p.full_name) setFullName(p.full_name)
+        if (p.job_title) setJobTitle(p.job_title)
+        if (p.company) setCompany(p.company)
+        if (p.education) setEducation(p.education)
+        if (p.skills?.length) setSkills(p.skills.join(', '))
+        if (p.experience) setExperience(p.experience)
+        if (p.projects) setProjects(p.projects)
+        if (p.search_terms?.length) setSearchTerms(p.search_terms.join(', '))
+      } else {
+        setImportError(data.error || 'Failed to parse CV')
+      }
+    } catch {
+      setImportError('Failed to import CV')
+    }
+
+    setImporting(false)
+    e.target.value = ''
+  }
 
   const handleSave = async () => {
     setSaving(true)
@@ -68,6 +116,7 @@ export default function ProfilePage() {
 
     await supabase.from('profiles').upsert({
       id: user.id,
+      email: user.email,
       full_name: fullName,
       job_title: jobTitle,
       company,
@@ -75,7 +124,11 @@ export default function ProfilePage() {
       skills: skills.split(',').map(s => s.trim()).filter(Boolean),
       experience,
       projects,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
+      email_notifications: emailNotifications,
+      cover_letter_tone: coverLetterTone,
+cover_letter_length: coverLetterLength,
+career_context: careerContext,
     })
 
     setSaving(false)
@@ -128,6 +181,44 @@ export default function ProfilePage() {
           >
             ← Dashboard
           </button>
+        </div>
+        {/* CV Import */}
+        <div style={{
+          background: '#0a0a1a', border: '1px dashed #2a2a4a',
+          borderRadius: '10px', padding: '20px', textAlign: 'center',
+          marginBottom: '28px'
+        }}>
+          <div style={{ fontSize: '24px', marginBottom: '8px' }}>📄</div>
+          <div style={{ fontSize: '13px', color: '#666', marginBottom: '12px' }}>
+            Import your CV to auto-fill your profile
+          </div>
+          <label style={{
+            display: 'inline-block',
+            background: importing ? '#0d0d20' : 'transparent',
+            border: '1px solid #00ff87',
+            color: '#00ff87', padding: '8px 20px',
+            borderRadius: '8px', fontFamily: "'DM Mono', monospace",
+            fontSize: '11px', fontWeight: '700', letterSpacing: '1px',
+            cursor: importing ? 'not-allowed' : 'pointer',
+            textTransform: 'uppercase' as const
+          }}>
+            {importing ? 'Importing...' : '⚡ Import CV (PDF)'}
+            <input
+              type="file"
+              accept=".pdf"
+              onChange={handleImportCV}
+              disabled={importing}
+              style={{ display: 'none' }}
+            />
+          </label>
+          {importError && (
+            <div style={{ color: '#ff6b6b', fontSize: '12px', marginTop: '8px', fontFamily: "'DM Mono', monospace" }}>
+              {importError}
+            </div>
+          )}
+          <div style={{ fontSize: '11px', color: '#333', marginTop: '8px', fontFamily: "'DM Mono', monospace" }}>
+            PDF only · review before saving
+          </div>
         </div>
 
         {/* Form */}
@@ -183,16 +274,131 @@ export default function ProfilePage() {
             />
           </div>
           <div style={{ marginBottom: '24px' }}>
-  <label style={labelStyle}>Job Search Keywords</label>
-  <div style={{ fontSize: '11px', color: '#444', marginBottom: '6px', fontStyle: 'italic' }}>
-    Comma separated — used to search for jobs e.g. "typescript developer, C# developer, flutter developer"
+            <label style={labelStyle}>Job Search Keywords</label>
+            <div style={{ fontSize: '11px', color: '#444', marginBottom: '6px', fontStyle: 'italic' }}>
+              Comma separated — used to search for jobs e.g. "typescript developer, C# developer, flutter developer"
+            </div>
+            <input
+              style={inputStyle}
+              value={searchTerms}
+              onChange={e => setSearchTerms(e.target.value)}
+              placeholder="typescript developer, C# developer, flutter developer"
+            />
+          </div>
+          <div style={{ marginBottom: '24px' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
+              <div
+                onClick={() => setEmailNotifications(!emailNotifications)}
+                style={{
+                  width: '44px', height: '24px', borderRadius: '12px',
+                  background: emailNotifications ? '#00ff87' : '#1e1e38',
+                  position: 'relative', transition: 'background 0.2s', flexShrink: 0
+                }}
+              >
+                <div style={{
+                  width: '18px', height: '18px', borderRadius: '50%',
+                  background: '#fff', position: 'absolute', top: '3px',
+                  transition: 'left 0.2s',
+                  left: emailNotifications ? '23px' : '3px'
+                }} />
+              </div>
+              <div>
+                <div style={{ fontSize: '13px', color: '#aaa' }}>Email notifications</div>
+                <div style={{ fontSize: '11px', color: '#444', fontFamily: "'DM Mono', monospace" }}>
+                  Daily digest of new matching jobs
+                </div>
+              </div>
+            </label>
+          </div>
+          {/* Cover Letter Preferences */}
+<div style={{ marginBottom: '24px' }}>
+  <div style={{
+    fontSize: '11px', color: '#555', letterSpacing: '1.5px',
+    textTransform: 'uppercase' as const, fontFamily: "'DM Mono', monospace",
+    marginBottom: '14px'
+  }}>
+    Cover Letter Style
   </div>
-  <input
-    style={inputStyle}
-    value={searchTerms}
-    onChange={e => setSearchTerms(e.target.value)}
-    placeholder="typescript developer, C# developer, flutter developer"
-  />
+
+  {/* Tone */}
+  <div style={{ marginBottom: '12px' }}>
+    <div style={{ fontSize: '11px', color: '#444', fontFamily: "'DM Mono', monospace", marginBottom: '8px' }}>Tone</div>
+    <div style={{ display: 'flex', gap: '8px' }}>
+      {[
+        { value: 'professional', label: '💼 Professional' },
+        { value: 'conversational', label: '😊 Conversational' },
+        { value: 'creative', label: '🎨 Creative' },
+      ].map(opt => (
+        <button
+          key={opt.value}
+          onClick={() => setCoverLetterTone(opt.value)}
+          style={{
+            flex: 1, padding: '9px 6px', borderRadius: '8px', cursor: 'pointer',
+            background: coverLetterTone === opt.value ? '#00ff8718' : '#0a0a1a',
+            border: `1px solid ${coverLetterTone === opt.value ? '#00ff87' : '#1e1e38'}`,
+            color: coverLetterTone === opt.value ? '#00ff87' : '#555',
+            fontSize: '11px', fontFamily: "'DM Mono', monospace",
+            transition: 'all 0.2s', textAlign: 'center' as const
+          }}
+        >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  </div>
+
+  {/* Length */}
+  <div style={{ marginBottom: '12px' }}>
+    <div style={{ fontSize: '11px', color: '#444', fontFamily: "'DM Mono', monospace", marginBottom: '8px' }}>Length</div>
+    <div style={{ display: 'flex', gap: '8px' }}>
+      {[
+        { value: 'short', label: '⚡ Short & Punchy' },
+        { value: 'detailed', label: '📝 Detailed' },
+      ].map(opt => (
+        <button
+          key={opt.value}
+          onClick={() => setCoverLetterLength(opt.value)}
+          style={{
+            flex: 1, padding: '9px', borderRadius: '8px', cursor: 'pointer',
+            background: coverLetterLength === opt.value ? '#00ff8718' : '#0a0a1a',
+            border: `1px solid ${coverLetterLength === opt.value ? '#00ff87' : '#1e1e38'}`,
+            color: coverLetterLength === opt.value ? '#00ff87' : '#555',
+            fontSize: '11px', fontFamily: "'DM Mono', monospace",
+            transition: 'all 0.2s', textAlign: 'center' as const
+          }}
+        >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  </div>
+
+  {/* Career context */}
+  <div>
+    <div style={{ fontSize: '11px', color: '#444', fontFamily: "'DM Mono', monospace", marginBottom: '8px' }}>Career Stage</div>
+    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' as const }}>
+      {[
+        { value: 'first_job', label: '🌱 First Job' },
+        { value: 'career_change', label: '🔄 Career Change' },
+        { value: 'experienced', label: '🚀 Experienced' },
+      ].map(opt => (
+        <button
+          key={opt.value}
+          onClick={() => setCareerContext(opt.value)}
+          style={{
+            flex: 1, padding: '9px 6px', borderRadius: '8px', cursor: 'pointer',
+            background: careerContext === opt.value ? '#00ff8718' : '#0a0a1a',
+            border: `1px solid ${careerContext === opt.value ? '#00ff87' : '#1e1e38'}`,
+            color: careerContext === opt.value ? '#00ff87' : '#555',
+            fontSize: '11px', fontFamily: "'DM Mono', monospace",
+            transition: 'all 0.2s', textAlign: 'center' as const
+          }}
+        >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  </div>
 </div>
 
           <button

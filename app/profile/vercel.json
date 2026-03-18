@@ -1,0 +1,19 @@
+{
+    "git": {
+        "deploymentEnabled": false
+    },
+    "crons": [
+        {
+            "path": "/api/jobs",
+            "schedule": "0 8 * * *"
+        },
+        {
+            "path": "/api/rescore",
+            "schedule": "0 8 30 * * *"
+        },
+        {
+            "path": "/api/notify?secret=jgdsfkjhkeslilesuigtiuhewjetgiuewyoitihfkldshnrkjgewytryfwusfjhlskjeuitasiudfjhaskjrey3i8i38354y32896trhweklrhliewh",
+            "schedule": "0 9 * * *"
+        }
+    ]
+}
