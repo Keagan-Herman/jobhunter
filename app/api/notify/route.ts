@@ -2,11 +2,10 @@ import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY!)
-
 export async function GET(request: Request) {
   try {
     // ✅ Support both header and query param for Vercel crons
+    const resend = new Resend(process.env.RESEND_API_KEY!)
     const authHeader = request.headers.get('authorization')
     const url = new URL(request.url)
     const querySecret = url.searchParams.get('secret')
