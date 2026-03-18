@@ -2,71 +2,70 @@ import { createClient } from '@/lib/supabase/server'
 import { generateContent } from '@/lib/gemini'
 import { withTimeout } from '@/lib/timeout'
 import { NextResponse } from 'next/server'
+import { extractText } from 'unpdf'
 
 function cleanPdfText(text: string): string {
-    return text
-        .replace(/\x00/g, '')           // null bytes
-        .replace(/\r\n/g, '\n')         // normalize line endings
-        .replace(/\n{3,}/g, '\n\n')     // collapse excessive blank lines
-        .replace(/[ \t]{2,}/g, ' ')     // collapse excessive spaces
-        .trim()
+  return text
+    .replace(/\x00/g, '')
+    .replace(/\r\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/[ \t]{2,}/g, ' ')
+    .trim()
 }
 
 function coerceToArray(value: any): string[] {
-    if (Array.isArray(value)) return value.filter(Boolean)
-    if (typeof value === 'string') return value.split(',').map(s => s.trim()).filter(Boolean)
-    return []
+  if (Array.isArray(value)) return value.filter(Boolean)
+  if (typeof value === 'string') return value.split(',').map(s => s.trim()).filter(Boolean)
+  return []
 }
 
 export async function POST(request: Request) {
+  try {
+    // Auth check
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const formData = await request.formData()
+    const file = formData.get('cv') as File
+
+    if (!file) {
+      return NextResponse.json({ error: 'No file uploaded' }, { status: 400 })
+    }
+
+    if (!file.type.includes('pdf') && !file.name.endsWith('.pdf')) {
+      return NextResponse.json({ error: 'Please upload a PDF file' }, { status: 400 })
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      return NextResponse.json({ error: 'File too large — max 5MB' }, { status: 400 })
+    }
+
+    // Extract text using unpdf — works in serverless and edge environments
+    let text: string
     try {
-        // ✅ Auth check
-        const supabase = await createClient()
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-        }
+      const buffer = await file.arrayBuffer()
+      const { text: extracted } = await withTimeout(
+        extractText(new Uint8Array(buffer), { mergePages: true }),
+        15000,
+        'PDF parsing'
+      )
+      text = cleanPdfText(extracted).slice(0, 3000)
+    } catch (err: any) {
+      return NextResponse.json({
+        error: 'Failed to read PDF — make sure the file is not corrupted or password protected'
+      }, { status: 400 })
+    }
 
-        const formData = await request.formData()
-        const file = formData.get('cv') as File
+    if (!text.trim()) {
+      return NextResponse.json({
+        error: 'Could not extract text from this PDF. Make sure it is not a scanned image.'
+      }, { status: 400 })
+    }
 
-        if (!file) {
-            return NextResponse.json({ error: 'No file uploaded' }, { status: 400 })
-        }
-
-        // File type check
-        if (!file.type.includes('pdf') && !file.name.endsWith('.pdf')) {
-            return NextResponse.json({ error: 'Please upload a PDF file' }, { status: 400 })
-        }
-
-        // File size check — 5MB max
-        if (file.size > 5 * 1024 * 1024) {
-            return NextResponse.json({ error: 'File too large — max 5MB' }, { status: 400 })
-        }
-
-        // ✅ Use lib/pdf-parse.js directly to avoid Vercel serverless crash
-        const pdf = (await import('pdf-parse/lib/pdf-parse.js' as string)).default as (buffer: Buffer) => Promise<{ text: string, numpages: number }>
-        const buffer = Buffer.from(await file.arrayBuffer())
-
-        let pdfData
-        try {
-            pdfData = await withTimeout(pdf(buffer), 15000, 'PDF parsing')
-        } catch (err: any) {
-            return NextResponse.json({
-                error: 'Failed to read PDF — make sure the file is not corrupted or password protected'
-            }, { status: 400 })
-        }
-
-        // ✅ Clean extracted text
-        const text = cleanPdfText((pdfData as { text: string }).text).slice(0, 3000)
-        // Empty text check for scanned PDFs
-        if (!text.trim()) {
-            return NextResponse.json({
-                error: 'Could not extract text from this PDF. Make sure it is not a scanned image.'
-            }, { status: 400 })
-        }
-
-        const prompt = `
+    const prompt = `
 Extract information from this CV and return ONLY valid JSON with no markdown or explanation.
 
 CV TEXT:
@@ -88,37 +87,36 @@ For search_terms, generate exactly 4 relevant job search keywords based on their
 If any field is not found, use an empty string or empty array.
 `
 
-        let result: string
-        try {
-            result = await withTimeout(generateContent(prompt), 15000, 'AI CV parsing')
-        } catch {
-            return NextResponse.json({ error: 'AI timed out — please try again' }, { status: 500 })
-        }
-
-        const clean = result.replace(/```json|```/g, '').trim()
-
-        let parsed
-        try {
-            parsed = JSON.parse(clean)
-        } catch {
-            return NextResponse.json({ error: 'AI failed to parse CV — please try again' }, { status: 500 })
-        }
-
-        // ✅ Coerce fields to correct types so profile save never crashes
-        const safeProfile = {
-            full_name: String(parsed.full_name || ''),
-            job_title: String(parsed.job_title || ''),
-            company: String(parsed.company || ''),
-            education: String(parsed.education || ''),
-            skills: coerceToArray(parsed.skills),
-            experience: String(parsed.experience || ''),
-            projects: String(parsed.projects || ''),
-            search_terms: coerceToArray(parsed.search_terms),
-        }
-
-        return NextResponse.json({ success: true, profile: safeProfile })
-
-    } catch (err: any) {
-        return NextResponse.json({ error: err.message }, { status: 500 })
+    let result: string
+    try {
+      result = await withTimeout(generateContent(prompt), 15000, 'AI CV parsing')
+    } catch {
+      return NextResponse.json({ error: 'AI timed out — please try again' }, { status: 500 })
     }
+
+    const clean = result.replace(/```json|```/g, '').trim()
+
+    let parsed
+    try {
+      parsed = JSON.parse(clean)
+    } catch {
+      return NextResponse.json({ error: 'AI failed to parse CV — please try again' }, { status: 500 })
+    }
+
+    const safeProfile = {
+      full_name: String(parsed.full_name || ''),
+      job_title: String(parsed.job_title || ''),
+      company: String(parsed.company || ''),
+      education: String(parsed.education || ''),
+      skills: coerceToArray(parsed.skills),
+      experience: String(parsed.experience || ''),
+      projects: String(parsed.projects || ''),
+      search_terms: coerceToArray(parsed.search_terms),
+    }
+
+    return NextResponse.json({ success: true, profile: safeProfile })
+
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 })
+  }
 }
