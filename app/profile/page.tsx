@@ -53,6 +53,7 @@ export default function ProfilePage() {
         setSkills((data.skills || []).join(', '))
         setExperience(data.experience || '')
         setProjects(data.projects || '')
+        setSearchTerms((data.search_terms || []).join(', '))
       }
       setLoading(false)
     }
@@ -181,6 +182,18 @@ export default function ProfilePage() {
               rows={3}
             />
           </div>
+          <div style={{ marginBottom: '24px' }}>
+  <label style={labelStyle}>Job Search Keywords</label>
+  <div style={{ fontSize: '11px', color: '#444', marginBottom: '6px', fontStyle: 'italic' }}>
+    Comma separated — used to search for jobs e.g. "typescript developer, C# developer, flutter developer"
+  </div>
+  <input
+    style={inputStyle}
+    value={searchTerms}
+    onChange={e => setSearchTerms(e.target.value)}
+    placeholder="typescript developer, C# developer, flutter developer"
+  />
+</div>
 
           <button
             onClick={handleSave}
