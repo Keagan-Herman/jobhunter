@@ -1,26 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
-import { generateContent } from '@/lib/gemini'
+import { generateContent } from '@/lib/groq'
 import { NextResponse } from 'next/server'
-
-async function getUserProfile(supabase: any, userId: string): Promise<string> {
-  const { data } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', userId)
-    .single()
-
-  if (!data) return 'Software developer with full stack experience'
-
-  return `
-Name: ${data.full_name || ''}
-Current Role: ${data.job_title || ''}
-Company: ${data.company || ''}
-Education: ${data.education || ''}
-Skills: ${(data.skills || []).join(', ')}
-Experience: ${data.experience || ''}
-Projects: ${data.projects || ''}
-  `.trim()
-}
+import { getUserProfile } from '@/lib/profile'
 
 async function getUserPreferences(supabase: any, userId: string): Promise<{
   tone: string, length: string, context: string
@@ -84,7 +65,7 @@ export async function POST(request: Request) {
     }
 
     // Fetch user profile
-    const profile = await getUserProfile(supabase, user.id)
+    const { profileText: profile } = await getUserProfile(supabase, user.id)
 
     const preferences = await getUserPreferences(supabase, user.id)
 
