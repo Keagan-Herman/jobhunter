@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { mockUser, isDev } from '@/lib/auth-mock'
 import { generateContent } from '@/lib/groq'
 import { withTimeout } from '@/lib/timeout'
 import { NextResponse } from 'next/server'
@@ -21,11 +22,14 @@ function coerceToArray(value: any): string[] {
 
 export async function POST(request: Request) {
   try {
-    // Auth check
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    let user;
+    if (isDev) {
+        user = mockUser
+    } else {
+        const { data: { user: authUser } } = await supabase.auth.getUser()
+        if (!authUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        user = authUser
     }
 
     const formData = await request.formData()
