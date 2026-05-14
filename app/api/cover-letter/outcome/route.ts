@@ -1,12 +1,19 @@
 import { createClient } from '@/lib/supabase/server'
+import { mockUser, isDev } from '@/lib/auth-mock'
 import { generateContent } from '@/lib/groq'
 import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
   try {
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    let user;
+    if (isDev) {
+        user = mockUser
+    } else {
+        const { data: { user: authUser } } = await supabase.auth.getUser()
+        if (!authUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        user = authUser
+    }
 
     const { coverLetterId, jobId, outcome } = await request.json()
 

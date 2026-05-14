@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { mockUser, isDev } from '@/lib/auth-mock'
 import { generateContent } from '@/lib/groq'
 import { NextResponse } from 'next/server'
 import { scoreCache } from '@/lib/cache'
@@ -25,7 +26,7 @@ async function scoreJob(
   salaryMin: number | null,
   jobSalaryMin: number | null,
   remoteOnly: boolean
-): Promise<{ score: number, reason: string, score_is_fallback?: boolean }> {
+): Promise<{ score: number, reason: string, stack: string[], score_is_fallback: boolean }> {
   try {
     const seniority = detectSeniority(title)
     const workStyle = detectWorkStyle(description)
@@ -33,10 +34,10 @@ async function scoreJob(
 
     // Pre-filter obvious mismatches before hitting AI
     if (remoteOnly && workStyle === 'on-site') {
-      return { score: 20, reason: 'On-site only — conflicts with remote preference' }
+      return { score: 20, reason: 'On-site only — conflicts with remote preference', stack, score_is_fallback: false }
     }
     if (salaryMin && jobSalaryMin && jobSalaryMin < salaryMin * 0.8) {
-      return { score: 25, reason: 'Salary below minimum preference' }
+      return { score: 25, reason: 'Salary below minimum preference', stack, score_is_fallback: false }
     }
 
     const prompt = `
@@ -82,7 +83,7 @@ Respond ONLY with valid JSON, no markdown:
     }
   } catch (err: any) {
     console.log('GROQ ERROR:', err.message?.slice(0, 80))
-    return { score: 50, reason: 'Scoring unavailable — saved for manual review', score_is_fallback: true }
+    return { score: 50, reason: 'Scoring unavailable — saved for manual review', stack: stack, score_is_fallback: true }
   }
 }
 
@@ -157,9 +158,14 @@ export async function GET() {
   try {
     const supabase = await createClient()
 
-    // Auth check
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    let user;
+    if (isDev) {
+        user = mockUser
+    } else {
+        const { data: { user: authUser } } = await supabase.auth.getUser()
+        if (!authUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        user = authUser
+    }
 
     // ✅ Fetch profile once — get both AI text and preferences
     const { profileText, profileData } = await getUserProfile(supabase, user.id)

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { mockUser, isDev } from '@/lib/auth-mock'
 
 const inputStyle = {
   width: '100%', background: '#0a0a1a',
@@ -42,8 +43,14 @@ const [careerContext, setCareerContext] = useState('experienced')
 
   useEffect(() => {
     const load = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { router.push('/login'); return }
+      let user;
+      if (isDev) {
+        user = mockUser
+      } else {
+        const { data: { user: authUser } } = await supabase.auth.getUser()
+        if (!authUser) { router.push('/login'); return }
+        user = authUser
+      }
 
       const { data } = await supabase
         .from('profiles')
@@ -111,8 +118,14 @@ setCareerContext(data.career_context || 'experienced')
   const handleSave = async () => {
     setSaving(true)
     setSaved(false)
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
+    let user;
+    if (isDev) {
+        user = mockUser
+    } else {
+        const { data: { user: authUser } } = await supabase.auth.getUser()
+        if (!authUser) return
+        user = authUser
+    }
 
     await supabase.from('profiles').upsert({
       id: user.id,
