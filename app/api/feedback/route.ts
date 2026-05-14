@@ -18,10 +18,35 @@ export async function POST(request: Request) {
     })
 
     // Update job status
+    const status = action === 'skipped' ? 'skipped' :
+                   action === 'pending' ? 'pending' : 'applied'
+
     await supabase
       .from('jobs')
-      .update({ status: action === 'skipped' ? 'skipped' : 'applied' })
+      .update({
+        status,
+        score_reason: action === 'skipped' && reason ? `Skipped: ${reason}` : undefined
+      })
       .eq('id', jobId)
+
+    // Extract signals if skipped
+    if (action === 'skipped' && reason) {
+        const { data: job } = await supabase.from('jobs').select('*').eq('id', jobId).single()
+        if (job) {
+            // Add to learned_signals with negative outcome
+            const signalType = reason.toLowerCase().includes('stack') ? 'stack' :
+                               reason.toLowerCase().includes('senior') ? 'seniority' :
+                               reason.toLowerCase().includes('salary') ? 'salary' : 'preference'
+
+            await supabase.from('learned_signals').insert({
+                user_id: user.id,
+                signal_type: signalType,
+                signal_value: reason,
+                weight: 0.5,
+                outcome: 'negative'
+            })
+        }
+    }
 
     return NextResponse.json({ success: true })
   } catch (err: any) {

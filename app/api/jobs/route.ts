@@ -1,137 +1,18 @@
 import { createClient } from '@/lib/supabase/server'
-import { generateContent } from '@/lib/gemini'
+import { generateContent } from '@/lib/groq'
 import { NextResponse } from 'next/server'
 import { scoreCache } from '@/lib/cache'
 import { withTimeout } from '@/lib/timeout'
-
-async function getUserProfile(supabase: any, userId: string): Promise<{ profileText: string, profileData: any }> {
-  const { data } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', userId)
-    .single()
-
-  if (!data) return {
-    profileText: 'Software developer with full stack experience',
-    profileData: {}
-  }
-
-  const profileText = `
-Name: ${data.full_name || ''}
-Current Role: ${data.job_title || ''}
-Company: ${data.company || ''}
-Education: ${data.education || ''}
-Skills: ${(data.skills || []).join(', ')}
-Experience: ${data.experience || ''}
-Projects: ${data.projects || ''}
-  `.trim()
-
-  return { profileText, profileData: data }
-}
-
-async function getUserFeedbackContext(supabase: any, userId: string): Promise<string> {
-  const { data: feedback } = await supabase
-    .from('job_feedback')
-    .select(`action, reason, jobs (title, company, stack)`)
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
-    .limit(20)
-
-  if (!feedback?.length) return ''
-
-  const skipped = feedback
-    .filter((f: any) => f.action === 'skipped' && f.jobs)
-    .map((f: any) => `- Skipped "${f.jobs.title}" at ${f.jobs.company}${f.reason ? ` because: ${f.reason}` : ''}`)
-    .join('\n')
-
-  const applied = feedback
-    .filter((f: any) => f.action === 'applied' && f.jobs)
-    .map((f: any) => `- Applied to "${f.jobs.title}" at ${f.jobs.company}${f.reason ? ` — liked: ${f.reason}` : ''}`)
-    .join('\n')
-
-  return `
-PAST BEHAVIOUR (use this to calibrate your score):
-Jobs they applied to:
-${applied || 'None yet'}
-
-Jobs they skipped:
-${skipped || 'None yet'}
-`.trim()
-}
-
-async function getLearnedSignals(supabase: any, userId: string): Promise<string> {
-  const { data: signals } = await supabase
-    .from('learned_signals')
-    .select('signal_type, signal_value, weight, outcome')
-    .eq('user_id', userId)
-    .order('weight', { ascending: false })
-    .limit(20)
-
-  if (!signals?.length) return ''
-
-  const positive = signals
-    .filter((s: any) => s.outcome === 'positive')
-    .map((s: any) => `- ${s.signal_type}: "${s.signal_value}" (strength: ${s.weight.toFixed(1)})`)
-    .join('\n')
-
-  const negative = signals
-    .filter((s: any) => s.outcome === 'negative')
-    .map((s: any) => `- ${s.signal_type}: "${s.signal_value}" (strength: ${s.weight.toFixed(1)})`)
-    .join('\n')
-
-  return `
-LEARNED SIGNALS FROM PAST INTERVIEWS:
-Signals that led to positive outcomes (weight them higher):
-${positive || 'None yet'}
-
-Signals that led to negative outcomes (weight them lower):
-${negative || 'None yet'}
-  `.trim()
-}
-
-function detectSeniority(title: string): string {
-  const t = title.toLowerCase()
-  if (t.includes('junior') || t.includes('graduate') || t.includes('entry')) return 'junior'
-  if (t.includes('senior') || t.includes('lead') || t.includes('principal')) return 'senior'
-  if (t.includes('head') || t.includes('director') || t.includes('vp')) return 'executive'
-  return 'mid'
-}
-
-function detectWorkStyle(description: string): string {
-  const d = description.toLowerCase()
-  if (d.includes('fully remote') || d.includes('100% remote') || d.includes('work from anywhere')) return 'fully remote'
-  if (d.includes('hybrid')) return 'hybrid'
-  if (d.includes('on-site') || d.includes('onsite') || d.includes('in office') || d.includes('in-office')) return 'on-site'
-  return 'unspecified'
-}
-
-function calculateStackOverlap(jobStack: string[], userSkills: string[]): number {
-  if (!jobStack.length || !userSkills.length) return 0
-  const userSkillsLower = userSkills.map(s => s.toLowerCase())
-  const matches = jobStack.filter(s => userSkillsLower.includes(s.toLowerCase()))
-  return Math.round((matches.length / jobStack.length) * 100)
-}
-
-function extractStack(description: string): string[] {
-  const keywords = [
-    'TypeScript', 'JavaScript', 'React', 'Next.js', 'Vue', 'Angular',
-    'C#', 'MVC', '.NET', 'Flutter', 'Kotlin', 'Swift', 'Dart',
-    'Python', 'Java', 'Go', 'Rust', 'Node.js', 'Express',
-    'PostgreSQL', 'MySQL', 'MongoDB', 'Supabase', 'Firebase',
-    'Blazor', 'HTML', 'CSS', 'Tailwind', 'Docker', 'AWS', 'Azure',
-    'IoT', 'Power BI', 'GraphQL', 'REST', 'API'
-  ]
-  return keywords.filter(k => description?.toLowerCase().includes(k.toLowerCase()))
-}
-
-function getCountryName(code: string): string {
-  const map: Record<string, string> = {
-    za: 'South Africa', gb: 'United Kingdom', us: 'United States',
-    au: 'Australia', ca: 'Canada', de: 'Germany',
-    nl: 'Netherlands', sg: 'Singapore'
-  }
-  return map[code] || 'South Africa'
-}
+import {
+  getUserProfile,
+  getUserFeedbackContext,
+  getLearnedSignals,
+  detectSeniority,
+  detectWorkStyle,
+  calculateStackOverlap,
+  extractStack,
+  getCountryName
+} from '@/lib/profile'
 
 async function scoreJob(
   title: string,
@@ -144,7 +25,7 @@ async function scoreJob(
   salaryMin: number | null,
   jobSalaryMin: number | null,
   remoteOnly: boolean
-): Promise<{ score: number, reason: string }> {
+): Promise<{ score: number, reason: string, score_is_fallback?: boolean }> {
   try {
     const seniority = detectSeniority(title)
     const workStyle = detectWorkStyle(description)
@@ -172,10 +53,10 @@ JOB ANALYSIS:
 Title: ${title}
 Seniority Level: ${seniority}
 Work Style: ${workStyle}
-Stack: ${stack.join(', ')}
+Stack (detected): ${stack.join(', ')}
 Stack Overlap with Candidate: ${stackOverlap}%
 Salary: ${jobSalaryMin ? `R${jobSalaryMin.toLocaleString()}` : 'Not specified'}
-Description: ${description?.slice(0, 600)}
+Description: ${description?.slice(0, 1500)}
 
 SCORING GUIDE:
 - 90-100: Perfect match — strong stack overlap, right seniority, matches preferences
@@ -188,14 +69,20 @@ Consider stack overlap (${stackOverlap}%) heavily in your score.
 Use past behaviour to calibrate further.
 
 Respond ONLY with valid JSON, no markdown:
-{"score": <0-100>, "reason": "<one punchy sentence explaining the score>"}
+{"score": <0-100>, "reason": "<one punchy sentence explaining the score>", "stack": ["extracted", "tech", "stack"]}
 `
     const text = await generateContent(prompt)
     const clean = text.replace(/```json|```/g, '').trim()
-    return JSON.parse(clean)
+    const result = JSON.parse(clean)
+    return {
+        score: result.score,
+        reason: result.reason,
+        stack: result.stack || stack,
+        score_is_fallback: false
+    }
   } catch (err: any) {
     console.log('GROQ ERROR:', err.message?.slice(0, 80))
-    return { score: 75, reason: 'Scoring unavailable — saved for manual review' }
+    return { score: 50, reason: 'Scoring unavailable — saved for manual review', score_is_fallback: true }
   }
 }
 
@@ -277,6 +164,18 @@ export async function GET() {
     // ✅ Fetch profile once — get both AI text and preferences
     const { profileText, profileData } = await getUserProfile(supabase, user.id)
 
+    // Rate limiting check
+    const lastScanAt = profileData?.last_scan_at
+    if (lastScanAt) {
+      const lastScan = new Date(lastScanAt)
+      const now = new Date()
+      const diffMs = now.getTime() - lastScan.getTime()
+      const diffMins = Math.floor(diffMs / 60000)
+      if (diffMins < 30) {
+        return NextResponse.json({ error: `Please wait ${30 - diffMins} minutes before scanning again.` }, { status: 429 })
+      }
+    }
+
     const searchTerms: string[] = profileData?.search_terms?.length
       ? profileData.search_terms
       : ['software developer']
@@ -309,33 +208,31 @@ export async function GET() {
       return NextResponse.json({ error: 'No results from any source' }, { status: 500 })
     }
 
-    let newJobs = 0
-    let skipped = 0
-    let scored = 0
+    // Batch check existence
+    const externalIds = uniqueResults.map(j => String(j.id))
+    const { data: existingJobs } = await supabase
+      .from('jobs')
+      .select('external_id')
+      .in('external_id', externalIds)
+      .eq('user_id', user.id)
 
-    for (const job of uniqueResults) {
+    const existingSet = new Set(existingJobs?.map(j => j.external_id) || [])
+    const resultsToScore = uniqueResults.filter(j => !existingSet.has(String(j.id)))
+
+    let newJobs = 0
+    let scored = 0
+    const jobsToInsert: any[] = []
+
+    for (const job of resultsToScore) {
       const externalId = String(job.id)
       const company = job.company?.display_name || 'Unknown'
       const description = job.description || ''
-
-      // Skip duplicates per user
-      const { data: existing } = await supabase
-        .from('jobs')
-        .select('id')
-        .eq('external_id', externalId)
-        .eq('user_id', user.id)
-        .single()
-
-      if (existing) {
-        skipped++
-        continue
-      }
 
       const stack = extractStack(description)
 
       // ✅ Check cache before hitting AI
       const cacheKey = `${externalId}_${user.id}`
-      let scoreResult = scoreCache.get(cacheKey)
+      let scoreResult = await scoreCache.get(supabase, cacheKey)
 
       if (!scoreResult) {
         scoreResult = await scoreJob(
@@ -350,26 +247,24 @@ export async function GET() {
           job.salary_min || null,
           remoteOnly
         )
-        scoreCache.set(cacheKey, scoreResult, 86400)
-      } else {
-        console.log(`[CACHE HIT] ${job.title}`)
       }
 
-      const { score, reason } = scoreResult
+      const { score, reason, score_is_fallback, stack: aiStack } = scoreResult
 
-      await supabase.from('jobs').insert({
+      jobsToInsert.push({
         user_id: user.id,
         external_id: externalId,
         title: job.title,
         company,
         location: job.location?.display_name || 'Unknown',
-        description: description.slice(0, 1000),
+        description: description.slice(0, 1500),
         salary_min: job.salary_min || null,
         salary_max: job.salary_max || null,
         url: job.redirect_url,
-        stack,
+        stack: aiStack || stack,
         score,
         score_reason: reason,
+        score_is_fallback: score_is_fallback || false,
         status: 'pending',
         source: (job as any).source || 'adzuna',
         seniority: detectSeniority(job.title),
@@ -377,10 +272,16 @@ export async function GET() {
         stack_overlap: calculateStackOverlap(stack, userSkills)
       })
 
-      console.log(`SAVED: ${job.title} at ${company} — score: ${score}`)
       newJobs++
       scored++
     }
+
+    if (jobsToInsert.length > 0) {
+        await supabase.from('jobs').insert(jobsToInsert)
+    }
+
+    // Update last_scan_at
+    await supabase.from('profiles').update({ last_scan_at: new Date().toISOString() }).eq('id', user.id)
 
     // ✅ Scan log counts all sources
     await supabase.from('scan_logs').insert({
@@ -394,7 +295,7 @@ export async function GET() {
       success: true,
       found: uniqueResults.length,
       saved: newJobs,
-      skipped,
+      skipped: uniqueResults.length - resultsToScore.length,
       scored
     })
 

@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { generateContent } from '@/lib/gemini'
+import { generateContent } from '@/lib/groq'
 import { withTimeout } from '@/lib/timeout'
 import { NextResponse } from 'next/server'
 import { extractText } from 'unpdf'
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
         15000,
         'PDF parsing'
       )
-      text = cleanPdfText(extracted).slice(0, 3000)
+      text = cleanPdfText(extracted).slice(0, 5000)
     } catch (err: any) {
       return NextResponse.json({
         error: 'Failed to read PDF — make sure the file is not corrupted or password protected'

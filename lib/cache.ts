@@ -1,36 +1,37 @@
-type CacheEntry<T> = {
-  value: T
-  expiresAt: number
-}
+import { createClient } from '@/lib/supabase/server'
+import { SupabaseClient } from '@supabase/supabase-js'
 
-class SimpleCache<T> {
-  private store = new Map<string, CacheEntry<T>>()
+export const scoreCache = {
+  async get(supabase: SupabaseClient, key: string) {
+    const { data } = await supabase
+      .from('jobs')
+      .select('score, score_reason, stack, score_is_fallback')
+      .eq('external_id', key.split('_')[0])
+      .eq('user_id', key.split('_')[1])
+      .eq('score_is_fallback', false)
+      .single()
 
-  set(key: string, value: T, ttlSeconds: number = 3600) {
-    this.store.set(key, {
-      value,
-      expiresAt: Date.now() + ttlSeconds * 1000
-    })
-  }
-
-  get(key: string): T | null {
-    const entry = this.store.get(key)
-    if (!entry) return null
-    if (Date.now() > entry.expiresAt) {
-      this.store.delete(key)
-      return null
+    if (data) {
+        return {
+            score: data.score,
+            reason: data.score_reason,
+            stack: data.stack,
+            score_is_fallback: data.score_is_fallback
+        }
     }
-    return entry.value
-  }
+    return null
+  },
 
-  has(key: string): boolean {
-    return this.get(key) !== null
-  }
-
-  clear() {
-    this.store.clear()
+  async set(supabase: SupabaseClient, key: string, value: any) {
+    // In our case, the score is already being saved to the jobs table during the scan loop.
+    // So 'set' is implicitly handled by the insert.
+    // However, if we wanted a separate cache table:
+    /*
+    await supabase.from('score_cache').upsert({
+      key,
+      value,
+      expires_at: new Date(Date.now() + 86400 * 1000).toISOString()
+    })
+    */
   }
 }
-
-// Score cache — keyed by job external_id + user_id
-export const scoreCache = new SimpleCache<{ score: number, reason: string }>()
