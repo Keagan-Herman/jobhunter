@@ -38,14 +38,22 @@ export async function getUserFeedbackContext(supabase: SupabaseClient, userId: s
 
   if (!feedback?.length) return ''
 
-  const skipped = feedback
-    .filter((f: any) => f.action === 'skipped' && f.jobs)
-    .map((f: any) => `- Skipped "${f.jobs.title}" at ${f.jobs.company}${f.reason ? ` because: ${f.reason}` : ''}`)
+  interface FeedbackItem {
+    action: string
+    reason: string | null
+    jobs: { title: string, company: string, stack: string[] | null } | null
+  }
+
+  const feedbackItems = feedback as unknown as FeedbackItem[]
+
+  const skipped = feedbackItems
+    .filter((f) => f.action === 'skipped' && f.jobs)
+    .map((f) => `- Skipped "${f.jobs!.title}" at ${f.jobs!.company}${f.reason ? ` because: ${f.reason}` : ''}`)
     .join('\n')
 
-  const applied = feedback
-    .filter((f: any) => f.action === 'applied' && f.jobs)
-    .map((f: any) => `- Applied to "${f.jobs.title}" at ${f.jobs.company}${f.reason ? ` — liked: ${f.reason}` : ''}`)
+  const applied = feedbackItems
+    .filter((f) => f.action === 'applied' && f.jobs)
+    .map((f) => `- Applied to "${f.jobs!.title}" at ${f.jobs!.company}${f.reason ? ` — liked: ${f.reason}` : ''}`)
     .join('\n')
 
   return `
@@ -68,14 +76,23 @@ export async function getLearnedSignals(supabase: SupabaseClient, userId: string
 
   if (!signals?.length) return ''
 
-  const positive = signals
-    .filter((s: any) => s.outcome === 'positive')
-    .map((s: any) => `- ${s.signal_type}: "${s.signal_value}" (strength: ${s.weight.toFixed(1)})`)
+  interface LearnedSignal {
+    signal_type: string
+    signal_value: string
+    weight: number
+    outcome: string
+  }
+
+  const signalItems = signals as unknown as LearnedSignal[]
+
+  const positive = signalItems
+    .filter((s) => s.outcome === 'positive')
+    .map((s) => `- ${s.signal_type}: "${s.signal_value}" (strength: ${s.weight.toFixed(1)})`)
     .join('\n')
 
-  const negative = signals
-    .filter((s: any) => s.outcome === 'negative')
-    .map((s: any) => `- ${s.signal_type}: "${s.signal_value}" (strength: ${s.weight.toFixed(1)})`)
+  const negative = signalItems
+    .filter((s) => s.outcome === 'negative')
+    .map((s) => `- ${s.signal_type}: "${s.signal_value}" (strength: ${s.weight.toFixed(1)})`)
     .join('\n')
 
   return `

@@ -2,8 +2,9 @@ import { createClient } from '@/lib/supabase/server'
 import { generateContent } from '@/lib/groq'
 import { NextResponse } from 'next/server'
 import { getUserProfile } from '@/lib/profile'
+import { SupabaseClient } from '@supabase/supabase-js'
 
-async function getUserPreferences(supabase: any, userId: string): Promise<{
+async function getUserPreferences(supabase: SupabaseClient, userId: string): Promise<{
   tone: string, length: string, context: string
 }> {
   const { data } = await supabase
@@ -19,7 +20,7 @@ async function getUserPreferences(supabase: any, userId: string): Promise<{
   }
 }
 
-async function getSuccessfulPatterns(supabase: any, userId: string): Promise<string> {
+async function getSuccessfulPatterns(supabase: SupabaseClient, userId: string): Promise<string> {
   const { data: patterns } = await supabase
     .from('cover_letter_patterns')
     .select('pattern, job_title, company')
@@ -30,9 +31,17 @@ async function getSuccessfulPatterns(supabase: any, userId: string): Promise<str
 
   if (!patterns?.length) return ''
 
+  interface Pattern {
+    pattern: string
+    job_title: string
+    company: string
+  }
+
+  const patternItems = patterns as unknown as Pattern[]
+
   return `
 PATTERNS FROM YOUR SUCCESSFUL COVER LETTERS (that led to interviews):
-${patterns.map((p: any) => `- ${p.pattern} (worked for ${p.job_title} at ${p.company})`).join('\n')}
+${patternItems.map((p) => `- ${p.pattern} (worked for ${p.job_title} at ${p.company})`).join('\n')}
 
 Incorporate these patterns naturally into this cover letter.
   `.trim()
@@ -154,7 +163,8 @@ STRICT RULES:
       }
     })
 
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err)
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

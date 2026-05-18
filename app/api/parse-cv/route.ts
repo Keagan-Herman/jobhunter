@@ -13,8 +13,8 @@ function cleanPdfText(text: string): string {
     .trim()
 }
 
-function coerceToArray(value: any): string[] {
-  if (Array.isArray(value)) return value.filter(Boolean)
+function coerceToArray(value: unknown): string[] {
+  if (Array.isArray(value)) return value.filter((v): v is string => typeof v === 'string').filter(Boolean)
   if (typeof value === 'string') return value.split(',').map(s => s.trim()).filter(Boolean)
   return []
 }
@@ -25,8 +25,24 @@ export async function POST(request: Request) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
+      const { isDev } = await import('@/lib/auth-mock')
+      if (isDev) {
+        // Use mock user for dev
+        return await handleParseCV(request)
+      }
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+
+    return await handleParseCV(request)
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err)
+    console.error('Error in POST /api/parse-cv:', message)
+    return NextResponse.json({ error: message }, { status: 500 })
+  }
+}
+
+async function handleParseCV(request: Request) {
+  try {
 
     const formData = await request.formData()
     const file = formData.get('cv') as File
@@ -53,7 +69,7 @@ export async function POST(request: Request) {
         'PDF parsing'
       )
       text = cleanPdfText(extracted).slice(0, 5000)
-    } catch (err: any) {
+    } catch {
       return NextResponse.json({
         error: 'Failed to read PDF — make sure the file is not corrupted or password protected'
       }, { status: 400 })
@@ -116,7 +132,8 @@ If any field is not found, use an empty string or empty array.
 
     return NextResponse.json({ success: true, profile: safeProfile })
 
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err)
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

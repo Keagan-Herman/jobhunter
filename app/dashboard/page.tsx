@@ -9,32 +9,7 @@ import { SkeletonRow } from '@/components/dashboard/Skeleton'
 import { DetailPanel } from '@/components/dashboard/DetailPanel'
 import { SkipModal } from '@/components/dashboard/SkipModal'
 
-type Job = {
-    id: string
-    title: string
-    company: string
-    location: string
-    description: string
-    salary_min: number | null
-    salary_max: number | null
-    url: string
-    stack: string[]
-    score: number
-    score_reason: string
-    status: 'pending' | 'applied' | 'skipped' | 'interviewing'
-    fetched_at: string
-    cover_letter?: string
-    cover_letter_id?: string
-    notes?: string
-    interview_date?: string
-    contact_name?: string
-    contact_email?: string
-    offer_amount?: number
-    follow_up_date?: string
-    seniority?: string
-    work_style?: string
-    stack_overlap?: number
-}
+import { Job } from '@/types'
 
 export default function DashboardPage() {
     // ── State ────────────────────────────────────────────────────────
@@ -45,8 +20,8 @@ export default function DashboardPage() {
     const [generating, setGenerating] = useState(false)
     const [activeTab, setActiveTab] = useState<'pending' | 'applied' | 'interviewing' | 'skipped'>('pending')
     const [scanResult, setScanResult] = useState('')
-    const [user, setUser] = useState<any>(null)
-    const [profile, setProfile] = useState<any>(null)
+    const [, setUser] = useState<unknown>(null)
+    const [profile, setProfile] = useState<import('@/types').Profile | null>(null)
     const [error, setError] = useState('')
     const [firstTime, setFirstTime] = useState(false)
 
@@ -74,8 +49,8 @@ export default function DashboardPage() {
                 .order('score', { ascending: false })
 
             if (error) throw error
-            if (data) setJobs(data as Job[])
-        } catch (err: any) {
+            if (data) setJobs(data as unknown as Job[])
+        } catch {
             setError('Failed to load jobs. Please refresh.')
         } finally {
             setLoading(false)
@@ -91,7 +66,7 @@ export default function DashboardPage() {
             else {
                 setUser(user)
                 supabase.from('profiles').select('*').eq('id', user.id).single().then(({ data }) => {
-                    setProfile(data)
+                    setProfile(data as unknown as import('@/types').Profile)
                 })
             }
         })
@@ -188,7 +163,7 @@ export default function DashboardPage() {
         }
     }
 
-    const handleSaveTracking = async (trackingData: any) => {
+    const handleSaveTracking = async (trackingData: Partial<Job>) => {
         if (!selected) return
         const { error } = await supabase
             .from('jobs')
@@ -300,7 +275,7 @@ export default function DashboardPage() {
                     {error && (
                         <div className="bg-[#ff6b6b10] border border-[#ff6b6b30] rounded-xl p-4 flex justify-between items-center animate-in slide-in-from-top-2">
                             <span className="text-[#ff6b6b] text-sm font-mono">{error}</span>
-                            <button onClick={() => { setError(''); fetchJobs() }} className="text-[#ff6b6b] text-sm font-mono hover:underline">Retry →</button>
+                            <button onClick={() => { setError(''); fetchJobs() }} className="text-[#ff6b6b] text-sm font-mono hover:underline">Retry &rarr;</button>
                         </div>
                     )}
                     {scanResult && (
@@ -319,7 +294,7 @@ export default function DashboardPage() {
                 {firstTime && (
                     <div className="bg-[#00ff8710] border border-[#00ff8730] rounded-2xl p-6 mb-8 flex flex-col md:flex-row items-center justify-between gap-6">
                         <div>
-                            <div className="font-bold text-lg text-[#00ff87] mb-1">🎉 You're all set!</div>
+                            <div className="font-bold text-lg text-[#00ff87] mb-1">🎉 You&apos;re all set!</div>
                             <div className="text-sm text-[#888]">Run your first scan to find jobs matching your profile</div>
                         </div>
                         <button onClick={() => { setFirstTime(false); handleScan() }}

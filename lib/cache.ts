@@ -1,4 +1,3 @@
-import { createClient } from '@/lib/supabase/server'
 import { SupabaseClient } from '@supabase/supabase-js'
 
 export const scoreCache = {
@@ -22,7 +21,7 @@ export const scoreCache = {
     return null
   },
 
-  async set(supabase: SupabaseClient, key: string, value: any) {
+  async set() {
     // In our case, the score is already being saved to the jobs table during the scan loop.
     // So 'set' is implicitly handled by the insert.
     // However, if we wanted a separate cache table:

@@ -1,11 +1,12 @@
 import { createClient } from '@/lib/supabase/server'
 import { generateContent } from '@/lib/groq'
 import { NextResponse } from 'next/server'
+import { SupabaseClient } from '@supabase/supabase-js'
 
 async function updateLearnedSignals(
-  supabase: any,
+  supabase: SupabaseClient,
   userId: string,
-  job: any,
+  job: { stack: string[] | null, seniority: string | null, work_style: string | null },
   outcome: 'positive' | 'negative'
 ) {
   const signals = [
@@ -132,7 +133,8 @@ Return ONLY valid JSON:
     }
 
     return NextResponse.json({ success: true })
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err)
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

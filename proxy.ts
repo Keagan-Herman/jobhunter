@@ -1,12 +1,12 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://dummy.supabase.co',
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'dummy-key',
     {
       cookies: {
         getAll() { return request.cookies.getAll() },
@@ -25,7 +25,18 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  const isAuth = !!user
+  let currentUser = user
+  // Dev mode mock bypass
+  if (!currentUser && process.env.NODE_ENV === 'development') {
+    try {
+      const { isDev, mockUser } = await import('@/lib/auth-mock')
+      if (isDev) currentUser = mockUser
+    } catch {
+      // ignore
+    }
+  }
+
+  const isAuth = !!currentUser
   const path = request.nextUrl.pathname
 
   // Not logged in — send to login

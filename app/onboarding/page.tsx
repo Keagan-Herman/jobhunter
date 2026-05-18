@@ -57,6 +57,7 @@ export default function OnboardingPage() {
       if (data) router.push('/dashboard')
     }
     check()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleImportCV = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -160,7 +161,7 @@ export default function OnboardingPage() {
                 }}>
                   {step > i + 1 ? '✓' : i + 1}
                 </div>
-                <span style={{ fontSize: '10px', color: step === i + 1 ? '#00ff87' : '#333', fontFamily: "'DM Mono', monospace' " }}>
+                <span style={{ fontSize: '10px', color: step === i + 1 ? '#00ff87' : '#333', fontFamily: "'DM Mono', monospace" }}>
                   {label}
                 </span>
               </div>
@@ -181,7 +182,7 @@ export default function OnboardingPage() {
             borderRadius: '14px', padding: '32px'
           }}>
             <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: '22px', fontWeight: '800', color: '#fff', marginBottom: '8px' }}>
-              Welcome! Let's get you set up 👋
+              Welcome! Let&apos;s get you set up {"\uD83D\uDC4B"}
             </h2>
             <p style={{ color: '#555', fontSize: '13px', lineHeight: 1.7, marginBottom: '28px' }}>
               JobHunter automatically finds and scores jobs based on your profile, then generates tailored cover letters. Takes about 2 minutes to set up.
@@ -233,7 +234,7 @@ export default function OnboardingPage() {
                 cursor: 'pointer', textTransform: 'uppercase' as const
               }}
             >
-              Fill in manually →
+              Fill in manually &rarr;
             </button>
           </div>
         )}
@@ -275,7 +276,7 @@ export default function OnboardingPage() {
             <div style={{ marginBottom: '16px' }}>
               <label style={labelStyle}>Experience Summary</label>
               <textarea
-                style={{ ...inputStyle, resize: 'vertical', lineHeight: '1.6' } as any}
+                style={{ ...inputStyle, resize: 'vertical', lineHeight: '1.6' } as React.CSSProperties}
                 value={experience}
                 onChange={e => setExperience(e.target.value)}
                 placeholder="Brief summary of your work experience..."
@@ -285,10 +286,10 @@ export default function OnboardingPage() {
             <div style={{ marginBottom: '24px' }}>
               <label style={labelStyle}>Notable Projects</label>
               <textarea
-                style={{ ...inputStyle, resize: 'vertical', lineHeight: '1.6' } as any}
+                style={{ ...inputStyle, resize: 'vertical', lineHeight: '1.6' } as React.CSSProperties}
                 value={projects}
                 onChange={e => setProjects(e.target.value)}
-                placeholder="Projects you've built or contributed to..."
+                placeholder="Projects you&apos;ve built or contributed to&hellip;"
                 rows={2}
               />
             </div>
@@ -317,7 +318,7 @@ export default function OnboardingPage() {
                   textTransform: 'uppercase' as const
                 }}
               >
-                Next → Preferences
+                Next &rarr; Preferences
               </button>
             </div>
           </div>
@@ -339,7 +340,7 @@ export default function OnboardingPage() {
             <div style={{ marginBottom: '16px' }}>
               <label style={labelStyle}>Search Keywords</label>
               <div style={{ fontSize: '11px', color: '#444', marginBottom: '6px', fontStyle: 'italic' }}>
-                Comma separated — what to search for
+                Comma separated &mdash; what to search for
               </div>
               <input
                 style={inputStyle}
@@ -356,7 +357,7 @@ export default function OnboardingPage() {
                 onChange={e => setCountry(e.target.value)}
                 style={{
                   ...inputStyle, cursor: 'pointer',
-                  appearance: 'none' as any
+                  appearance: 'none' as React.CSSProperties['appearance']
                 }}
               >
                 <option value="za">🇿🇦 South Africa</option>
@@ -373,7 +374,7 @@ export default function OnboardingPage() {
             <div style={{ marginBottom: '16px' }}>
               <label style={labelStyle}>Minimum Salary</label>
               <div style={{ fontSize: '11px', color: '#444', marginBottom: '6px', fontStyle: 'italic' }}>
-                In your local currency — leave blank to see all
+                In your local currency &mdash; leave blank to see all
               </div>
               <input
                 style={inputStyle}
