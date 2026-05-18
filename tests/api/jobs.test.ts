@@ -24,6 +24,9 @@ describe('GET /api/jobs', () => {
     jest.clearAllMocks()
 
     mockSupabase = {
+      auth: {
+        getUser: jest.fn().mockResolvedValue({ data: { user: { id: 'dev-user' } }, error: null })
+      },
       from: jest.fn().mockReturnThis(),
       select: jest.fn().mockReturnThis(),
       eq: jest.fn().mockReturnThis(),

@@ -14,6 +14,13 @@ import {
   getCountryName
 } from '@/lib/profile'
 
+interface ScoreResult {
+  score: number
+  reason: string
+  stack: string[]
+  score_is_fallback: boolean
+}
+
 async function scoreJob(
   title: string,
   description: string,
@@ -25,7 +32,7 @@ async function scoreJob(
   salaryMin: number | null,
   jobSalaryMin: number | null,
   remoteOnly: boolean
-): Promise<{ score: number, reason: string, score_is_fallback?: boolean }> {
+): Promise<ScoreResult> {
   try {
     const seniority = detectSeniority(title)
     const workStyle = detectWorkStyle(description)
@@ -33,10 +40,10 @@ async function scoreJob(
 
     // Pre-filter obvious mismatches before hitting AI
     if (remoteOnly && workStyle === 'on-site') {
-      return { score: 20, reason: 'On-site only — conflicts with remote preference' }
+      return { score: 20, reason: 'On-site only — conflicts with remote preference', stack, score_is_fallback: false }
     }
     if (salaryMin && jobSalaryMin && jobSalaryMin < salaryMin * 0.8) {
-      return { score: 25, reason: 'Salary below minimum preference' }
+      return { score: 25, reason: 'Salary below minimum preference', stack, score_is_fallback: false }
     }
 
     const prompt = `
@@ -80,10 +87,27 @@ Respond ONLY with valid JSON, no markdown:
         stack: result.stack || stack,
         score_is_fallback: false
     }
-  } catch (err: any) {
-    console.log('GROQ ERROR:', err.message?.slice(0, 80))
-    return { score: 50, reason: 'Scoring unavailable — saved for manual review', score_is_fallback: true }
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err)
+    console.log('GROQ ERROR:', message.slice(0, 80))
+    return {
+      score: 50,
+      reason: 'Scoring unavailable — saved for manual review',
+      stack: stack,
+      score_is_fallback: true
+    }
   }
+}
+
+interface AdzunaJob {
+  id: string
+  title: string
+  company: { display_name: string }
+  location: { display_name: string }
+  description: string
+  salary_min: number | null
+  salary_max: number | null
+  redirect_url: string
 }
 
 // ✅ Fetch Adzuna for a single term
@@ -92,7 +116,7 @@ async function fetchAdzunaJobs(
   country: string,
   remoteOnly: boolean,
   salaryMin: number | null
-): Promise<any[]> {
+): Promise<AdzunaJob[]> {
   try {
     const url = new URL(`https://api.adzuna.com/v1/api/jobs/${country}/search/1`)
     url.searchParams.set('app_id', process.env.ADZUNA_APP_ID!)
@@ -105,10 +129,23 @@ async function fetchAdzunaJobs(
     const res = await withTimeout(fetch(url.toString()), 10000, `Adzuna: ${term}`)
     const data = await res.json()
     return data.results || []
-  } catch (err: any) {
-    console.log(`[ADZUNA] Failed for "${term}": ${err.message}`)
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err)
+    console.log(`[ADZUNA] Failed for "${term}": ${message}`)
     return []
   }
+}
+
+interface JSearchJob {
+  job_id: string
+  job_title: string
+  employer_name: string
+  job_city?: string
+  job_country?: string
+  job_description: string
+  job_min_salary: number | null
+  job_max_salary: number | null
+  job_apply_link: string
 }
 
 // ✅ Fetch JSearch for a single term
@@ -116,7 +153,7 @@ async function fetchJSearchTerm(
   term: string,
   country: string,
   remoteOnly: boolean
-): Promise<any[]> {
+): Promise<AdzunaJob[]> {
   try {
     const query = remoteOnly ? `${term} remote` : term
     const url = new URL('https://jsearch.p.rapidapi.com/search')
@@ -136,7 +173,7 @@ async function fetchJSearchTerm(
       `JSearch: ${term}`
     )
     const data = await res.json()
-    return (data.data || []).map((job: any) => ({
+    return (data.data || []).map((job: JSearchJob) => ({
       id: `jsearch_${job.job_id}`,
       title: job.job_title,
       company: { display_name: job.employer_name },
@@ -147,7 +184,7 @@ async function fetchJSearchTerm(
       redirect_url: job.job_apply_link,
       source: 'jsearch'
     }))
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.log(`[JSEARCH] Failed for "${term}": ${err.message}`)
     return []
   }
@@ -192,10 +229,10 @@ export async function GET() {
       // ✅ All Adzuna + JSearch terms run in parallel
       ...searchTerms.map(term => fetchAdzunaJobs(term, country, remoteOnly, salaryMin)),
       ...searchTerms.slice(0, 2).map(term => fetchJSearchTerm(term, country, remoteOnly))
-    ])
+    ]) as [string, string, ...AdzunaJob[][]]
 
     // ✅ Merge all results and deduplicate by ID
-    const allResults = jobResults.flat()
+    const allResults = jobResults.flat() as AdzunaJob[]
     const seen = new Set<string>()
     const uniqueResults = allResults.filter(job => {
       const id = String(job.id)
@@ -221,7 +258,7 @@ export async function GET() {
 
     let newJobs = 0
     let scored = 0
-    const jobsToInsert: any[] = []
+    const jobsToInsert: Record<string, unknown>[] = []
 
     for (const job of resultsToScore) {
       const externalId = String(job.id)
@@ -232,7 +269,7 @@ export async function GET() {
 
       // ✅ Check cache before hitting AI
       const cacheKey = `${externalId}_${user.id}`
-      let scoreResult = await scoreCache.get(supabase, cacheKey)
+      let scoreResult: ScoreResult | null = await scoreCache.get(supabase, cacheKey)
 
       if (!scoreResult) {
         scoreResult = await scoreJob(
@@ -284,12 +321,13 @@ export async function GET() {
     await supabase.from('profiles').update({ last_scan_at: new Date().toISOString() }).eq('id', user.id)
 
     // ✅ Scan log counts all sources
-    await supabase.from('scan_logs').insert({
+    const scanLog: Record<string, unknown> = {
       jobs_found: uniqueResults.length,
       jobs_new: newJobs,
       jobs_scored: scored,
       status: 'success'
-    })
+    }
+    await supabase.from('scan_logs').insert(scanLog)
 
     return NextResponse.json({
       success: true,
@@ -299,7 +337,8 @@ export async function GET() {
       scored
     })
 
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err)
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

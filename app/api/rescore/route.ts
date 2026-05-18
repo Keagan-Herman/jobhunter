@@ -3,7 +3,7 @@ import { generateContent } from '@/lib/groq'
 import { NextResponse } from 'next/server'
 import { getUserProfile, getUserFeedbackContext } from '@/lib/profile'
 
-export async function POST(request: Request) {
+export async function POST() {
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -55,8 +55,9 @@ Respond ONLY with valid JSON, no markdown:
 
         console.log(`RESCORED: ${job.title} — ${score}`)
         rescored++
-      } catch (err: any) {
-        console.log(`RESCORE FAILED: ${job.title} — ${err.message?.slice(0, 50)}`)
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err)
+        console.log(`RESCORE FAILED: ${job.title} — ${message.slice(0, 50)}`)
       }
     }
 
@@ -66,7 +67,8 @@ Respond ONLY with valid JSON, no markdown:
       remaining: jobs.length - rescored
     })
 
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err)
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

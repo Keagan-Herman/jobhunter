@@ -3,7 +3,7 @@ import { withRetry } from './retry'
 import { withTimeout } from './timeout'
 
 const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY!
+  apiKey: process.env.GROQ_API_KEY || 'dummy-key-for-build'
 })
 
 export async function generateContent(prompt: string): Promise<string> {

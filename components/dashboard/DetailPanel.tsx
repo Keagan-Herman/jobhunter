@@ -29,7 +29,7 @@ export function DetailPanel({
   generating: boolean
   onCoverLetterOutcome: (outcome: string) => void
 }) {
-  const [coverLetter, setCoverLetter] = useState(job.cover_letter || '')
+  const [coverLetter] = useState(job.cover_letter || '')
   const [copied, setCopied] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)

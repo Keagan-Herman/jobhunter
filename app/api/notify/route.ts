@@ -102,16 +102,18 @@ export async function GET(request: Request) {
 
         notified++
 
-      } catch (userErr: any) {
+      } catch (userErr: unknown) {
         // ✅ Per-user error handling — one failure doesn't kill the rest
-        console.log(`[NOTIFY] Failed for ${profile.email}: ${userErr.message}`)
+        const message = userErr instanceof Error ? userErr.message : String(userErr)
+        console.log(`[NOTIFY] Failed for ${profile.email}: ${message}`)
         errors++
       }
     }
 
     return NextResponse.json({ success: true, notified, errors })
 
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err)
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

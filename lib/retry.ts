@@ -4,14 +4,15 @@ export async function withRetry<T>(
   delayMs: number = 1000,
   label: string = 'operation'
 ): Promise<T> {
-  let lastError: any
+  let lastError: Error | unknown
 
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       return await fn()
-    } catch (err: any) {
+    } catch (err: unknown) {
       lastError = err
-      console.log(`[RETRY] ${label} failed (attempt ${attempt}/${retries}): ${err.message?.slice(0, 80)}`)
+      const message = err instanceof Error ? err.message : String(err)
+      console.log(`[RETRY] ${label} failed (attempt ${attempt}/${retries}): ${message.slice(0, 80)}`)
       if (attempt < retries) {
         await new Promise(r => setTimeout(r, delayMs * attempt)) // exponential backoff
       }

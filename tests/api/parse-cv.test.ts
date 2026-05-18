@@ -22,6 +22,9 @@ describe('POST /api/parse-cv', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabase = {
+      auth: {
+        getUser: jest.fn().mockResolvedValue({ data: { user: { id: 'dev-user' } }, error: null })
+      },
       from: jest.fn().mockReturnThis(),
       update: jest.fn().mockReturnThis(),
       eq: jest.fn().mockImplementation(() => Promise.resolve({ data: [], error: null }))

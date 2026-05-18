@@ -68,6 +68,7 @@ setCareerContext(data.career_context || 'experienced')
       setLoading(false)
     }
     load()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleImportCV = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -248,14 +249,14 @@ career_context: careerContext,
 
           <div style={{ marginBottom: '20px' }}>
             <label style={labelStyle}>Skills</label>
-            <div style={{ fontSize: '11px', color: '#444', marginBottom: '6px', fontStyle: 'italic' }}>Comma separated — used to match and score jobs</div>
+            <div style={{ fontSize: '11px', color: '#444', marginBottom: '6px', fontStyle: 'italic' }}>Comma separated &mdash; used to match and score jobs</div>
             <input style={inputStyle} value={skills} onChange={e => setSkills(e.target.value)} placeholder="TypeScript, JavaScript, C#, Flutter, Kotlin, React, PostgreSQL" />
           </div>
 
           <div style={{ marginBottom: '20px' }}>
             <label style={labelStyle}>Experience</label>
             <textarea
-              style={{ ...inputStyle, resize: 'vertical', lineHeight: '1.6' } as any}
+              style={{ ...inputStyle, resize: 'vertical', lineHeight: '1.6' } as React.CSSProperties}
               value={experience}
               onChange={e => setExperience(e.target.value)}
               placeholder="2 years building web and mobile apps. Lead developer on Nevada LMS and Webroute systems..."
@@ -266,7 +267,7 @@ career_context: careerContext,
           <div style={{ marginBottom: '24px' }}>
             <label style={labelStyle}>Projects</label>
             <textarea
-              style={{ ...inputStyle, resize: 'vertical', lineHeight: '1.6' } as any}
+              style={{ ...inputStyle, resize: 'vertical', lineHeight: '1.6' } as React.CSSProperties}
               value={projects}
               onChange={e => setProjects(e.target.value)}
               placeholder="Fleet tracking app for trucks, Fitness tracking mobile app"
@@ -276,7 +277,7 @@ career_context: careerContext,
           <div style={{ marginBottom: '24px' }}>
             <label style={labelStyle}>Job Search Keywords</label>
             <div style={{ fontSize: '11px', color: '#444', marginBottom: '6px', fontStyle: 'italic' }}>
-              Comma separated — used to search for jobs e.g. "typescript developer, C# developer, flutter developer"
+              Comma separated &mdash; used to search for jobs e.g. &quot;typescript developer, C# developer, flutter developer&quot;
             </div>
             <input
               style={inputStyle}
