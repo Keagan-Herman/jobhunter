@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server'
-import { mockUser, isDev } from '@/lib/auth-mock'
 import { generateContent } from '@/lib/groq'
 import { NextResponse } from 'next/server'
 import { getUserProfile, getUserFeedbackContext } from '@/lib/profile'
@@ -7,14 +6,8 @@ import { getUserProfile, getUserFeedbackContext } from '@/lib/profile'
 export async function POST(request: Request) {
   try {
     const supabase = await createClient()
-    let user;
-    if (isDev) {
-        user = mockUser
-    } else {
-        const { data: { user: authUser } } = await supabase.auth.getUser()
-        if (!authUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-        user = authUser
-    }
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     // Find all jobs with broken scores
     const { data: jobs } = await supabase

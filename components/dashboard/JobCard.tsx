@@ -1,5 +1,18 @@
 import { ScoreBadge, StatusBadge } from './Badges'
-import { Job } from '@/types'
+
+type Job = {
+  id: string
+  title: string
+  company: string
+  location: string
+  stack: string[]
+  score: number
+  score_reason: string
+  status: string
+  seniority?: string
+  work_style?: string
+  stack_overlap?: number
+}
 
 export function JobCard({
   job,
@@ -23,9 +36,9 @@ export function JobCard({
       <div className="flex justify-between items-start mb-1.5">
         <div className="flex-1 mr-2.5">
           <div className="font-semibold text-sm text-[#e0e0f0] mb-0.5">{job.title}</div>
-          <div className="text-xs text-[#555]">{job.company} · {job.location || 'Unknown'}</div>
+          <div className="text-xs text-[#555]">{job.company} · {job.location}</div>
         </div>
-        <ScoreBadge score={job.score || 0} />
+        <ScoreBadge score={job.score} />
       </div>
 
       <div className="flex gap-1.5 flex-wrap mt-2">
@@ -47,7 +60,7 @@ export function JobCard({
             {job.work_style}
           </span>
         )}
-        {job.stack_overlap !== undefined && job.stack_overlap !== null && job.stack_overlap > 0 && (
+        {job.stack_overlap !== undefined && job.stack_overlap > 0 && (
           <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#2a1a1a] text-[#ffd60a] font-mono">
             {job.stack_overlap}% match
           </span>
