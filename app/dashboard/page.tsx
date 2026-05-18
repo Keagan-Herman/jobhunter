@@ -3,13 +3,38 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { mockUser, isDev } from '@/lib/auth-mock'
 import { StatsGrid } from '@/components/dashboard/StatsGrid'
 import { JobCard } from '@/components/dashboard/JobCard'
 import { SkeletonRow } from '@/components/dashboard/Skeleton'
 import { DetailPanel } from '@/components/dashboard/DetailPanel'
 import { SkipModal } from '@/components/dashboard/SkipModal'
-import { Job } from '@/types'
+
+type Job = {
+    id: string
+    title: string
+    company: string
+    location: string
+    description: string
+    salary_min: number | null
+    salary_max: number | null
+    url: string
+    stack: string[]
+    score: number
+    score_reason: string
+    status: 'pending' | 'applied' | 'skipped' | 'interviewing'
+    fetched_at: string
+    cover_letter?: string
+    cover_letter_id?: string
+    notes?: string
+    interview_date?: string
+    contact_name?: string
+    contact_email?: string
+    offer_amount?: number
+    follow_up_date?: string
+    seniority?: string
+    work_style?: string
+    stack_overlap?: number
+}
 
 export default function DashboardPage() {
     // ── State ────────────────────────────────────────────────────────
@@ -49,7 +74,7 @@ export default function DashboardPage() {
                 .order('score', { ascending: false })
 
             if (error) throw error
-            if (data) setJobs(data as unknown as Job[])
+            if (data) setJobs(data as Job[])
         } catch (err: any) {
             setError('Failed to load jobs. Please refresh.')
         } finally {
@@ -61,43 +86,16 @@ export default function DashboardPage() {
         if (typeof window !== 'undefined' && window.location.search.includes('firstTime=true')) {
             setFirstTime(true)
         }
-
-        if (isDev) {
-            // Mocking auth for dev
-            const user = mockUser
-            setUser(user)
-
-            const ensureProfile = async () => {
-                const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-                if (error || !data) {
-                    // Create a basic profile if it doesn't exist for the mock user
-                    const { data: newProfile } = await supabase.from('profiles').insert({
-                        id: user.id,
-                        full_name: 'Dev User',
-                        job_title: 'Software Engineer',
-                        skills: ['React', 'Next.js', 'TypeScript'],
-                        search_terms: ['software engineer']
-                    }).select().single()
-                    setProfile(newProfile)
-                } else {
+        supabase.auth.getUser().then(({ data: { user } }) => {
+            if (!user) router.push('/login')
+            else {
+                setUser(user)
+                supabase.from('profiles').select('*').eq('id', user.id).single().then(({ data }) => {
                     setProfile(data)
-                }
+                })
             }
-
-            ensureProfile()
-            fetchJobs()
-        } else {
-            supabase.auth.getUser().then(({ data: { user } }) => {
-                if (!user) router.push('/login')
-                else {
-                    setUser(user)
-                    supabase.from('profiles').select('*').eq('id', user.id).single().then(({ data }) => {
-                        setProfile(data)
-                    })
-                }
-            })
-            fetchJobs()
-        }
+        })
+        fetchJobs()
     }, [supabase, router, fetchJobs])
 
     // Auto-dismiss results
@@ -238,12 +236,8 @@ export default function DashboardPage() {
     }
 
     const handleSignOut = async () => {
-        if (isDev) {
-            router.push('/login')
-        } else {
-            await supabase.auth.signOut()
-            router.push('/login')
-        }
+        await supabase.auth.signOut()
+        router.push('/login')
     }
 
     // ── Derived state ─────────────────────────────────────────────────

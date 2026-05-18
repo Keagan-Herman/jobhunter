@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { mockUser, isDev } from '@/lib/auth-mock'
 
 const inputStyle = {
   width: '100%', background: '#0a0a1a',
@@ -45,14 +44,8 @@ export default function OnboardingPage() {
 
   useEffect(() => {
     const check = async () => {
-      let user;
-      if (isDev) {
-        user = mockUser
-      } else {
-        const { data: { user: authUser } } = await supabase.auth.getUser()
-        if (!authUser) { router.push('/login'); return }
-        user = authUser
-      }
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { router.push('/login'); return }
 
       // If profile already exists skip onboarding
       const { data } = await supabase
@@ -101,14 +94,8 @@ export default function OnboardingPage() {
 
   const handleSave = async () => {
     setSaving(true)
-    let user;
-    if (isDev) {
-        user = mockUser
-    } else {
-        const { data: { user: authUser } } = await supabase.auth.getUser()
-        if (!authUser) return
-        user = authUser
-    }
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
 
     await supabase.from('profiles').upsert({
       id: user.id,
