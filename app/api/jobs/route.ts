@@ -185,7 +185,8 @@ async function fetchJSearchTerm(
       source: 'jsearch'
     }))
   } catch (err: unknown) {
-    console.log(`[JSEARCH] Failed for "${term}": ${err.message}`)
+    const message = err instanceof Error ? err.message : String(err)
+    console.log(`[JSEARCH] Failed for "${term}": ${message}`)
     return []
   }
 }

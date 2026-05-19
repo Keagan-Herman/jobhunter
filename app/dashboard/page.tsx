@@ -169,11 +169,11 @@ export default function DashboardPage() {
             .from('jobs')
             .update({
                 notes: trackingData.notes || null,
-                interview_date: trackingData.interviewDate || null,
-                contact_name: trackingData.contactName || null,
-                contact_email: trackingData.contactEmail || null,
-                offer_amount: trackingData.offerAmount || null,
-                follow_up_date: trackingData.followUpDate || null,
+                interview_date: trackingData.interview_date || null,
+                contact_name: trackingData.contact_name || null,
+                contact_email: trackingData.contact_email || null,
+                offer_amount: trackingData.offer_amount || null,
+                follow_up_date: trackingData.follow_up_date || null,
             })
             .eq('id', selected.id)
 
@@ -361,7 +361,7 @@ export default function DashboardPage() {
                     {selected && (
                         <DetailPanel
                             job={selected}
-                            country={profile?.country}
+                            country={profile?.country ?? undefined}
                             generating={generating}
                             onClose={() => setSelected(null)}
                             onGenerateCoverLetter={handleGenerateCoverLetter}
