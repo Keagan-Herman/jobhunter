@@ -30,7 +30,7 @@ export async function proxy(request: NextRequest) {
   if (!currentUser && process.env.NODE_ENV === 'development') {
     try {
       const { isDev, mockUser } = await import('@/lib/auth-mock')
-      if (isDev) currentUser = mockUser
+      if (isDev) currentUser = mockUser as any
     } catch {
       // ignore
     }
