@@ -19,6 +19,8 @@ interface ScoreResult {
   reason: string
   stack: string[]
   score_is_fallback: boolean
+  culture_fit?: string
+  interview_prep?: string
 }
 
 async function scoreJob(
@@ -75,8 +77,18 @@ SCORING GUIDE:
 Consider stack overlap (${stackOverlap}%) heavily in your score.
 Use past behaviour to calibrate further.
 
+Also provide:
+1. Culture Fit: A 1-2 sentence analysis of how well the candidate fits the likely company culture based on the description.
+2. Interview Prep: 2 specific, technical bullet points the candidate should focus on for this specific role.
+
 Respond ONLY with valid JSON, no markdown:
-{"score": <0-100>, "reason": "<one punchy sentence explaining the score>", "stack": ["extracted", "tech", "stack"]}
+{
+  "score": <0-100>,
+  "reason": "<one punchy sentence explaining the score>",
+  "stack": ["extracted", "tech", "stack"],
+  "culture_fit": "<analysis>",
+  "interview_prep": "<bullet points>"
+}
 `
     const text = await generateContent(prompt)
     const clean = text.replace(/```json|```/g, '').trim()
@@ -85,6 +97,8 @@ Respond ONLY with valid JSON, no markdown:
         score: result.score,
         reason: result.reason,
         stack: result.stack || stack,
+        culture_fit: result.culture_fit,
+        interview_prep: result.interview_prep,
         score_is_fallback: false
     }
   } catch (err: unknown) {
@@ -287,7 +301,7 @@ export async function GET() {
         )
       }
 
-      const { score, reason, score_is_fallback, stack: aiStack } = scoreResult
+      const { score, reason, score_is_fallback, stack: aiStack, culture_fit, interview_prep } = scoreResult
 
       jobsToInsert.push({
         user_id: user.id,
@@ -303,8 +317,10 @@ export async function GET() {
         score,
         score_reason: reason,
         score_is_fallback: score_is_fallback || false,
+        culture_fit,
+        interview_prep,
         status: 'pending',
-        source: (job as any).source || 'adzuna',
+        source: (job as AdzunaJob & { source?: string }).source || 'adzuna',
         seniority: detectSeniority(job.title),
         work_style: detectWorkStyle(description),
         stack_overlap: calculateStackOverlap(stack, userSkills)

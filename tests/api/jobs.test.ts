@@ -18,7 +18,7 @@ jest.mock('@/lib/cache', () => ({
 }))
 
 describe('GET /api/jobs', () => {
-  let mockSupabase: any
+  let mockSupabase: any /* eslint-disable-line @typescript-eslint/no-explicit-any */
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -33,7 +33,7 @@ describe('GET /api/jobs', () => {
       in: jest.fn().mockReturnThis(),
       update: jest.fn().mockReturnThis(),
       insert: jest.fn().mockReturnThis(),
-      single: jest.fn().mockImplementation(function(this: any) {
+      single: jest.fn().mockImplementation(function(this: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
         return Promise.resolve({ data: this._data, error: this._error })
       })
     }

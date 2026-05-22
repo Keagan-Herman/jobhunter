@@ -45,4 +45,6 @@ export type Job = {
     follow_up_date: string | null
     cover_letter?: string
     cover_letter_id?: string
+    culture_fit?: string
+    interview_prep?: string
 }

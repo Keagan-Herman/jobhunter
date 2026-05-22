@@ -16,7 +16,7 @@ const mockJob = {
   work_style: 'fully remote',
   stack_overlap: 90,
   score_reason: 'Good match'
-} as any
+} as any /* eslint-disable-line @typescript-eslint/no-explicit-any */
 
 describe('JobCard', () => {
   it('renders job details correctly', () => {

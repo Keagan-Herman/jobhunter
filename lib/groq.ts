@@ -26,3 +26,18 @@ export async function generateContent(prompt: string): Promise<string> {
     'generateContent'
   )
 }
+
+export async function* streamContent(prompt: string): AsyncGenerator<string> {
+  const stream = await groq.chat.completions.create({
+    model: 'llama-3.3-70b-versatile',
+    messages: [{ role: 'user', content: prompt }],
+    temperature: 0.3,
+    max_tokens: 800,
+    stream: true,
+  })
+
+  for await (const chunk of stream) {
+    const content = chunk.choices[0]?.delta?.content || ''
+    if (content) yield content
+  }
+}

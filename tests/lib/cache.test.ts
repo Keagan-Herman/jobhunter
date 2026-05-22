@@ -6,7 +6,7 @@ describe('scoreCache', () => {
     select: jest.fn().mockReturnThis(),
     eq: jest.fn().mockReturnThis(),
     single: jest.fn()
-  } as any
+  } as any /* eslint-disable-line @typescript-eslint/no-explicit-any */
 
   test('get returns cached data when found', async () => {
     mockSupabase.single.mockResolvedValue({

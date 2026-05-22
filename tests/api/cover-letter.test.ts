@@ -12,7 +12,7 @@ jest.mock('@/lib/auth-mock', () => ({
 }))
 
 describe('POST /api/cover-letter', () => {
-  let mockSupabase: any
+  let mockSupabase: any /* eslint-disable-line @typescript-eslint/no-explicit-any */
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -56,26 +56,38 @@ describe('POST /api/cover-letter', () => {
   })
 
   test('generates and saves cover letter', async () => {
+    mockSupabase.maybeSingle = jest.fn().mockResolvedValueOnce({ data: null })
     mockSupabase.single
       .mockResolvedValueOnce({ data: { id: 'job-123', title: 'Dev', company: 'Co' }, error: null }) // job
       .mockResolvedValueOnce({ data: { tone: 'professional' }, error: null }) // preferences
-      .mockResolvedValueOnce({ data: null, error: null }) // existing
-      .mockResolvedValueOnce({ data: { id: 'cl-123', version: 1 }, error: null }) // saved
 
     mockSupabase.limit.mockResolvedValueOnce({ data: [] }) // patterns
 
     ;(profileLib.getUserProfile as jest.Mock).mockResolvedValue({ profileText: 'My profile' })
-    ;(groq.generateContent as jest.Mock).mockResolvedValue('Generated Letter')
+
+    async function* mockStream() {
+      yield 'Generated '
+      yield 'Letter'
+    }
+    ;(groq.streamContent as jest.Mock).mockReturnValue(mockStream())
 
     const req = new Request('http://localhost/api/cover-letter', {
       method: 'POST',
       body: JSON.stringify({ jobId: 'job-123' })
     })
     const res = await POST(req)
-    const data = await res.json()
-
     expect(res.status).toBe(200)
-    expect(data.success).toBe(true)
-    expect(data.coverLetter.content).toBe('Generated Letter')
+
+    const reader = res.body?.getReader()
+    const decoder = new TextDecoder()
+    let result = ''
+    if (reader) {
+        while (true) {
+            const { done, value } = await reader.read()
+            if (done) break
+            result += decoder.decode(value)
+        }
+    }
+    expect(result).toBe('Generated Letter')
   })
 })

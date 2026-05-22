@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import type { User } from '@supabase/supabase-js'
 
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
@@ -25,12 +26,12 @@ export async function proxy(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  let currentUser = user
+  let currentUser: User | null = user
   // Dev mode mock bypass
   if (!currentUser && process.env.NODE_ENV === 'development') {
     try {
       const { isDev, mockUser } = await import('@/lib/auth-mock')
-      if (isDev) currentUser = mockUser as any
+      if (isDev) currentUser = mockUser as unknown as User
     } catch {
       // ignore
     }
