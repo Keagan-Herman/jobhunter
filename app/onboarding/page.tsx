@@ -4,20 +4,6 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
-const inputStyle = {
-  width: '100%', background: '#0a0a1a',
-  border: '1px solid #1e1e38', borderRadius: '8px',
-  padding: '12px 14px', color: '#e0e0f0', fontSize: '13px',
-  fontFamily: "'DM Sans', sans-serif", outline: 'none',
-  transition: 'border-color 0.2s'
-}
-
-const labelStyle = {
-  display: 'block', fontSize: '11px', color: '#555',
-  letterSpacing: '1.5px', textTransform: 'uppercase' as const,
-  fontFamily: "'DM Mono', monospace", marginBottom: '6px'
-}
-
 export default function OnboardingPage() {
   const [step, setStep] = useState(1)
   const [importing, setImporting] = useState(false)
@@ -90,7 +76,7 @@ export default function OnboardingPage() {
       setImportError('Failed to import CV')
     }
     setImporting(false)
-    e.target.value = ''
+    if (e.target) e.target.value = ''
   }
 
   const handleSave = async () => {
@@ -120,119 +106,78 @@ export default function OnboardingPage() {
 
   const progress = (step / 3) * 100
 
-  return (
-    <div style={{
-      minHeight: '100vh', background: '#080812',
-      fontFamily: "'DM Sans', sans-serif", color: '#e0e0f0',
-      padding: '24px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center'
-    }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=DM+Mono:wght@400;700&family=Syne:wght@800&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        input:focus, textarea:focus { border-color: #00ff87 !important; outline: none; }
-        @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-        .fade-in { animation: fadeIn 0.4s ease forwards; }
-      `}</style>
+  const inputClasses = "w-full bg-[#0a0a1a] border border-[#1e1e38] rounded-lg px-3.5 py-3 text-[#e0e0f0] text-[13px] outline-none focus:border-[#00ff87] transition-colors font-sans"
+  const labelClasses = "block text-[11px] color-[#555] tracking-[1.5px] uppercase font-mono mb-1.5"
 
-      <div style={{ width: '100%', maxWidth: '560px' }}>
+  return (
+    <div className="min-h-screen bg-[#080812] font-sans text-[#e0e0f0] px-4 py-6 flex flex-col items-center">
+      <div className="w-full max-w-[560px]">
 
         {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <h1 style={{
-            fontFamily: "'Syne', sans-serif", fontSize: '28px',
-            fontWeight: '800', color: '#fff'
-          }}>
-            Job<span style={{ color: '#00ff87' }}>Hunter</span>
+        <div className="text-center mb-8">
+          <h1 className="font-syne text-[28px] font-extrabold text-white tracking-tight">
+            Job<span className="text-[#00ff87]">Hunter</span>
           </h1>
         </div>
 
         {/* Progress bar */}
-        <div style={{ marginBottom: '32px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+        <div className="mb-8">
+          <div className="flex justify-between mb-2">
             {['Welcome', 'Your Profile', 'Preferences'].map((label, i) => (
-              <div key={label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                <div style={{
-                  width: '28px', height: '28px', borderRadius: '50%',
-                  background: step > i + 1 ? '#00ff87' : step === i + 1 ? 'transparent' : '#0d0d20',
-                  border: step === i + 1 ? '2px solid #00ff87' : step > i + 1 ? 'none' : '2px solid #1e1e38',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '11px', fontWeight: '700', color: step > i + 1 ? '#0a0a1a' : step === i + 1 ? '#00ff87' : '#333',
-                  fontFamily: "'DM Mono', monospace", transition: 'all 0.3s'
-                }}>
+              <div key={label} className="flex flex-col items-center gap-1">
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold font-mono transition-all duration-300
+                  ${step > i + 1 ? 'bg-[#00ff87] text-[#0a0a1a]' : step === i + 1 ? 'border-2 border-[#00ff87] text-[#00ff87]' : 'bg-[#0d0d20] border-2 border-[#1e1e38] text-[#333]'}`}>
                   {step > i + 1 ? '✓' : i + 1}
                 </div>
-                <span style={{ fontSize: '10px', color: step === i + 1 ? '#00ff87' : '#333', fontFamily: "'DM Mono', monospace" }}>
+                <span className={`text-[10px] font-mono ${step === i + 1 ? 'text-[#00ff87]' : 'text-[#333]'}`}>
                   {label}
                 </span>
               </div>
             ))}
           </div>
-          <div style={{ height: '2px', background: '#1e1e38', borderRadius: '2px', marginTop: '4px' }}>
-            <div style={{
-              height: '100%', background: '#00ff87', borderRadius: '2px',
-              width: `${progress}%`, transition: 'width 0.4s ease'
-            }} />
+          <div className="h-0.5 bg-[#1e1e38] rounded-full mt-1">
+            <div className="h-full bg-[#00ff87] rounded-full transition-all duration-500 ease-out" style={{ width: `${progress}%` }} />
           </div>
         </div>
 
         {/* Step 1 — Welcome */}
         {step === 1 && (
-          <div className="fade-in" style={{
-            background: '#0d0d20', border: '1px solid #1e1e38',
-            borderRadius: '14px', padding: '32px'
-          }}>
-            <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: '22px', fontWeight: '800', color: '#fff', marginBottom: '8px' }}>
-              Welcome! Let&apos;s get you set up {"\uD83D\uDC4B"}
+          <div className="bg-[#0d0d20] border border-[#1e1e38] rounded-2xl p-8 animate-in fade-in slide-in-from-bottom-2 duration-400">
+            <h2 className="font-syne text-[22px] font-extrabold text-white mb-2 leading-tight">
+              Welcome! Let&apos;s get you set up 👋
             </h2>
-            <p style={{ color: '#555', fontSize: '13px', lineHeight: 1.7, marginBottom: '28px' }}>
+            <p className="text-[#555] text-[13px] leading-relaxed mb-7">
               JobHunter automatically finds and scores jobs based on your profile, then generates tailored cover letters. Takes about 2 minutes to set up.
             </p>
 
             {/* CV Import */}
-            <div style={{
-              background: '#0a0a1a', border: '1px dashed #2a2a4a',
-              borderRadius: '10px', padding: '24px', textAlign: 'center', marginBottom: '16px'
-            }}>
-              <div style={{ fontSize: '32px', marginBottom: '8px' }}>📄</div>
-              <div style={{ fontSize: '14px', fontWeight: '600', color: '#e0e0f0', marginBottom: '4px' }}>
+            <div className="bg-[#0a0a1a] border border-dashed border-[#2a2a4a] rounded-xl p-6 text-center mb-4 group hover:border-[#00ff8740] transition-colors">
+              <div className="text-3xl mb-2">📄</div>
+              <div className="text-sm font-semibold text-[#e0e0f0] mb-1">
                 Import your CV
               </div>
-              <div style={{ fontSize: '12px', color: '#444', marginBottom: '16px' }}>
-                We'll auto-fill your profile from your CV
+              <div className="text-xs text-[#444] mb-4">
+                We&apos;ll auto-fill your profile from your CV
               </div>
-              <label style={{
-                display: 'inline-block', border: '1px solid #00ff87',
-                color: '#00ff87', padding: '10px 24px', borderRadius: '8px',
-                fontFamily: "'DM Mono', monospace", fontSize: '11px',
-                fontWeight: '700', letterSpacing: '1px',
-                cursor: importing ? 'not-allowed' : 'pointer',
-                textTransform: 'uppercase' as const,
-                opacity: importing ? 0.6 : 1
-              }}>
+              <label className={`inline-block border border-[#00ff87] text-[#00ff87] px-6 py-2.5 rounded-lg font-mono text-[11px] font-bold tracking-wider uppercase cursor-pointer transition-all hover:bg-[#00ff8710]
+                ${importing ? 'opacity-60 cursor-not-allowed' : ''}`}>
                 {importing ? 'Importing...' : '⚡ Upload PDF'}
-                <input type="file" accept=".pdf" onChange={handleImportCV} disabled={importing} style={{ display: 'none' }} />
+                <input type="file" accept=".pdf" onChange={handleImportCV} disabled={importing} className="hidden" />
               </label>
               {importError && (
-                <div style={{ color: '#ff6b6b', fontSize: '12px', marginTop: '8px', fontFamily: "'DM Mono', monospace" }}>
+                <div className="text-[#ff6b6b] text-[12px] mt-2 font-mono">
                   {importError}
                 </div>
               )}
             </div>
 
-            <div style={{ textAlign: 'center', color: '#333', fontSize: '12px', marginBottom: '16px', fontFamily: "'DM Mono', monospace" }}>
+            <div className="text-center text-[#333] text-[12px] mb-4 font-mono uppercase tracking-widest">
               — or —
             </div>
 
             <button
               onClick={() => setStep(2)}
-              style={{
-                width: '100%', background: 'transparent',
-                border: '1px solid #2a2a4a', color: '#666',
-                padding: '12px', borderRadius: '8px',
-                fontFamily: "'DM Mono', monospace", fontSize: '11px',
-                fontWeight: '700', letterSpacing: '1px',
-                cursor: 'pointer', textTransform: 'uppercase' as const
-              }}
+              className="w-full bg-transparent border border-[#2a2a4a] text-[#666] py-3 rounded-lg font-mono text-[11px] font-bold tracking-wider uppercase cursor-pointer hover:border-[#444] hover:text-[#888] transition-all"
             >
               Fill in manually &rarr;
             </button>
@@ -241,82 +186,70 @@ export default function OnboardingPage() {
 
         {/* Step 2 — Profile */}
         {step === 2 && (
-          <div className="fade-in" style={{
-            background: '#0d0d20', border: '1px solid #1e1e38',
-            borderRadius: '14px', padding: '32px'
-          }}>
-            <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: '22px', fontWeight: '800', color: '#fff', marginBottom: '4px' }}>
+          <div className="bg-[#0d0d20] border border-[#1e1e38] rounded-2xl p-8 animate-in fade-in slide-in-from-bottom-2 duration-400">
+            <h2 className="font-syne text-[22px] font-extrabold text-white mb-1">
               Your Profile
             </h2>
-            <p style={{ color: '#555', fontSize: '13px', marginBottom: '24px' }}>
+            <p className="text-[#555] text-[13px] mb-6">
               This is used to score jobs and write cover letters.
             </p>
 
-            <div style={{ marginBottom: '16px' }}>
-              <label style={labelStyle}>Full Name</label>
-              <input style={inputStyle} value={fullName} onChange={e => setFullName(e.target.value)} placeholder="John Smith" />
-            </div>
-            <div style={{ marginBottom: '16px' }}>
-              <label style={labelStyle}>Current Job Title</label>
-              <input style={inputStyle} value={jobTitle} onChange={e => setJobTitle(e.target.value)} placeholder="Software Engineer at Acme Corp" />
-            </div>
-            <div style={{ marginBottom: '16px' }}>
-              <label style={labelStyle}>Company</label>
-              <input style={inputStyle} value={company} onChange={e => setCompany(e.target.value)} placeholder="Acme Corp" />
-            </div>
-            <div style={{ marginBottom: '16px' }}>
-              <label style={labelStyle}>Education</label>
-              <input style={inputStyle} value={education} onChange={e => setEducation(e.target.value)} placeholder="BSc Computer Science, University of Cape Town" />
-            </div>
-            <div style={{ marginBottom: '16px' }}>
-              <label style={labelStyle}>Skills</label>
-              <div style={{ fontSize: '11px', color: '#444', marginBottom: '6px', fontStyle: 'italic' }}>Comma separated</div>
-              <input style={inputStyle} value={skills} onChange={e => setSkills(e.target.value)} placeholder="TypeScript, React, Python, SQL" />
-            </div>
-            <div style={{ marginBottom: '16px' }}>
-              <label style={labelStyle}>Experience Summary</label>
-              <textarea
-                style={{ ...inputStyle, resize: 'vertical', lineHeight: '1.6' } as React.CSSProperties}
-                value={experience}
-                onChange={e => setExperience(e.target.value)}
-                placeholder="Brief summary of your work experience..."
-                rows={3}
-              />
-            </div>
-            <div style={{ marginBottom: '24px' }}>
-              <label style={labelStyle}>Notable Projects</label>
-              <textarea
-                style={{ ...inputStyle, resize: 'vertical', lineHeight: '1.6' } as React.CSSProperties}
-                value={projects}
-                onChange={e => setProjects(e.target.value)}
-                placeholder="Projects you&apos;ve built or contributed to&hellip;"
-                rows={2}
-              />
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className={labelClasses}>Full Name</label>
+                <input className={inputClasses} value={fullName} onChange={e => setFullName(e.target.value)} placeholder="John Smith" />
+              </div>
+              <div>
+                <label className={labelClasses}>Current Job Title</label>
+                <input className={inputClasses} value={jobTitle} onChange={e => setJobTitle(e.target.value)} placeholder="Software Engineer at Acme Corp" />
+              </div>
+              <div>
+                <label className={labelClasses}>Company</label>
+                <input className={inputClasses} value={company} onChange={e => setCompany(e.target.value)} placeholder="Acme Corp" />
+              </div>
+              <div>
+                <label className={labelClasses}>Education</label>
+                <input className={inputClasses} value={education} onChange={e => setEducation(e.target.value)} placeholder="BSc Computer Science, University of Cape Town" />
+              </div>
+              <div>
+                <label className={labelClasses}>Skills</label>
+                <div className="text-[11px] text-[#444] mb-1.5 italic">Comma separated</div>
+                <input className={inputClasses} value={skills} onChange={e => setSkills(e.target.value)} placeholder="TypeScript, React, Python, SQL" />
+              </div>
+              <div>
+                <label className={labelClasses}>Experience Summary</label>
+                <textarea
+                  className={`${inputClasses} resize-none leading-relaxed`}
+                  value={experience}
+                  onChange={e => setExperience(e.target.value)}
+                  placeholder="Brief summary of your work experience..."
+                  rows={3}
+                />
+              </div>
+              <div>
+                <label className={labelClasses}>Notable Projects</label>
+                <textarea
+                  className={`${inputClasses} resize-none leading-relaxed`}
+                  value={projects}
+                  onChange={e => setProjects(e.target.value)}
+                  placeholder="Projects you&apos;ve built or contributed to..."
+                  rows={2}
+                />
+              </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '10px' }}>
+            <div className="flex gap-2.5">
               <button
                 onClick={() => setStep(1)}
-                style={{
-                  flex: 1, background: 'transparent', border: '1px solid #1e1e38',
-                  color: '#444', padding: '12px', borderRadius: '8px',
-                  fontFamily: "'DM Mono', monospace", fontSize: '11px', cursor: 'pointer'
-                }}
+                className="flex-1 bg-transparent border border-[#1e1e38] text-[#444] py-3 rounded-lg font-mono text-[11px] font-bold uppercase hover:border-[#2a2a4a] transition-all"
               >
                 ← Back
               </button>
               <button
                 onClick={() => setStep(3)}
                 disabled={!fullName || !skills}
-                style={{
-                  flex: 2, background: '#00ff87', border: 'none',
-                  color: '#0a0a1a', padding: '12px', borderRadius: '8px',
-                  fontFamily: "'DM Mono', monospace", fontSize: '11px',
-                  fontWeight: '700', letterSpacing: '1px',
-                  cursor: !fullName || !skills ? 'not-allowed' : 'pointer',
-                  opacity: !fullName || !skills ? 0.5 : 1,
-                  textTransform: 'uppercase' as const
-                }}
+                className={`flex-[2] bg-[#00ff87] text-[#0a0a1a] py-3 rounded-lg font-mono text-[11px] font-bold tracking-wider uppercase transition-all
+                  ${!fullName || !skills ? 'opacity-50 cursor-not-allowed' : 'hover:brightness-110 shadow-lg shadow-[#00ff8720]'}`}
               >
                 Next &rarr; Preferences
               </button>
@@ -326,109 +259,90 @@ export default function OnboardingPage() {
 
         {/* Step 3 — Preferences */}
         {step === 3 && (
-          <div className="fade-in" style={{
-            background: '#0d0d20', border: '1px solid #1e1e38',
-            borderRadius: '14px', padding: '32px'
-          }}>
-            <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: '22px', fontWeight: '800', color: '#fff', marginBottom: '4px' }}>
+          <div className="bg-[#0d0d20] border border-[#1e1e38] rounded-2xl p-8 animate-in fade-in slide-in-from-bottom-2 duration-400">
+            <h2 className="font-syne text-[22px] font-extrabold text-white mb-1">
               Job Preferences
             </h2>
-            <p style={{ color: '#555', fontSize: '13px', marginBottom: '24px' }}>
-              Tell us what you're looking for.
+            <p className="text-[#555] text-[13px] mb-6">
+              Tell us what you&apos;re looking for.
             </p>
 
-            <div style={{ marginBottom: '16px' }}>
-              <label style={labelStyle}>Search Keywords</label>
-              <div style={{ fontSize: '11px', color: '#444', marginBottom: '6px', fontStyle: 'italic' }}>
-                Comma separated &mdash; what to search for
-              </div>
-              <input
-                style={inputStyle}
-                value={searchTerms}
-                onChange={e => setSearchTerms(e.target.value)}
-                placeholder="software engineer, full stack developer, react developer"
-              />
-            </div>
-
-            <div style={{ marginBottom: '16px' }}>
-              <label style={labelStyle}>Country</label>
-              <select
-                value={country}
-                onChange={e => setCountry(e.target.value)}
-                style={{
-                  ...inputStyle, cursor: 'pointer',
-                  appearance: 'none' as React.CSSProperties['appearance']
-                }}
-              >
-                <option value="za">🇿🇦 South Africa</option>
-                <option value="gb">🇬🇧 United Kingdom</option>
-                <option value="us">🇺🇸 United States</option>
-                <option value="au">🇦🇺 Australia</option>
-                <option value="ca">🇨🇦 Canada</option>
-                <option value="de">🇩🇪 Germany</option>
-                <option value="nl">🇳🇱 Netherlands</option>
-                <option value="sg">🇸🇬 Singapore</option>
-              </select>
-            </div>
-
-            <div style={{ marginBottom: '16px' }}>
-              <label style={labelStyle}>Minimum Salary</label>
-              <div style={{ fontSize: '11px', color: '#444', marginBottom: '6px', fontStyle: 'italic' }}>
-                In your local currency &mdash; leave blank to see all
-              </div>
-              <input
-                style={inputStyle}
-                type="number"
-                value={salaryMin}
-                onChange={e => setSalaryMin(e.target.value)}
-                placeholder="e.g. 25000"
-              />
-            </div>
-
-            <div style={{ marginBottom: '24px' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
-                <div
-                  onClick={() => setRemoteOnly(!remoteOnly)}
-                  style={{
-                    width: '44px', height: '24px', borderRadius: '12px',
-                    background: remoteOnly ? '#00ff87' : '#1e1e38',
-                    position: 'relative', transition: 'background 0.2s', flexShrink: 0
-                  }}
-                >
-                  <div style={{
-                    width: '18px', height: '18px', borderRadius: '50%',
-                    background: '#fff', position: 'absolute',
-                    top: '3px', transition: 'left 0.2s',
-                    left: remoteOnly ? '23px' : '3px'
-                  }} />
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className={labelClasses}>Search Keywords</label>
+                <div className="text-[11px] text-[#444] mb-1.5 italic">
+                  Comma separated &mdash; what to search for
                 </div>
-                <span style={{ fontSize: '13px', color: '#aaa' }}>Remote only</span>
-              </label>
+                <input
+                  className={inputClasses}
+                  value={searchTerms}
+                  onChange={e => setSearchTerms(e.target.value)}
+                  placeholder="software engineer, full stack developer, react developer"
+                />
+              </div>
+
+              <div>
+                <label className={labelClasses}>Country</label>
+                <div className="relative">
+                    <select
+                        value={country}
+                        onChange={e => setCountry(e.target.value)}
+                        className={`${inputClasses} appearance-none cursor-pointer pr-10`}
+                    >
+                        <option value="za">🇿🇦 South Africa</option>
+                        <option value="gb">🇬🇧 United Kingdom</option>
+                        <option value="us">🇺🇸 United States</option>
+                        <option value="au">🇦🇺 Australia</option>
+                        <option value="ca">🇨🇦 Canada</option>
+                        <option value="de">🇩🇪 Germany</option>
+                        <option value="nl">🇳🇱 Netherlands</option>
+                        <option value="sg">🇸🇬 Singapore</option>
+                    </select>
+                    <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-[#444]">▼</div>
+                </div>
+              </div>
+
+              <div>
+                <label className={labelClasses}>Minimum Salary</label>
+                <div className="text-[11px] text-[#444] mb-1.5 italic">
+                  In your local currency &mdash; leave blank to see all
+                </div>
+                <input
+                  className={inputClasses}
+                  type="number"
+                  value={salaryMin}
+                  onChange={e => setSalaryMin(e.target.value)}
+                  placeholder="e.g. 25000"
+                />
+              </div>
+
+              <div className="pt-2">
+                <label className="flex items-center gap-3 cursor-pointer group">
+                  <div
+                    onClick={() => setRemoteOnly(!remoteOnly)}
+                    className={`w-11 h-6 rounded-full relative transition-colors duration-200 ease-in-out
+                      ${remoteOnly ? 'bg-[#00ff87]' : 'bg-[#1e1e38]'}`}
+                  >
+                    <div className={`w-4.5 h-4.5 rounded-full bg-white absolute top-0.75 transition-all duration-200 ease-in-out
+                      ${remoteOnly ? 'left-[23px]' : 'left-0.75'}`} />
+                  </div>
+                  <span className="text-[13px] text-[#aaa] group-hover:text-[#ccc] transition-colors">Remote only</span>
+                </label>
+              </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '10px' }}>
+            <div className="flex gap-2.5">
               <button
                 onClick={() => setStep(2)}
-                style={{
-                  flex: 1, background: 'transparent', border: '1px solid #1e1e38',
-                  color: '#444', padding: '12px', borderRadius: '8px',
-                  fontFamily: "'DM Mono', monospace", fontSize: '11px', cursor: 'pointer'
-                }}
+                className="flex-1 bg-transparent border border-[#1e1e38] text-[#444] py-3 rounded-lg font-mono text-[11px] font-bold uppercase hover:border-[#2a2a4a] transition-all"
               >
                 ← Back
               </button>
               <button
                 onClick={handleSave}
                 disabled={saving || !searchTerms}
-                style={{
-                  flex: 2, background: '#00ff87', border: 'none',
-                  color: '#0a0a1a', padding: '12px', borderRadius: '8px',
-                  fontFamily: "'DM Mono', monospace", fontSize: '11px',
-                  fontWeight: '700', letterSpacing: '1px',
-                  cursor: saving || !searchTerms ? 'not-allowed' : 'pointer',
-                  opacity: saving || !searchTerms ? 0.5 : 1,
-                  textTransform: 'uppercase' as const
-                }}
+                className={`flex-[2] bg-[#00ff87] text-[#0a0a1a] py-3 rounded-lg font-mono text-[11px] font-bold tracking-wider uppercase transition-all
+                  ${saving || !searchTerms ? 'opacity-50 cursor-not-allowed' : 'hover:brightness-110 shadow-lg shadow-[#00ff8720]'}`}
               >
                 {saving ? 'Setting up...' : '🚀 Launch JobHunter'}
               </button>

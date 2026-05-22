@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { generateContent } from '@/lib/groq'
+import { streamContent } from '@/lib/groq'
 import { NextResponse } from 'next/server'
 import { getUserProfile } from '@/lib/profile'
 import { SupabaseClient } from '@supabase/supabase-js'
@@ -125,41 +125,52 @@ STRICT RULES:
 - No subject line, no "Dear Hiring Manager" — just the body paragraphs
 `
 
-    const content = await generateContent(prompt)
+    const encoder = new TextEncoder()
+    const stream = streamContent(prompt)
 
-    // Check if a cover letter already exists for this job
-    const { data: existing } = await supabase
-      .from('cover_letters')
-      .select('id, version')
-      .eq('job_id', jobId)
-      .order('version', { ascending: false })
-      .limit(1)
-      .single()
+    const readableStream = new ReadableStream({
+      async start(controller) {
+        let fullContent = ''
+        try {
+          for await (const chunk of stream) {
+            fullContent += chunk
+            controller.enqueue(encoder.encode(chunk))
+          }
 
-    const nextVersion = existing ? existing.version + 1 : 1
+          // Once finished, save to DB in background
+          const existingRes = await supabase
+            .from('cover_letters')
+            .select('id, version')
+            .eq('job_id', jobId)
+            .order('version', { ascending: false })
+            .limit(1)
+            .maybeSingle()
 
-    // Save to DB
-    const { data: coverLetter, error: saveError } = await supabase
-      .from('cover_letters')
-      .insert({
-        job_id: jobId,
-        content,
-        version: nextVersion,
-        user_id: user.id
-      })
-      .select()
-      .single()
+          const existing = existingRes?.data
 
-    if (saveError) {
-      return NextResponse.json({ error: saveError.message }, { status: 500 })
-    }
+          const nextVersion = (existing as { version: number } | null)?.version ? (existing as { version: number }).version + 1 : 1
 
-    return NextResponse.json({
-      success: true,
-      coverLetter: {
-        id: coverLetter.id,
-        content,
-        version: nextVersion
+          await supabase
+            .from('cover_letters')
+            .insert({
+              job_id: jobId,
+              content: fullContent,
+              version: nextVersion,
+              user_id: user.id
+            })
+
+          controller.close()
+        } catch (err: unknown) {
+          controller.error(err)
+        }
+      }
+    })
+
+    return new Response(readableStream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
       }
     })
 

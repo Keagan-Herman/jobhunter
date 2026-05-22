@@ -20,8 +20,8 @@ jest.mock('@/lib/auth-mock', () => ({
 }))
 
 describe('DashboardPage', () => {
-  let mockSupabase: any
-  let mockRouter: any
+  let mockSupabase: any /* eslint-disable-line @typescript-eslint/no-explicit-any */
+  let mockRouter: any /* eslint-disable-line @typescript-eslint/no-explicit-any */
 
   beforeEach(() => {
     jest.clearAllMocks()

@@ -17,7 +17,7 @@ jest.mock('@/lib/timeout', () => ({
 }))
 
 describe('POST /api/parse-cv', () => {
-  let mockSupabase: any
+  let mockSupabase: any /* eslint-disable-line @typescript-eslint/no-explicit-any */
 
   beforeEach(() => {
     jest.clearAllMocks()

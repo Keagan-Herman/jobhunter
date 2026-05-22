@@ -6,11 +6,11 @@ import { useRouter } from 'next/navigation'
 import { StatsGrid } from '@/components/dashboard/StatsGrid'
 import { JobCard } from '@/components/dashboard/JobCard'
 import { SkeletonRow } from '@/components/dashboard/Skeleton'
+import * as ReactWindow from 'react-window'
 import { DetailPanel } from '@/components/dashboard/DetailPanel'
 import { SkipModal } from '@/components/dashboard/SkipModal'
 
 import { Job, Profile } from '@/types'
-import { User } from '@supabase/supabase-js'
 
 export default function DashboardPage() {
     // ── State ────────────────────────────────────────────────────────
@@ -33,9 +33,7 @@ export default function DashboardPage() {
     const [rescoring, setRescoring] = useState(false)
     const [rescoreResult, setRescoreResult] = useState('')
 
-    // Pagination
-    const [page, setPage] = useState(1)
-    const PAGE_SIZE = 15
+    const [listHeight, setListHeight] = useState(600)
 
     const supabase = useMemo(() => createClient(), [])
     const router = useRouter()
@@ -58,9 +56,18 @@ export default function DashboardPage() {
     }, [supabase])
 
     useEffect(() => {
-        if (typeof window !== 'undefined' && window.location.search.includes('firstTime=true')) {
-            setFirstTime(true)
+        if (typeof window !== 'undefined') {
+            if (window.location.search.includes('firstTime=true')) {
+                setFirstTime(true)
+            }
+            const handleResize = () => setListHeight(window.innerHeight - 350)
+            handleResize()
+            window.addEventListener('resize', handleResize)
+            return () => window.removeEventListener('resize', handleResize)
         }
+    }, [])
+
+    useEffect(() => {
         supabase.auth.getUser().then(({ data: { user } }) => {
             if (!user) router.push('/login')
             else {
@@ -124,27 +131,25 @@ export default function DashboardPage() {
         setRescoring(false)
     }
 
-    const handleGenerateCoverLetter = async () => {
+    const handleGenerateCoverLetter = async (content: string) => {
         if (!selected) return
-        setGenerating(true)
+
+        // If content is empty, it means streaming started
+        if (!content) {
+            setGenerating(true)
+            return
+        }
+
+        // If content is provided, streaming finished
         try {
-            const res = await fetch('/api/cover-letter', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ jobId: selected.id })
-            })
-            const data = await res.json()
-            if (data.success) {
-                const updatedJob: Job = {
-                    ...selected,
-                    cover_letter: data.coverLetter.content,
-                    cover_letter_id: data.coverLetter.id
-                }
-                setJobs(prev => prev.map(j => j.id === selected.id ? updatedJob : j))
-                setSelected(updatedJob)
+            const updatedJob: Job = {
+                ...selected,
+                cover_letter: content
             }
+            setJobs(prev => prev.map(j => j.id === selected.id ? updatedJob : j))
+            setSelected(updatedJob)
         } catch {
-            setError('Failed to generate cover letter.')
+            setError('Failed to update cover letter.')
         }
         setGenerating(false)
     }
@@ -164,7 +169,14 @@ export default function DashboardPage() {
         }
     }
 
-    const handleSaveTracking = async (trackingData: Partial<Job>) => {
+    const handleSaveTracking = async (trackingData: {
+        notes: string;
+        interview_date: string;
+        contact_name: string;
+        contact_email: string;
+        offer_amount: number;
+        follow_up_date: string;
+    }) => {
         if (!selected) return
         const { error } = await supabase
             .from('jobs')
@@ -181,6 +193,7 @@ export default function DashboardPage() {
         if (error) throw error
 
         setJobs(prev => prev.map(j => j.id === selected.id ? { ...j, ...trackingData } : j))
+        setSelected(prev => prev ? { ...prev, ...trackingData } : null)
     }
 
     const handleCoverLetterOutcome = async (outcome: string) => {
@@ -218,8 +231,6 @@ export default function DashboardPage() {
 
     // ── Derived state ─────────────────────────────────────────────────
     const filteredJobs = useMemo(() => jobs.filter(j => j.status === activeTab), [jobs, activeTab])
-    const jobsToShow = useMemo(() => filteredJobs.slice(0, page * PAGE_SIZE), [filteredJobs, page])
-    const hasMore = filteredJobs.length > page * PAGE_SIZE
 
     const stats = useMemo(() => ({
         pending: jobs.filter(j => j.status === 'pending').length,
@@ -310,7 +321,7 @@ export default function DashboardPage() {
                     <div className="flex gap-1 border-b border-[#1a1a32]">
                         {(['pending', 'applied', 'interviewing', 'skipped'] as const).map(tab => (
                             <button key={tab}
-                                    onClick={() => { setActiveTab(tab); setPage(1) }}
+                                    onClick={() => { setActiveTab(tab) }}
                                     className={`px-6 py-4 font-mono text-[11px] font-bold tracking-[2px] uppercase transition-all relative
                                     ${activeTab === tab ? 'text-[#00ff87]' : 'text-[#444] hover:text-[#777]'}`}>
                                 {tab} ({jobs.filter(j => j.status === tab).length})
@@ -322,39 +333,53 @@ export default function DashboardPage() {
                     <div className={`grid gap-8 ${selected ? 'lg:grid-cols-2' : 'grid-cols-1'}`}>
 
                         {/* Job list container */}
-                        <div className="bg-[#0d0d20] border border-[#1a1a32] rounded-2xl overflow-hidden h-fit shadow-2xl">
+                        <div className="bg-[#0d0d20] border border-[#1a1a32] rounded-2xl overflow-hidden h-[calc(100vh-350px)] shadow-2xl flex flex-col">
                             {loading ? (
-                                Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)
+                                <div className="overflow-hidden flex-1">
+                                    {Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)}
+                                </div>
                             ) : filteredJobs.length === 0 ? (
-                                <div className="py-24 text-center">
+                                <div className="py-24 text-center flex-1 flex flex-col items-center justify-center">
                                     <div className="text-5xl mb-6 opacity-20 filter grayscale">{activeTab === 'pending' ? '🔍' : activeTab === 'applied' ? '📨' : activeTab === 'interviewing' ? '🎯' : '🗑️'}</div>
                                     <div className="text-xs text-[#444] font-mono uppercase tracking-[3px]">
                                         {activeTab === 'pending' ? 'No pending jobs — run a scan!' : `No ${activeTab} jobs yet`}
                                     </div>
                                 </div>
                             ) : (
-                                <>
-                                    <div className="divide-y divide-[#0f0f22]">
-                                        {jobsToShow.map((job, i) => (
-                                            <JobCard
-                                                key={job.id}
-                                                job={job}
-                                                isSelected={selected?.id === job.id}
-                                                index={i}
-                                                onClick={() => setSelected(job)}
-                                            />
-                                        ))}
-                                    </div>
-
-                                    {hasMore && (
-                                        <div className="p-8 text-center border-t border-[#1a1a32] bg-[#0a0a1a]/50">
-                                            <button onClick={() => setPage(p => p + 1)}
-                                                    className="px-8 py-3 border border-[#2a2a4a] rounded-xl text-[#555] font-mono text-[11px] font-bold tracking-widest uppercase hover:bg-[#1a1a3a] hover:text-white transition-all">
-                                                Load more ({filteredJobs.length - page * PAGE_SIZE} remaining)
-                                            </button>
+                                <div className="flex-1">
+                                    {ReactWindow.FixedSizeList ? (
+                                        <ReactWindow.FixedSizeList
+                                            height={listHeight}
+                                            itemCount={filteredJobs.length}
+                                            itemSize={175}
+                                            width="100%"
+                                            className="scrollbar-hide"
+                                        >
+                                            {({ index, style }: { index: number, style: React.CSSProperties }) => (
+                                                <div style={style}>
+                                                    <JobCard
+                                                        job={filteredJobs[index]}
+                                                        isSelected={selected?.id === filteredJobs[index].id}
+                                                        index={index}
+                                                        onClick={() => setSelected(filteredJobs[index])}
+                                                    />
+                                                </div>
+                                            )}
+                                        </ReactWindow.FixedSizeList>
+                                    ) : (
+                                        <div className="divide-y divide-[#0f0f22]">
+                                            {filteredJobs.map((job, i) => (
+                                                <JobCard
+                                                    key={job.id}
+                                                    job={job}
+                                                    isSelected={selected?.id === job.id}
+                                                    index={i}
+                                                    onClick={() => setSelected(job)}
+                                                />
+                                            ))}
                                         </div>
                                     )}
-                                </>
+                                </div>
                             )}
                         </div>
 

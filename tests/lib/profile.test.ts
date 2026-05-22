@@ -129,7 +129,7 @@ describe('profile utilities', () => {
         select: jest.fn().mockReturnThis(),
         eq: jest.fn().mockReturnThis(),
         single: mockSingle
-      } as any
+      } as any /* eslint-disable-line @typescript-eslint/no-explicit-any */
 
       const result = await getUserProfile(mockSupabase, 'user-123')
       expect(result.profileData?.full_name).toBe('John Doe')
@@ -143,7 +143,7 @@ describe('profile utilities', () => {
         select: jest.fn().mockReturnThis(),
         eq: jest.fn().mockReturnThis(),
         single: jest.fn().mockResolvedValue({ data: null, error: null })
-      } as any
+      } as any /* eslint-disable-line @typescript-eslint/no-explicit-any */
 
       const result = await getUserProfile(mockSupabase, 'user-123')
       expect(result.profileData).toBeNull()
@@ -164,7 +164,7 @@ describe('profile utilities', () => {
                     { action: 'skipped', reason: 'Too far', jobs: { title: 'Skip 1', company: 'Co 2' } }
                 ]
             })
-        } as any
+        } as any /* eslint-disable-line @typescript-eslint/no-explicit-any */
 
         const result = await getUserFeedbackContext(mockSupabase, 'user-123')
         expect(result).toContain('Jobs they applied to:')
@@ -187,7 +187,7 @@ describe('profile utilities', () => {
                     { signal_type: 'location', signal_value: 'Remote', weight: 3, outcome: 'negative' }
                 ]
             })
-        } as any
+        } as any /* eslint-disable-line @typescript-eslint/no-explicit-any */
 
         const result = await getLearnedSignals(mockSupabase, 'user-123')
         expect(result).toContain('Signals that led to positive outcomes')
