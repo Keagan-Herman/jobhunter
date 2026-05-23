@@ -1,26 +1,54 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+@theme {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-syne: var(--font-syne);
+
+  --color-background: #080812;
+  --color-foreground: #e0e0f0;
+
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer utilities {
+  .bg-glass {
+    background: rgba(13, 13, 32, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
+
+  .border-premium {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .text-glow-green {
+    text-shadow: 0 0 10px rgba(0, 255, 135, 0.4);
+  }
+
+  .bg-radial-glow {
+    background: radial-gradient(circle at center, var(--color-00ff8710) 0%, transparent 70%);
+  }
+}
+
+:root {
+  --background: #080812;
+  --foreground: #e0e0f0;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

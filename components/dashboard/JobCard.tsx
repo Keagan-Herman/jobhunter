@@ -15,19 +15,19 @@ export function JobCard({
 }) {
   return (
     <div
-      className={`p-4 px-5 border-b border-[#0f0f22] cursor-pointer transition-all duration-200 ease-in-out hover:bg-[#111128] group
-        ${isSelected ? 'bg-[#111128] border-l-4 border-l-[#00ff87]' : 'border-l-4 border-l-transparent'}
-        animate-in fade-in slide-in-from-bottom-2 duration-300 fill-mode-forwards`}
-      style={{ animationDelay: `${index * 50}ms`, opacity: 0 }}
+      className={`p-5 px-6 border-b border-[#1a1a32]/50 cursor-pointer transition-all duration-300 ease-out hover:bg-[#111128] group relative
+        ${isSelected ? 'bg-[#111128] before:absolute before:left-0 before:top-2 before:bottom-2 before:w-1 before:bg-[#00ff87] before:rounded-r-full before:shadow-[0_0_15px_#00ff87]' : ''}
+        animate-in fade-in slide-in-from-bottom-3 duration-500 fill-mode-forwards`}
+      style={{ animationDelay: `${index * 40}ms`, opacity: 0 }}
       onClick={onClick}
     >
-      <div className="flex justify-between items-center mb-3">
+      <div className="flex justify-between items-start mb-4">
         <div className="flex-1 mr-4">
-          <div className="font-syne font-bold text-base text-[#e0e0f0] mb-1 group-hover:text-white transition-colors">
+          <div className="font-syne font-bold text-[17px] text-[#e0e0f0] mb-1 group-hover:text-white transition-colors leading-tight">
             {job.title}
           </div>
-          <div className="text-[11px] text-[#555] font-mono tracking-wider flex items-center gap-2">
-            <span className="text-[#888]">{job.company}</span>
+          <div className="text-[11px] text-[#666] font-mono tracking-widest flex items-center gap-2 uppercase font-semibold">
+            <span className="text-[#999]">{job.company}</span>
             <span className="w-1 h-1 rounded-full bg-[#1e1e38]" />
             <span>{job.location || 'Unknown'}</span>
           </div>
@@ -35,41 +35,46 @@ export function JobCard({
         <RadialScore score={job.score || 0} />
       </div>
 
-      <div className="flex gap-2 flex-wrap mb-3">
-        {(job.stack || []).slice(0, 4).map(s => (
-          <span key={s} className="text-[9px] px-2 py-0.5 rounded-md bg-[#1a1a3a] text-[#7b61ff] font-mono font-semibold tracking-tighter uppercase border border-[#2a2a4a]">
+      <div className="flex gap-1.5 flex-wrap mb-4">
+        {(job.stack || []).slice(0, 5).map(s => (
+          <span key={s} className="text-[9px] px-2 py-0.5 rounded-md bg-[#1a1a3a]/50 text-[#7b61ff] font-mono font-bold tracking-tight uppercase border border-[#2a2a4a]/50 transition-colors group-hover:border-[#7b61ff30]">
             {s}
           </span>
         ))}
+        {(job.stack || []).length > 5 && (
+          <span className="text-[9px] px-2 py-0.5 text-[#444] font-mono font-bold">
+            +{(job.stack || []).length - 5} MORE
+          </span>
+        )}
       </div>
 
       <div className="flex gap-2 flex-wrap items-center">
         {job.seniority && (
-          <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-[#1a2a1a] border border-[#00ff8720]">
-             <span className="text-[9px] text-[#00ff87] font-mono font-bold uppercase tracking-widest">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#00ff8708] border border-[#00ff8715]">
+             <span className="text-[9px] text-[#00ff87] font-mono font-bold uppercase tracking-wider">
                {job.seniority}
              </span>
           </div>
         )}
         {job.work_style && job.work_style !== 'unspecified' && (
-          <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-[#1a1a2a] border border-[#00d4ff20]">
-            <span className="text-[9px] text-[#00d4ff] font-mono font-bold uppercase tracking-widest">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#00d4ff08] border border-[#00d4ff15]">
+            <span className="text-[9px] text-[#00d4ff] font-mono font-bold uppercase tracking-wider">
               {job.work_style}
             </span>
           </div>
         )}
         {job.stack_overlap !== null && job.stack_overlap !== undefined && job.stack_overlap > 0 && (
-          <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-[#2a1a1a] border border-[#ffd60a20]">
-            <span className="text-[9px] text-[#ffd60a] font-mono font-bold uppercase tracking-widest">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#ffd60a08] border border-[#ffd60a15]">
+            <span className="text-[9px] text-[#ffd60a] font-mono font-bold uppercase tracking-wider">
               {job.stack_overlap}% MATCH
             </span>
           </div>
         )}
       </div>
 
-      <div className="flex justify-between items-center mt-4 pt-3 border-t border-[#0f0f22]/50">
+      <div className="flex justify-between items-center mt-5 pt-4 border-t border-[#1a1a32]/30">
         {job.score_reason && (
-          <div className="text-[10px] text-[#444] font-medium italic flex-1 mr-4 line-clamp-1 group-hover:text-[#666] transition-colors">
+          <div className="text-[11px] text-[#555] font-medium italic flex-1 mr-4 line-clamp-1 group-hover:text-[#888] transition-colors">
             &quot;{job.score_reason}&quot;
           </div>
         )}

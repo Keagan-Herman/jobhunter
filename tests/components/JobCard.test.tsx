@@ -41,6 +41,6 @@ describe('JobCard', () => {
   it('applies selected styles when isSelected is true', () => {
     const { container } = render(<JobCard job={mockJob} isSelected={true} onClick={() => {}} index={0} />)
     expect(container.firstChild).toHaveClass('bg-[#111128]')
-    expect(container.firstChild).toHaveClass('border-l-[#00ff87]')
+    expect(container.firstChild).toHaveClass('before:bg-[#00ff87]')
   })
 })
