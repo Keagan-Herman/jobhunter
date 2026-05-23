@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { StatsGrid } from '@/components/dashboard/StatsGrid'
 import { JobCard } from '@/components/dashboard/JobCard'
 import { SkeletonRow } from '@/components/dashboard/Skeleton'
-import * as ReactWindow from 'react-window'
+import { List } from 'react-window'
 import { DetailPanel } from '@/components/dashboard/DetailPanel'
 import { SkipModal } from '@/components/dashboard/SkipModal'
 
@@ -347,38 +347,23 @@ export default function DashboardPage() {
                                 </div>
                             ) : (
                                 <div className="flex-1">
-                                    {ReactWindow.FixedSizeList ? (
-                                        <ReactWindow.FixedSizeList
-                                            height={listHeight}
-                                            itemCount={filteredJobs.length}
-                                            itemSize={175}
-                                            width="100%"
-                                            className="scrollbar-hide"
-                                        >
-                                            {({ index, style }: { index: number, style: React.CSSProperties }) => (
-                                                <div style={style}>
-                                                    <JobCard
-                                                        job={filteredJobs[index]}
-                                                        isSelected={selected?.id === filteredJobs[index].id}
-                                                        index={index}
-                                                        onClick={() => setSelected(filteredJobs[index])}
-                                                    />
-                                                </div>
-                                            )}
-                                        </ReactWindow.FixedSizeList>
-                                    ) : (
-                                        <div className="divide-y divide-[#0f0f22]">
-                                            {filteredJobs.map((job, i) => (
+                                    <List
+                                        rowCount={filteredJobs.length}
+                                        rowHeight={175}
+                                        className="scrollbar-hide"
+                                        style={{ height: listHeight, width: '100%' }}
+                                        rowProps={{}}
+                                        rowComponent={({ index, style }) => (
+                                            <div style={style}>
                                                 <JobCard
-                                                    key={job.id}
-                                                    job={job}
-                                                    isSelected={selected?.id === job.id}
-                                                    index={i}
-                                                    onClick={() => setSelected(job)}
+                                                    job={filteredJobs[index]}
+                                                    isSelected={selected?.id === filteredJobs[index].id}
+                                                    index={index}
+                                                    onClick={() => setSelected(filteredJobs[index])}
                                                 />
-                                            ))}
-                                        </div>
-                                    )}
+                                            </div>
+                                        )}
+                                    />
                                 </div>
                             )}
                         </div>
