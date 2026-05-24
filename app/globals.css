@@ -31,6 +31,15 @@
   .bg-radial-glow {
     background: radial-gradient(circle at center, var(--color-00ff8710) 0%, transparent 70%);
   }
+
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s infinite;
+  }
 }
 
 :root {
