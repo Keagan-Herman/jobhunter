@@ -78,18 +78,22 @@ export default function OnboardingPage() {
         if (p.projects) setProjects(p.projects)
         if (p.search_terms?.length) setSearchTerms(p.search_terms.join(', '))
 
-        timers.push(setTimeout(() => setStep(2), 800))
+        // Clear simulation timers before final transition
+        timers.forEach(clearTimeout)
+        setTimeout(() => {
+          setStep(2)
+          setImporting(false)
+          setImportStep('')
+        }, 800)
       } else {
         setImportError(data.error || 'Failed to parse CV')
+        timers.forEach(clearTimeout)
+        setImporting(false)
       }
     } catch {
       setImportError('Failed to import CV')
-    } finally {
       timers.forEach(clearTimeout)
-      setTimeout(() => {
-        setImporting(false)
-        setImportStep('')
-      }, 1000)
+      setImporting(false)
     }
     if (e.target) e.target.value = ''
   }
