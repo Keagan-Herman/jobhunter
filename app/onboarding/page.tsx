@@ -81,15 +81,13 @@ export default function OnboardingPage() {
         timers.push(setStep(2))
       } else {
         setImportError(data.error || 'Failed to parse CV')
+        timers.forEach(clearTimeout)
+        setImporting(false)
       }
     } catch {
       setImportError('Failed to import CV')
-    } finally {
       timers.forEach(clearTimeout)
-      setTimeout(() => {
-        setImporting(false)
-        setImportStep('')
-      }, 1000)
+      setImporting(false)
     }
     if (e.target) e.target.value = ''
   }

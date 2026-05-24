@@ -60,7 +60,7 @@ export default function DashboardPage() {
             if (window.location.search.includes('firstTime=true')) {
                 setFirstTime(true)
             }
-            const handleResize = () => setListHeight(window.innerHeight - 350)
+            const handleResize = () => setListHeight(window.innerHeight - 380)
             handleResize()
             window.addEventListener('resize', handleResize)
             return () => window.removeEventListener('resize', handleResize)
@@ -243,41 +243,45 @@ export default function DashboardPage() {
     return (
         <div className="min-h-screen bg-[#080812] text-[#e0e0f0] font-sans selection:bg-[#00ff8720] selection:text-[#00ff87]">
             {/* Background elements */}
-            <div className="fixed inset-0 z-0 pointer-events-none opacity-20"
-                 style={{ backgroundImage: 'linear-gradient(#00ff8715 1px, transparent 1px), linear-gradient(90deg, #00ff8715 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-            <div className="fixed -top-80 -right-80 w-[800px] h-[800px] rounded-full bg-radial-gradient from-[#00ff8708] to-transparent z-0 pointer-events-none" />
+            <div className="fixed inset-0 z-0 pointer-events-none opacity-[0.15]"
+                 style={{ backgroundImage: 'linear-gradient(#00ff8710 1px, transparent 1px), linear-gradient(90deg, #00ff8710 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+            <div className="fixed -top-[20rem] -right-[20rem] w-[60rem] h-[60rem] rounded-full bg-radial-gradient from-[#00ff8708] to-transparent z-0 pointer-events-none blur-[100px]" />
+            <div className="fixed -bottom-[30rem] -left-[20rem] w-[70rem] h-[70rem] rounded-full bg-radial-gradient from-[#7b61ff05] to-transparent z-0 pointer-events-none blur-[120px]" />
 
-            <div className="relative z-10 max-w-7xl mx-auto px-6 py-12 md:px-8 space-y-10">
+            <div className="relative z-10 max-w-7xl mx-auto px-6 py-12 md:px-8 space-y-12">
 
                 {/* ── Header ── */}
-                <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div className="flex items-center gap-4">
-                        <h1 className="font-syne text-3xl md:text-4xl font-extrabold tracking-tight text-white">
-                            Job<span className="text-[#00ff87]">Hunter</span>
+                <header className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+                    <div className="flex items-center gap-6">
+                        <h1 className="font-syne text-4xl font-extrabold tracking-tight text-white flex items-center gap-1">
+                            Job<span className="text-[#00ff87] text-glow-green">Hunter</span>
                         </h1>
                         <div className="flex items-center gap-2 bg-[#0d0d20] border border-[#1e1e38] rounded-full px-3 py-1">
                             <span className="text-[10px] text-[#00ff87] font-mono font-bold tracking-widest uppercase">Live</span>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-3 flex-wrap">
+                    <div className="flex items-center gap-4 flex-wrap">
                         <button onClick={handleScan} disabled={scanning}
-                                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-mono text-[11px] font-bold tracking-widest uppercase transition-all duration-200 shadow-[0_0_20px_-5px_#00ff8740]
-                                ${scanning ? 'bg-[#0d0d20] border border-[#2a2a4a] text-[#00ff87] cursor-not-allowed' : 'bg-[#00ff87] text-[#0a0a1a] hover:brightness-110 active:translate-y-px'}`}>
+                                className={`group relative flex items-center gap-2 px-6 py-3 rounded-2xl font-mono text-[11px] font-bold tracking-[2px] uppercase transition-all duration-300 shadow-[0_0_30px_-5px_#00ff8730] overflow-hidden
+                                ${scanning ? 'bg-white/[0.03] border border-white/5 text-[#00ff87] cursor-not-allowed' : 'bg-[#00ff87] text-[#0a0a1a] hover:brightness-110 active:scale-95'}`}>
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer" />
                             {scanning ? (
                                 <><span className="w-3 h-3 border-2 border-[#00ff87] border-t-transparent rounded-full animate-spin" /> Scanning...</>
                             ) : 'Scan Jobs'}
                         </button>
 
                         <button onClick={handleRescore} disabled={rescoring}
-                                className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#1e1e38] text-[#444] font-mono text-[11px] font-bold tracking-widest uppercase hover:bg-[#1a1a3a] hover:text-white transition-all disabled:opacity-50">
+                                className="flex items-center gap-2 px-5 py-3 rounded-2xl border border-white/5 bg-white/[0.02] text-[#666] font-mono text-[11px] font-bold tracking-[2px] uppercase hover:bg-white/[0.05] hover:text-white transition-all disabled:opacity-50 hover:border-white/10 active:scale-95">
                             {rescoring ? (
                                 <><span className="w-3 h-3 border-2 border-[#00ff87] border-t-transparent rounded-full animate-spin" /> Rescoring...</>
                             ) : 'Rescore'}
                         </button>
 
-                        <button onClick={() => router.push('/profile')} className="px-4 py-2.5 rounded-xl border border-[#1e1e38] text-[#444] font-mono text-[11px] font-bold hover:bg-[#1a1a3a] hover:text-white transition-all">Profile</button>
-                        <button onClick={handleSignOut} className="px-4 py-2.5 rounded-xl border border-[#1e1e38] text-[#444] font-mono text-[11px] font-bold hover:bg-[#1a1a3a] hover:text-white transition-all">Sign Out</button>
+                        <div className="h-8 w-[1px] bg-white/5 mx-2" />
+
+                        <button onClick={() => router.push('/profile')} className="px-5 py-3 rounded-2xl border border-white/5 bg-white/[0.02] text-[#555] font-mono text-[11px] font-bold tracking-[1px] hover:bg-white/[0.05] hover:text-white transition-all active:scale-95">Profile</button>
+                        <button onClick={handleSignOut} className="px-5 py-3 rounded-2xl border border-white/5 bg-white/[0.02] text-[#555] font-mono text-[11px] font-bold tracking-[1px] hover:bg-white/[0.05] hover:text-white transition-all active:scale-95">Sign Out</button>
                     </div>
                 </header>
 
@@ -316,23 +320,23 @@ export default function DashboardPage() {
                 <StatsGrid stats={stats} />
 
                 {/* ── Tabs & Content ── */}
-                <div className="space-y-6">
-                    <div className="flex gap-1 border-b border-[#1a1a32]">
+                <div className="space-y-8">
+                    <div className="flex gap-2 border-b border-white/5 pb-px">
                         {(['pending', 'applied', 'interviewing', 'skipped'] as const).map(tab => (
                             <button key={tab}
                                     onClick={() => { setActiveTab(tab) }}
-                                    className={`px-6 py-4 font-mono text-[11px] font-bold tracking-[2px] uppercase transition-all relative
+                                    className={`px-8 py-5 font-mono text-[10px] font-bold tracking-[3px] uppercase transition-all relative
                                     ${activeTab === tab ? 'text-[#00ff87]' : 'text-[#444] hover:text-[#777]'}`}>
-                                {tab} ({jobs.filter(j => j.status === tab).length})
-                                {activeTab === tab && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#00ff87] shadow-[0_0_10px_#00ff87]" />}
+                                {tab} <span className={`ml-2 px-2 py-0.5 rounded-md text-[9px] ${activeTab === tab ? 'bg-[#00ff87]/10 text-[#00ff87]' : 'bg-white/5 text-[#555]'}`}>{jobs.filter(j => j.status === tab).length}</span>
+                                {activeTab === tab && <div className="absolute bottom-0 left-4 right-4 h-[2px] bg-[#00ff87] shadow-[0_0_15px_#00ff87]" />}
                             </button>
                         ))}
                     </div>
 
-                    <div className={`grid gap-8 ${selected ? 'lg:grid-cols-2' : 'grid-cols-1'}`}>
+                    <div className={`grid gap-10 ${selected ? 'lg:grid-cols-2' : 'grid-cols-1'}`}>
 
                         {/* Job list container */}
-                        <div className="bg-[#0d0d20] border border-[#1a1a32] rounded-2xl overflow-hidden h-[calc(100vh-350px)] shadow-2xl flex flex-col">
+                        <div className="bg-glass border-premium rounded-[2.5rem] overflow-hidden h-[calc(100vh-380px)] shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col relative">
                             {loading ? (
                                 <div className="overflow-hidden flex-1">
                                     {Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)}
@@ -343,12 +347,15 @@ export default function DashboardPage() {
                                     <div className="text-xs text-[#444] font-mono uppercase tracking-[3px]">
                                         {activeTab === 'pending' ? 'No pending jobs — run a scan!' : `No ${activeTab} jobs yet`}
                                     </div>
+                                    {activeTab === 'pending' && (
+                                        <button onClick={handleScan} className="bg-white/5 border border-white/5 text-[#555] px-6 py-2.5 rounded-xl font-mono text-[10px] font-bold uppercase tracking-widest hover:text-white hover:border-white/10 transition-all">Scan Now</button>
+                                    )}
                                 </div>
                             ) : (
                                 <div className="flex-1">
                                     <List
                                         rowCount={filteredJobs.length}
-                                        rowHeight={175}
+                                        rowHeight={195}
                                         className="scrollbar-hide"
                                         style={{ height: listHeight, width: '100%' }}
                                         rowProps={{}}
