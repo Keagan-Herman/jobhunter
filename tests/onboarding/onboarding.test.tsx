@@ -59,7 +59,7 @@ describe('OnboardingPage', () => {
     fireEvent.change(screen.getByPlaceholderText(/React, TypeScript, Node.js, AWS/i), { target: { value: 'React, Node' } })
 
     // Step 2 -> Step 3
-    fireEvent.click(screen.getByText(/Next → Preferences/i))
+    fireEvent.click(screen.getByText(/Next to Preferences/i))
     expect(screen.getByRole('heading', { name: /Search Preferences/i })).toBeInTheDocument()
   })
 

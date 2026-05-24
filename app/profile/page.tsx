@@ -153,13 +153,13 @@ export default function ProfilePage() {
             onClick={() => router.push('/dashboard')}
             className="w-fit flex items-center gap-2 px-6 py-2.5 rounded-xl border border-[#1e1e38] text-[#666] font-mono text-[11px] font-bold tracking-widest uppercase hover:bg-[#1a1a3a] hover:text-white transition-all"
           >
-            ← Dashboard
+            Dashboard
           </button>
         </header>
 
         {/* CV Import */}
         <section className="bg-[#0a0a1a] border border-dashed border-[#2a2a4a] rounded-2xl p-8 text-center group hover:border-[#00ff8740] transition-colors shadow-2xl">
-          <div className="text-4xl mb-4">📄</div>
+          <div className="text-4xl mb-4"></div>
           <h3 className="text-lg font-semibold text-white mb-2">Import your CV</h3>
           <p className="text-sm text-[#555] mb-6 max-w-xs mx-auto font-sans">
             Auto-fill your entire profile from your CV. We support PDF format.
@@ -168,7 +168,7 @@ export default function ProfilePage() {
             ${importing ? 'opacity-60 cursor-not-allowed' : ''}`}>
             {importing ? (
               <><div className="w-3 h-3 border-2 border-[#00ff87] border-t-transparent rounded-full animate-spin" /> Processing...</>
-            ) : '⚡ Upload PDF'}
+            ) : 'Upload PDF'}
             <input type="file" accept=".pdf" onChange={handleImportCV} disabled={importing} className="hidden" />
           </label>
           {importError && (
@@ -273,9 +273,9 @@ export default function ProfilePage() {
                 <label className={labelClasses}>Tone</label>
                 <div className="grid grid-cols-1 gap-2">
                   {[
-                    { value: 'professional', label: '💼 Professional' },
-                    { value: 'conversational', label: '😊 Conversational' },
-                    { value: 'creative', label: '🎨 Creative' },
+                    { value: 'professional', label: 'Professional' },
+                    { value: 'conversational', label: 'Conversational' },
+                    { value: 'creative', label: 'Creative' },
                   ].map(opt => (
                     <button
                       key={opt.value}
@@ -294,8 +294,8 @@ export default function ProfilePage() {
                 <label className={labelClasses}>Length</label>
                 <div className="grid grid-cols-2 gap-2">
                   {[
-                    { value: 'short', label: '⚡ Short' },
-                    { value: 'detailed', label: '📝 Detailed' },
+                    { value: 'short', label: 'Short' },
+                    { value: 'detailed', label: 'Detailed' },
                   ].map(opt => (
                     <button
                       key={opt.value}
@@ -314,9 +314,9 @@ export default function ProfilePage() {
                 <label className={labelClasses}>Career Stage</label>
                 <div className="grid grid-cols-1 gap-2">
                   {[
-                    { value: 'first_job', label: '🌱 First Job' },
-                    { value: 'career_change', label: '🔄 Career Change' },
-                    { value: 'experienced', label: '🚀 Experienced Professional' },
+                    { value: 'first_job', label: 'First Job' },
+                    { value: 'career_change', label: 'Career Change' },
+                    { value: 'experienced', label: 'Experienced Professional' },
                   ].map(opt => (
                     <button
                       key={opt.value}
@@ -344,7 +344,7 @@ export default function ProfilePage() {
             className={`w-full md:w-fit min-w-[240px] py-4 rounded-xl font-mono text-xs font-bold tracking-[3px] uppercase transition-all duration-500 shadow-2xl
               ${saved ? 'bg-[#00ff8720] border border-[#00ff8740] text-[#00ff87]' : 'bg-[#00ff87] text-[#0a0a1a] hover:brightness-110 active:translate-y-px'}`}
           >
-            {saving ? 'Processing...' : saved ? '✓ Profile Updated' : 'Save All Changes'}
+            {saving ? 'Processing...' : saved ? 'Profile Updated' : 'Save All Changes'}
           </button>
         </footer>
       </div>

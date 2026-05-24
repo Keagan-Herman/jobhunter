@@ -78,13 +78,7 @@ export default function OnboardingPage() {
         if (p.projects) setProjects(p.projects)
         if (p.search_terms?.length) setSearchTerms(p.search_terms.join(', '))
 
-        // Clear simulation timers before final transition
-        timers.forEach(clearTimeout)
-        setTimeout(() => {
-          setStep(2)
-          setImporting(false)
-          setImportStep('')
-        }, 800)
+        timers.push(setStep(2))
       } else {
         setImportError(data.error || 'Failed to parse CV')
         timers.forEach(clearTimeout)
@@ -151,7 +145,7 @@ export default function OnboardingPage() {
               <div key={label} className="flex flex-col items-center gap-2">
                 <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-[12px] font-bold font-mono transition-all duration-500
                   ${step > i + 1 ? 'bg-[#00ff87] text-[#0a0a1a] shadow-[0_0_15px_#00ff8740]' : step === i + 1 ? 'border-2 border-[#00ff87] text-[#00ff87] shadow-[0_0_15px_#00ff8720]' : 'bg-[#0d0d20] border-2 border-[#1e1e38] text-[#333]'}`}>
-                  {step > i + 1 ? '✓' : i + 1}
+                  {step > i + 1 ? '' : i + 1}
                 </div>
                 <span className={`text-[10px] font-mono font-bold uppercase tracking-wider ${step === i + 1 ? 'text-[#00ff87]' : 'text-[#333]'}`}>
                   {label}
@@ -168,7 +162,7 @@ export default function OnboardingPage() {
         {step === 1 && (
           <div className="bg-[#0d0d20]/80 backdrop-blur-xl border border-[#1e1e38] rounded-3xl p-10 animate-in fade-in slide-in-from-bottom-4 duration-700 shadow-2xl">
             <h2 className="font-syne text-[26px] font-extrabold text-white mb-3 leading-tight tracking-tight">
-              Ready to land your next role? 👋
+              Ready to land your next role?
             </h2>
             <p className="text-[#666] text-[14px] leading-relaxed mb-10">
               JobHunter uses advanced AI to curate the best opportunities for you, score your fit instantly, and generate high-impact cover letters.
@@ -188,7 +182,7 @@ export default function OnboardingPage() {
                 </div>
               ) : (
                 <>
-                  <div className="text-4xl mb-4 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 scale-100 group-hover:scale-110">📄</div>
+                  <div className="text-4xl mb-4 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 scale-100 group-hover:scale-110"></div>
                   <div className="text-[16px] font-bold text-[#e0e0f0] mb-1 font-syne">
                     Import your CV
                   </div>
@@ -196,7 +190,7 @@ export default function OnboardingPage() {
                     We&apos;ll auto-fill your profile to save you time.
                   </div>
                   <label className="inline-block bg-[#00ff8710] border border-[#00ff8730] text-[#00ff87] px-8 py-3 rounded-xl font-mono text-[11px] font-bold tracking-[2px] uppercase cursor-pointer transition-all hover:bg-[#00ff8720] hover:shadow-[0_0_20px_#00ff8715]">
-                    ⚡ Upload PDF
+                    Upload PDF
                     <input type="file" accept=".pdf" onChange={handleImportCV} disabled={importing} className="hidden" />
                   </label>
                 </>
@@ -217,7 +211,7 @@ export default function OnboardingPage() {
               onClick={() => setStep(2)}
               className="w-full bg-transparent border border-[#1e1e38] text-[#444] py-4 rounded-xl font-mono text-[11px] font-bold tracking-[2px] uppercase cursor-pointer hover:border-[#333] hover:text-[#777] transition-all"
             >
-              Start from scratch &rarr;
+              Start from scratch
             </button>
           </div>
         )}
@@ -285,7 +279,7 @@ export default function OnboardingPage() {
                 onClick={() => setStep(1)}
                 className="flex-1 bg-transparent border border-[#1e1e38] text-[#444] py-4 rounded-2xl font-mono text-[11px] font-bold uppercase hover:border-[#333] transition-all"
               >
-                ← Back
+                Back
               </button>
               <button
                 onClick={() => setStep(3)}
@@ -293,7 +287,7 @@ export default function OnboardingPage() {
                 className={`flex-[2] bg-[#00ff87] text-[#0a0a1a] py-4 rounded-2xl font-mono text-[11px] font-bold tracking-[2px] uppercase transition-all
                   ${!fullName || !skills ? 'opacity-50 cursor-not-allowed' : 'hover:brightness-110 shadow-lg shadow-[#00ff8720] hover:-translate-y-0.5 active:translate-y-0'}`}
               >
-                Next &rarr; Preferences
+                Next to Preferences
               </button>
             </div>
           </div>
@@ -331,16 +325,16 @@ export default function OnboardingPage() {
                         onChange={e => setCountry(e.target.value)}
                         className={`${inputClasses} appearance-none cursor-pointer pr-10`}
                     >
-                        <option value="za">🇿🇦 South Africa</option>
-                        <option value="gb">🇬🇧 United Kingdom</option>
-                        <option value="us">🇺🇸 United States</option>
-                        <option value="au">🇦🇺 Australia</option>
-                        <option value="ca">🇨🇦 Canada</option>
-                        <option value="de">🇩🇪 Germany</option>
-                        <option value="nl">🇳🇱 Netherlands</option>
-                        <option value="sg">🇸🇬 Singapore</option>
+                        <option value="za">South Africa</option>
+                        <option value="gb">United Kingdom</option>
+                        <option value="us">United States</option>
+                        <option value="au">Australia</option>
+                        <option value="ca">Canada</option>
+                        <option value="de">Germany</option>
+                        <option value="nl">Netherlands</option>
+                        <option value="sg">Singapore</option>
                     </select>
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#333]">▼</div>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#333]"></div>
                 </div>
               </div>
 
@@ -381,7 +375,7 @@ export default function OnboardingPage() {
                 onClick={() => setStep(2)}
                 className="flex-1 bg-transparent border border-[#1e1e38] text-[#444] py-4 rounded-2xl font-mono text-[11px] font-bold uppercase hover:border-[#333] transition-all"
               >
-                ← Back
+                Back
               </button>
               <button
                 onClick={handleSave}
@@ -389,7 +383,7 @@ export default function OnboardingPage() {
                 className={`flex-[2] bg-[#00ff87] text-[#0a0a1a] py-4 rounded-2xl font-mono text-[11px] font-bold tracking-[2px] uppercase transition-all
                   ${saving || !searchTerms ? 'opacity-50 cursor-not-allowed' : 'hover:brightness-110 shadow-lg shadow-[#00ff8730] hover:-translate-y-0.5 active:translate-y-0'}`}
               >
-                {saving ? 'Preparing Dashboard...' : '🚀 Launch JobHunter'}
+                {saving ? 'Preparing Dashboard...' : 'Launch JobHunter'}
               </button>
             </div>
           </div>

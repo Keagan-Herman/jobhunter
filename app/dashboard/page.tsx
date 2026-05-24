@@ -102,13 +102,13 @@ export default function DashboardPage() {
             const res = await fetch('/api/jobs')
             const data = await res.json()
             if (res.ok && data.success) {
-                setScanResult(`✓ Found ${data.found} jobs, saved ${data.saved} new`)
+                setScanResult(`Found ${data.found} jobs, saved ${data.saved} new`)
                 await fetchJobs()
             } else {
-                setScanResult(`✗ ${data.error || 'Scan failed'}`)
+                setScanResult(`${data.error || 'Scan failed'}`)
             }
         } catch {
-            setScanResult('✗ Scan failed')
+            setScanResult('Scan failed')
         }
         setScanning(false)
     }
@@ -120,13 +120,13 @@ export default function DashboardPage() {
             const res = await fetch('/api/rescore', { method: 'POST' })
             const data = await res.json()
             if (data.success) {
-                setRescoreResult(`✓ Rescored ${data.rescored} jobs`)
+                setRescoreResult(`Rescored ${data.rescored} jobs`)
                 await fetchJobs()
             } else {
-                setRescoreResult(data.message || `✗ ${data.error || 'Rescore failed'}`)
+                setRescoreResult(data.message || `${data.error || 'Rescore failed'}`)
             }
         } catch {
-            setRescoreResult('✗ Rescore failed')
+            setRescoreResult('Rescore failed')
         }
         setRescoring(false)
     }
@@ -256,9 +256,8 @@ export default function DashboardPage() {
                         <h1 className="font-syne text-4xl font-extrabold tracking-tight text-white flex items-center gap-1">
                             Job<span className="text-[#00ff87] text-glow-green">Hunter</span>
                         </h1>
-                        <div className="flex items-center gap-2.5 bg-white/[0.03] border border-white/5 rounded-full px-4 py-1.5 shadow-xl">
-                            <div className="w-1.5 h-1.5 rounded-full bg-[#00ff87] animate-pulse shadow-[0_0_8px_#00ff87]" />
-                            <span className="text-[10px] text-[#00ff87] font-mono font-bold tracking-[2px] uppercase">System Active</span>
+                        <div className="flex items-center gap-2 bg-[#0d0d20] border border-[#1e1e38] rounded-full px-3 py-1">
+                            <span className="text-[10px] text-[#00ff87] font-mono font-bold tracking-widest uppercase">Live</span>
                         </div>
                     </div>
 
@@ -268,15 +267,15 @@ export default function DashboardPage() {
                                 ${scanning ? 'bg-white/[0.03] border border-white/5 text-[#00ff87] cursor-not-allowed' : 'bg-[#00ff87] text-[#0a0a1a] hover:brightness-110 active:scale-95'}`}>
                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer" />
                             {scanning ? (
-                                <><span className="w-3.5 h-3.5 border-2 border-[#00ff87] border-t-transparent rounded-full animate-spin" /> Scanning...</>
-                            ) : '▶ Scan Jobs'}
+                                <><span className="w-3 h-3 border-2 border-[#00ff87] border-t-transparent rounded-full animate-spin" /> Scanning...</>
+                            ) : 'Scan Jobs'}
                         </button>
 
                         <button onClick={handleRescore} disabled={rescoring}
                                 className="flex items-center gap-2 px-5 py-3 rounded-2xl border border-white/5 bg-white/[0.02] text-[#666] font-mono text-[11px] font-bold tracking-[2px] uppercase hover:bg-white/[0.05] hover:text-white transition-all disabled:opacity-50 hover:border-white/10 active:scale-95">
                             {rescoring ? (
-                                <><span className="w-3.5 h-3.5 border-2 border-[#00ff87] border-t-transparent rounded-full animate-spin" /> Rescoring...</>
-                            ) : '↻ Rescore'}
+                                <><span className="w-3 h-3 border-2 border-[#00ff87] border-t-transparent rounded-full animate-spin" /> Rescoring...</>
+                            ) : 'Rescore'}
                         </button>
 
                         <div className="h-8 w-[1px] bg-white/5 mx-2" />
@@ -289,41 +288,32 @@ export default function DashboardPage() {
                 {/* Toasts & Alerts */}
                 <div className="space-y-4">
                     {error && (
-                        <div className="bg-[#ff6b6b]/5 border border-[#ff6b6b]/20 rounded-2xl p-5 flex justify-between items-center animate-in slide-in-from-top-4 duration-500 shadow-xl">
-                            <span className="text-[#ff6b6b] text-sm font-mono font-medium tracking-tight flex items-center gap-3">
-                                <span className="text-xl">⚠️</span> {error}
-                            </span>
-                            <button onClick={() => { setError(''); fetchJobs() }} className="bg-[#ff6b6b]/10 text-[#ff6b6b] text-[10px] font-mono font-bold tracking-widest uppercase px-4 py-2 rounded-xl hover:bg-[#ff6b6b]/20 transition-all">Retry &rarr;</button>
+                        <div className="bg-[#ff6b6b10] border border-[#ff6b6b30] rounded-xl p-4 flex justify-between items-center animate-in slide-in-from-top-2">
+                            <span className="text-[#ff6b6b] text-sm font-mono">{error}</span>
+                            <button onClick={() => { setError(''); fetchJobs() }} className="text-[#ff6b6b] text-sm font-mono hover:underline">Retry</button>
                         </div>
                     )}
                     {scanResult && (
-                        <div className={`rounded-2xl p-5 text-sm font-mono font-medium animate-in slide-in-from-top-4 duration-500 shadow-xl border ${scanResult.startsWith('✓') ? 'bg-[#00ff87]/5 border-[#00ff87]/20 text-[#00ff87]' : 'bg-[#ff6b6b]/5 border-[#ff6b6b]/20 text-[#ff6b6b]'}`}>
-                             <div className="flex items-center gap-3">
-                                <span className="text-xl">{scanResult.startsWith('✓') ? '✨' : '❌'}</span>
-                                {scanResult}
-                             </div>
+                        <div className={`rounded-xl p-4 text-sm font-mono animate-in slide-in-from-top-2 ${!scanResult.includes('failed') ? 'bg-[#00ff8710] border border-[#00ff8730] text-[#00ff87]' : 'bg-[#ff6b6b10] border border-[#ff6b6b30] text-[#ff6b6b]'}`}>
+                            {scanResult}
                         </div>
                     )}
                     {rescoreResult && (
-                        <div className={`rounded-2xl p-5 text-sm font-mono font-medium animate-in slide-in-from-top-4 duration-500 shadow-xl border ${rescoreResult.startsWith('✓') ? 'bg-[#00ff87]/5 border-[#00ff87]/20 text-[#00ff87]' : 'bg-[#ff6b6b]/5 border-[#ff6b6b]/20 text-[#ff6b6b]'}`}>
-                            <div className="flex items-center gap-3">
-                                <span className="text-xl">🔄</span>
-                                {rescoreResult}
-                            </div>
+                        <div className={`rounded-xl p-4 text-sm font-mono animate-in slide-in-from-top-2 ${!rescoreResult.includes('failed') ? 'bg-[#00ff8710] border border-[#00ff8730] text-[#00ff87]' : 'bg-[#ff6b6b10] border border-[#ff6b6b30] text-[#ff6b6b]'}`}>
+                            {rescoreResult}
                         </div>
                     )}
                 </div>
 
                 {/* ── First time banner ── */}
                 {firstTime && (
-                    <div className="bg-glass border-premium rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl relative overflow-hidden group">
-                        <div className="absolute inset-0 bg-gradient-to-r from-[#00ff87]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <div className="relative z-10">
-                            <div className="font-syne font-extrabold text-2xl text-white mb-2 tracking-tight">🎉 Welcome to the future of search</div>
-                            <div className="text-[14px] text-[#888] font-medium max-w-[500px] leading-relaxed">Your profile is calibrated. Run your first intelligent scan to find high-impact roles matching your career trajectory.</div>
+                    <div className="bg-[#00ff8710] border border-[#00ff8730] rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6 shadow-[0_0_30px_-10px_#00ff8720]">
+                        <div>
+                            <div className="font-syne font-bold text-lg text-[#00ff87] mb-1">You&apos;re all set!</div>
+                            <div className="text-sm text-[#888]">Run your first scan to find jobs matching your profile</div>
                         </div>
                         <button onClick={() => { setFirstTime(false); handleScan() }}
-                                className="relative z-10 bg-[#00ff87] text-[#0a0a1a] px-8 py-4 rounded-2xl font-bold font-mono text-[11px] tracking-[2px] uppercase hover:brightness-110 transition-all shadow-[0_15px_30px_rgba(0,255,135,0.2)] active:scale-95">▶ Start Intelligent Scan</button>
+                                className="bg-[#00ff87] text-[#0a0a1a] px-6 py-3 rounded-xl font-mono text-xs font-bold tracking-widest uppercase hover:brightness-110 transition-all shadow-lg shadow-[#00ff8730]">Run First Scan</button>
                     </div>
                 )}
 
@@ -352,13 +342,10 @@ export default function DashboardPage() {
                                     {Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)}
                                 </div>
                             ) : filteredJobs.length === 0 ? (
-                                <div className="py-24 text-center flex-1 flex flex-col items-center justify-center space-y-6">
-                                    <div className="text-6xl mb-2 filter grayscale opacity-20 transform hover:scale-110 transition-transform duration-500">{activeTab === 'pending' ? '🔍' : activeTab === 'applied' ? '📨' : activeTab === 'interviewing' ? '🎯' : '🗑️'}</div>
-                                    <div className="space-y-2">
-                                        <div className="text-[11px] text-[#444] font-mono uppercase tracking-[4px] font-bold">
-                                            {activeTab === 'pending' ? 'No pending jobs found' : `No ${activeTab} records`}
-                                        </div>
-                                        <p className="text-[13px] text-[#333] font-medium italic">Run a scan to find new opportunities</p>
+                                <div className="py-24 text-center flex-1 flex flex-col items-center justify-center">
+                                    <div className="text-5xl mb-6 opacity-20 filter grayscale">{''}</div>
+                                    <div className="text-xs text-[#444] font-mono uppercase tracking-[3px]">
+                                        {activeTab === 'pending' ? 'No pending jobs — run a scan!' : `No ${activeTab} jobs yet`}
                                     </div>
                                     {activeTab === 'pending' && (
                                         <button onClick={handleScan} className="bg-white/5 border border-white/5 text-[#555] px-6 py-2.5 rounded-xl font-mono text-[10px] font-bold uppercase tracking-widest hover:text-white hover:border-white/10 transition-all">Scan Now</button>
