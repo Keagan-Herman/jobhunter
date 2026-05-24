@@ -102,13 +102,13 @@ export default function DashboardPage() {
             const res = await fetch('/api/jobs')
             const data = await res.json()
             if (res.ok && data.success) {
-                setScanResult(`✓ Found ${data.found} jobs, saved ${data.saved} new`)
+                setScanResult(`Found ${data.found} jobs, saved ${data.saved} new`)
                 await fetchJobs()
             } else {
-                setScanResult(`✗ ${data.error || 'Scan failed'}`)
+                setScanResult(`${data.error || 'Scan failed'}`)
             }
         } catch {
-            setScanResult('✗ Scan failed')
+            setScanResult('Scan failed')
         }
         setScanning(false)
     }
@@ -120,13 +120,13 @@ export default function DashboardPage() {
             const res = await fetch('/api/rescore', { method: 'POST' })
             const data = await res.json()
             if (data.success) {
-                setRescoreResult(`✓ Rescored ${data.rescored} jobs`)
+                setRescoreResult(`Rescored ${data.rescored} jobs`)
                 await fetchJobs()
             } else {
-                setRescoreResult(data.message || `✗ ${data.error || 'Rescore failed'}`)
+                setRescoreResult(data.message || `${data.error || 'Rescore failed'}`)
             }
         } catch {
-            setRescoreResult('✗ Rescore failed')
+            setRescoreResult('Rescore failed')
         }
         setRescoring(false)
     }
@@ -256,7 +256,6 @@ export default function DashboardPage() {
                             Job<span className="text-[#00ff87]">Hunter</span>
                         </h1>
                         <div className="flex items-center gap-2 bg-[#0d0d20] border border-[#1e1e38] rounded-full px-3 py-1">
-                            <div className="w-1.5 h-1.5 rounded-full bg-[#00ff87] animate-pulse" />
                             <span className="text-[10px] text-[#00ff87] font-mono font-bold tracking-widest uppercase">Live</span>
                         </div>
                     </div>
@@ -267,14 +266,14 @@ export default function DashboardPage() {
                                 ${scanning ? 'bg-[#0d0d20] border border-[#2a2a4a] text-[#00ff87] cursor-not-allowed' : 'bg-[#00ff87] text-[#0a0a1a] hover:brightness-110 active:translate-y-px'}`}>
                             {scanning ? (
                                 <><span className="w-3 h-3 border-2 border-[#00ff87] border-t-transparent rounded-full animate-spin" /> Scanning...</>
-                            ) : '▶ Scan Jobs'}
+                            ) : 'Scan Jobs'}
                         </button>
 
                         <button onClick={handleRescore} disabled={rescoring}
                                 className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#1e1e38] text-[#444] font-mono text-[11px] font-bold tracking-widest uppercase hover:bg-[#1a1a3a] hover:text-white transition-all disabled:opacity-50">
                             {rescoring ? (
                                 <><span className="w-3 h-3 border-2 border-[#00ff87] border-t-transparent rounded-full animate-spin" /> Rescoring...</>
-                            ) : '↻ Rescore'}
+                            ) : 'Rescore'}
                         </button>
 
                         <button onClick={() => router.push('/profile')} className="px-4 py-2.5 rounded-xl border border-[#1e1e38] text-[#444] font-mono text-[11px] font-bold hover:bg-[#1a1a3a] hover:text-white transition-all">Profile</button>
@@ -287,16 +286,16 @@ export default function DashboardPage() {
                     {error && (
                         <div className="bg-[#ff6b6b10] border border-[#ff6b6b30] rounded-xl p-4 flex justify-between items-center animate-in slide-in-from-top-2">
                             <span className="text-[#ff6b6b] text-sm font-mono">{error}</span>
-                            <button onClick={() => { setError(''); fetchJobs() }} className="text-[#ff6b6b] text-sm font-mono hover:underline">Retry &rarr;</button>
+                            <button onClick={() => { setError(''); fetchJobs() }} className="text-[#ff6b6b] text-sm font-mono hover:underline">Retry</button>
                         </div>
                     )}
                     {scanResult && (
-                        <div className={`rounded-xl p-4 text-sm font-mono animate-in slide-in-from-top-2 ${scanResult.startsWith('✓') ? 'bg-[#00ff8710] border border-[#00ff8730] text-[#00ff87]' : 'bg-[#ff6b6b10] border border-[#ff6b6b30] text-[#ff6b6b]'}`}>
+                        <div className={`rounded-xl p-4 text-sm font-mono animate-in slide-in-from-top-2 ${!scanResult.includes('failed') ? 'bg-[#00ff8710] border border-[#00ff8730] text-[#00ff87]' : 'bg-[#ff6b6b10] border border-[#ff6b6b30] text-[#ff6b6b]'}`}>
                             {scanResult}
                         </div>
                     )}
                     {rescoreResult && (
-                        <div className={`rounded-xl p-4 text-sm font-mono animate-in slide-in-from-top-2 ${rescoreResult.startsWith('✓') ? 'bg-[#00ff8710] border border-[#00ff8730] text-[#00ff87]' : 'bg-[#ff6b6b10] border border-[#ff6b6b30] text-[#ff6b6b]'}`}>
+                        <div className={`rounded-xl p-4 text-sm font-mono animate-in slide-in-from-top-2 ${!rescoreResult.includes('failed') ? 'bg-[#00ff8710] border border-[#00ff8730] text-[#00ff87]' : 'bg-[#ff6b6b10] border border-[#ff6b6b30] text-[#ff6b6b]'}`}>
                             {rescoreResult}
                         </div>
                     )}
@@ -306,11 +305,11 @@ export default function DashboardPage() {
                 {firstTime && (
                     <div className="bg-[#00ff8710] border border-[#00ff8730] rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6 shadow-[0_0_30px_-10px_#00ff8720]">
                         <div>
-                            <div className="font-syne font-bold text-lg text-[#00ff87] mb-1">🎉 You&apos;re all set!</div>
+                            <div className="font-syne font-bold text-lg text-[#00ff87] mb-1">You&apos;re all set!</div>
                             <div className="text-sm text-[#888]">Run your first scan to find jobs matching your profile</div>
                         </div>
                         <button onClick={() => { setFirstTime(false); handleScan() }}
-                                className="bg-[#00ff87] text-[#0a0a1a] px-6 py-3 rounded-xl font-mono text-xs font-bold tracking-widest uppercase hover:brightness-110 transition-all shadow-lg shadow-[#00ff8730]">▶ Run First Scan</button>
+                                className="bg-[#00ff87] text-[#0a0a1a] px-6 py-3 rounded-xl font-mono text-xs font-bold tracking-widest uppercase hover:brightness-110 transition-all shadow-lg shadow-[#00ff8730]">Run First Scan</button>
                     </div>
                 )}
 
@@ -340,7 +339,7 @@ export default function DashboardPage() {
                                 </div>
                             ) : filteredJobs.length === 0 ? (
                                 <div className="py-24 text-center flex-1 flex flex-col items-center justify-center">
-                                    <div className="text-5xl mb-6 opacity-20 filter grayscale">{activeTab === 'pending' ? '🔍' : activeTab === 'applied' ? '📨' : activeTab === 'interviewing' ? '🎯' : '🗑️'}</div>
+                                    <div className="text-5xl mb-6 opacity-20 filter grayscale">{''}</div>
                                     <div className="text-xs text-[#444] font-mono uppercase tracking-[3px]">
                                         {activeTab === 'pending' ? 'No pending jobs — run a scan!' : `No ${activeTab} jobs yet`}
                                     </div>

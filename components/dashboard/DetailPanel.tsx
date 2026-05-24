@@ -110,7 +110,7 @@ export function DetailPanel({
         <p className="text-[14px] leading-[1.7] text-[#bbb] whitespace-pre-wrap font-sans">{job.description}</p>
         {job.url && (
           <a href={job.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#1a1a3a]/50 border border-[#2a2a4a] text-[11px] text-[#00ff87] font-mono font-bold no-underline hover:bg-[#252550] hover:border-[#00ff8740] transition-all group/link">
-            View full listing on {job.source || 'Original Site'} <span className="group-hover/link:translate-x-1 transition-transform">→</span>
+            View full listing on {job.source || 'Original Site'} <span className="group-hover/link:translate-x-1 transition-transform"></span>
           </a>
         )}
       </div>
@@ -162,14 +162,14 @@ export function DetailPanel({
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-forwards">
       {!coverLetter && !generating && (
         <div className="flex flex-col items-center justify-center py-20 text-center space-y-6">
-          <div className="w-20 h-20 rounded-3xl bg-[#1a1a3a]/30 border border-[#2a2a4a] flex items-center justify-center text-4xl shadow-2xl">✍️</div>
+          <div className="w-20 h-20 rounded-3xl bg-[#1a1a3a]/30 border border-[#2a2a4a] flex items-center justify-center text-4xl shadow-2xl"></div>
           <div className="space-y-2">
             <h4 className="font-syne font-bold text-xl text-white">Tailored Cover Letter</h4>
             <p className="text-[13px] text-[#666] max-w-[280px] leading-relaxed">Let AI craft a perfect pitch based on your profile and this job description.</p>
           </div>
           <button onClick={handleGenerate}
             className="bg-[#00ff87] text-[#0a0a1a] px-8 py-3.5 rounded-2xl font-bold font-mono text-[11px] tracking-[2px] uppercase hover:brightness-110 transition-all shadow-[0_0_20px_#00ff8720]"
-          >⚡ Generate Now</button>
+          >Generate Now</button>
         </div>
       )}
 
@@ -177,7 +177,7 @@ export function DetailPanel({
         <div className="flex flex-col items-center justify-center py-20 text-center space-y-6">
           <div className="relative">
             <div className="w-20 h-20 rounded-full border-4 border-[#00ff8710] border-t-[#00ff87] animate-spin" />
-            <div className="absolute inset-0 flex items-center justify-center text-2xl">🤖</div>
+            <div className="absolute inset-0 flex items-center justify-center text-2xl"></div>
           </div>
           <div className="space-y-2">
             <h4 className="font-syne font-bold text-xl text-[#00ff87] animate-pulse">Crafting your story...</h4>
@@ -194,10 +194,10 @@ export function DetailPanel({
               <button onClick={handleCopy}
                 className={`px-4 py-2 rounded-xl font-mono text-[10px] font-bold uppercase transition-all flex items-center gap-2
                   ${copied ? 'bg-[#00ff8718] border border-[#00ff8740] text-[#00ff87]' : 'bg-[#12122a] border border-[#2a2a4a] text-[#777] hover:text-white hover:border-[#444]'}`}
-              >{copied ? '✓ Copied' : '⎘ Copy'}</button>
+              >{copied ? 'Copied' : 'Copy'}</button>
               <button onClick={handleGenerate}
                 className="px-4 py-2 rounded-xl bg-[#12122a] border border-[#2a2a4a] text-[#777] font-mono text-[10px] font-bold uppercase hover:text-white hover:border-[#444] transition-all"
-              >↺ Regenerate</button>
+              >Regenerate</button>
             </div>
           </div>
 
@@ -215,9 +215,9 @@ export function DetailPanel({
               <h4 className="text-[10px] text-[#555] tracking-[3px] uppercase font-mono text-center font-bold">Performance Feedback</h4>
               <div className="flex gap-3">
                 {[
-                  { value: 'interviewed', label: '🎯 Interview', color: 'text-[#00ff87]', bg: 'bg-[#00ff8708]', border: 'border-[#00ff8720]' },
-                  { value: 'rejected', label: '✗ Rejected', color: 'text-[#ff6b6b]', bg: 'bg-[#ff6b6b08]', border: 'border-[#ff6b6b20]' },
-                  { value: 'no_response', label: '👻 Ghosted', color: 'text-[#555]', bg: 'bg-[#55508]', border: 'border-[#55520]' },
+                  { value: 'interviewed', label: 'Interview', color: 'text-[#00ff87]', bg: 'bg-[#00ff8708]', border: 'border-[#00ff8720]' },
+                  { value: 'rejected', label: 'Rejected', color: 'text-[#ff6b6b]', bg: 'bg-[#ff6b6b08]', border: 'border-[#ff6b6b20]' },
+                  { value: 'no_response', label: 'Ghosted', color: 'text-[#555]', bg: 'bg-[#55508]', border: 'border-[#55520]' },
                 ].map(opt => (
                   <button key={opt.value} onClick={() => onCoverLetterOutcome(opt.value)}
                     className={`flex-1 py-3.5 rounded-2xl cursor-pointer text-[10px] font-bold ${opt.bg} border ${opt.border} ${opt.color} font-mono transition-all text-center hover:brightness-110 hover:border-current/30 uppercase tracking-wider`}
@@ -276,9 +276,9 @@ export function DetailPanel({
             </div>
             <div className="grid grid-cols-1 gap-3">
               {[
-                { value: 'offer', label: '🎉 Got an Offer!', color: 'text-[#00ff87]', bg: 'bg-[#00ff8708]', border: 'border-[#00ff8720]' },
-                { value: 'rejected_after_interview', label: '✗ Rejected After Interview', color: 'text-[#ff6b6b]', bg: 'bg-[#ff6b6b08]', border: 'border-[#ff6b6b20]' },
-                { value: 'withdrew', label: '🚪 Withdrew', color: 'text-[#ffd60a]', bg: 'bg-[#ffd60a08]', border: 'border-[#ffd60a20]' },
+                { value: 'offer', label: 'Got an Offer!', color: 'text-[#00ff87]', bg: 'bg-[#00ff8708]', border: 'border-[#00ff8720]' },
+                { value: 'rejected_after_interview', label: 'Rejected After Interview', color: 'text-[#ff6b6b]', bg: 'bg-[#ff6b6b08]', border: 'border-[#ff6b6b20]' },
+                { value: 'withdrew', label: 'Withdrew', color: 'text-[#ffd60a]', bg: 'bg-[#ffd60a08]', border: 'border-[#ffd60a20]' },
               ].map(opt => (
                 <button key={opt.value} onClick={() => onInterviewOutcome(opt.value)}
                   className={`w-full p-5 rounded-2xl cursor-pointer text-[13px] font-bold ${opt.bg} border ${opt.border} ${opt.color} font-syne tracking-tight transition-all text-left hover:brightness-110 hover:translate-x-1 active:translate-y-px active:translate-x-0`}
@@ -302,7 +302,7 @@ export function DetailPanel({
         className={`w-full py-4.5 rounded-2xl font-mono text-[11px] font-bold tracking-[3px] uppercase transition-all duration-500 shadow-lg
           ${saved ? 'bg-[#00ff8710] border border-[#00ff8740] text-[#00ff87] shadow-[#00ff8705]' : 'bg-[#12122a] border border-[#2a2a4a] text-[#777] hover:text-white hover:border-[#444] shadow-black/20'}`}
       >
-        {saving ? 'Syncing...' : saved ? '✓ Tracking Info Updated' : 'Update Tracking Info'}
+        {saving ? 'Syncing...' : saved ? 'Tracking Info Updated' : 'Update Tracking Info'}
       </button>
     </div>
   )
@@ -321,7 +321,7 @@ export function DetailPanel({
                 <span>{job.location}</span>
             </div>
           </div>
-          <button onClick={onClose} className="text-[#333] hover:text-white transition-all text-4xl leading-none -mt-4 hover:rotate-90">×</button>
+          <button onClick={onClose} className="text-[#333] hover:text-white transition-all text-4xl leading-none -mt-4 hover:rotate-90">X</button>
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">
@@ -368,7 +368,7 @@ export function DetailPanel({
           <>
             <button onClick={() => onStatusUpdate(job.id, 'applied')}
               className="flex-1 bg-[#00ff87] text-[#0a0a1a] py-4 rounded-2xl font-bold font-mono text-[11px] tracking-[2px] uppercase hover:brightness-110 shadow-[0_10px_20px_#00ff8715] transition-all hover:-translate-y-0.5 active:translate-y-0"
-            >✓ Mark Applied</button>
+            >Mark Applied</button>
             <button onClick={() => onStatusUpdate(job.id, 'skipped')}
               className="px-8 bg-[#12122a] border border-[#2a2a4a] text-[#666] py-4 rounded-2xl font-mono text-[11px] font-bold uppercase hover:border-[#3a3a5a] hover:text-[#888] transition-all"
             >Skip</button>
@@ -378,13 +378,13 @@ export function DetailPanel({
         {job.status === 'applied' && (
           <button onClick={() => onStatusUpdate(job.id, 'interviewing')}
             className="flex-1 bg-[#00d4ff] text-[#0a0a1a] py-4 rounded-2xl font-bold font-mono text-[11px] tracking-[2px] uppercase hover:brightness-110 shadow-[0_10px_20px_#00d4ff15] transition-all hover:-translate-y-0.5"
-          >🎯 Got Interview!</button>
+          >Got Interview!</button>
         )}
 
         {job.status === 'skipped' && (
           <button onClick={() => onStatusUpdate(job.id, 'pending')}
             className="flex-1 bg-[#ffd60a08] border border-[#ffd60a20] text-[#ffd60a] py-4 rounded-2xl font-bold font-mono text-[11px] tracking-[2px] uppercase hover:bg-[#ffd60a15] transition-all"
-          >↩ Undo Skip</button>
+          >Undo Skip</button>
         )}
 
         {job.status === 'interviewing' && (

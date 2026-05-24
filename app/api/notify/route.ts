@@ -57,7 +57,7 @@ export async function GET(request: Request) {
         await resend.emails.send({
           from: 'JobHunter <notifications@yourdomain.com>',
           to: profile.email,
-          subject: `🎯 ${newJobs.length} new job${newJobs.length > 1 ? 's' : ''} matched your profile`,
+          subject: `${newJobs.length} new job${newJobs.length > 1 ? 's' : ''} matched your profile`,
           html: `
             <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 32px; background: #080812; color: #e0e0f0;">
               <h1 style="color: #fff; font-size: 24px; margin-bottom: 4px;">
@@ -66,7 +66,7 @@ export async function GET(request: Request) {
               <p style="color: #555; font-size: 13px; margin-bottom: 24px;">Your daily job digest</p>
 
               <p style="color: #aaa; margin-bottom: 16px;">
-                Hey ${profile.full_name?.split(' ')[0] || 'there'} 👋 — we found 
+                Hey ${profile.full_name?.split(' ')[0] || 'there'} — we found
                 <strong style="color: #00ff87;">${newJobs.length} new job${newJobs.length > 1 ? 's' : ''}</strong> 
                 matching your profile today.
               </p>
@@ -75,7 +75,7 @@ export async function GET(request: Request) {
                 ${newJobs.map(j => `
                   <div style="padding: 10px 0; border-bottom: 1px solid #1a1a32;">
                     <div style="font-weight: 600; color: #fff; font-size: 14px;">${j.title}</div>
-                    <div style="color: #555; font-size: 12px; margin-top: 2px;">${j.company} · ${j.location}</div>
+                    <div style="color: #555; font-size: 12px; margin-top: 2px;">${j.company} - ${j.location}</div>
                     <div style="color: #00ff87; font-size: 12px; margin-top: 4px; font-family: monospace;">${j.score}% match</div>
                   </div>
                 `).join('')}
@@ -83,7 +83,7 @@ export async function GET(request: Request) {
 
               <a href="${process.env.NEXT_PUBLIC_SITE_URL}/dashboard"
                 style="display: block; background: #00ff87; color: #0a0a1a; text-align: center; padding: 14px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 13px; letter-spacing: 1px;">
-                VIEW JOBS & APPLY →
+                VIEW JOBS & APPLY
               </a>
 
               <p style="color: #333; font-size: 11px; text-align: center; margin-top: 20px; font-family: monospace;">
