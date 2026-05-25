@@ -10,20 +10,20 @@ export function RadialScore({ score, size = 48 }: { score: number, size?: number
   }
 
   const colors = getColors(score)
-  const gradientId = `scoreGradient-${score}`
+  const gradientId = `scoreGradient-${score}-${size}`
 
   return (
     <div className="relative flex items-center justify-center group" style={{ width: size, height: size }}>
-      {/* Glow Effect */}
+      {/* Premium Outer Glow */}
       <div
-        className="absolute inset-0 rounded-full blur-xl opacity-0 transition-opacity duration-700 group-hover:opacity-40"
+        className="absolute inset-0 rounded-full blur-2xl opacity-0 transition-all duration-700 group-hover:opacity-30 group-hover:scale-125"
         style={{ backgroundColor: colors.primary }}
       />
 
-      {/* Background Ring Glow */}
+      {/* Inner Glow Core */}
       <div
-        className="absolute inset-[15%] rounded-full blur-md opacity-20"
-        style={{ backgroundColor: colors.primary }}
+        className="absolute inset-[20%] rounded-full blur-md opacity-10 transition-opacity duration-500 group-hover:opacity-30"
+        style={{ backgroundColor: colors.secondary }}
       />
 
       <svg width={size} height={size} className="-rotate-90 relative z-10 overflow-visible">
@@ -32,26 +32,34 @@ export function RadialScore({ score, size = 48 }: { score: number, size?: number
             <stop offset="0%" stopColor={colors.primary} />
             <stop offset="100%" stopColor={colors.secondary} />
           </linearGradient>
-          <filter id="glow">
-            <feGaussianBlur stdDeviation="2" result="coloredBlur" />
-            <feMerge>
-              <feMergeNode in="coloredBlur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
+          <filter id={`glow-${score}`} x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
           </filter>
         </defs>
 
-        {/* Background circle */}
+        {/* Shadow Ring */}
         <circle
           cx={size / 2}
           cy={size / 2}
           r={radius}
           fill="transparent"
-          stroke="rgba(255,255,255,0.05)"
+          stroke="black"
+          strokeWidth="6"
+          className="opacity-20"
+        />
+
+        {/* Background track */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="transparent"
+          stroke="rgba(255,255,255,0.03)"
           strokeWidth="4"
         />
 
-        {/* Progress circle */}
+        {/* Progress circle - Glow layer */}
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -62,18 +70,32 @@ export function RadialScore({ score, size = 48 }: { score: number, size?: number
           strokeDasharray={circumference}
           strokeDashoffset={offset}
           strokeLinecap="round"
-          filter={score >= 85 ? "url(#glow)" : ""}
+          filter={`url(#glow-${score})`}
+          className="transition-all duration-1000 ease-out opacity-40 group-hover:opacity-70"
+        />
+
+        {/* Progress circle - Sharp layer */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="transparent"
+          stroke={`url(#${gradientId})`}
+          strokeWidth="4"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
           className="transition-all duration-1000 ease-out"
         />
       </svg>
 
       <div className="absolute inset-0 flex flex-col items-center justify-center z-20">
-        <span className="text-[12px] font-mono font-bold text-white tracking-tighter leading-none">
+        <span className="text-[13px] font-mono font-black text-white tracking-tighter leading-none drop-shadow-sm group-hover:scale-110 transition-transform duration-300">
           {score}
         </span>
         {size > 50 && (
-          <span className="text-[6px] font-mono font-bold text-[#555] uppercase tracking-tighter mt-0.5">
-            Fit
+          <span className="text-[7px] font-mono font-bold text-[#555] uppercase tracking-widest mt-0.5 group-hover:text-[#888] transition-colors">
+            FIT
           </span>
         )}
       </div>
