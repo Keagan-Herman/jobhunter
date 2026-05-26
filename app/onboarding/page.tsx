@@ -58,6 +58,7 @@ export default function OnboardingPage() {
     formData.append('cv', file)
 
     const timers: NodeJS.Timeout[] = []
+    const clearTimers = () => timers.forEach(clearTimeout)
 
     try {
       // Simulate steps for better UX
@@ -78,15 +79,16 @@ export default function OnboardingPage() {
         if (p.projects) setProjects(p.projects)
         if (p.search_terms?.length) setSearchTerms(p.search_terms.join(', '))
 
-        timers.push(setStep(2))
+        clearTimers()
+        setStep(2)
       } else {
         setImportError(data.error || 'Failed to parse CV')
-        timers.forEach(clearTimeout)
+        clearTimers()
         setImporting(false)
       }
     } catch {
       setImportError('Failed to import CV')
-      timers.forEach(clearTimeout)
+      clearTimers()
       setImporting(false)
     }
     if (e.target) e.target.value = ''

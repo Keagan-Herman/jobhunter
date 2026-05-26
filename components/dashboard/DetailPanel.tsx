@@ -12,7 +12,8 @@ export function DetailPanel({
   onInterviewOutcome,
   onSaveTracking,
   generating,
-  onCoverLetterOutcome
+  onCoverLetterOutcome,
+  userSkills = []
 }: {
   job: Job
   onClose: () => void
@@ -30,12 +31,14 @@ export function DetailPanel({
   }) => Promise<void>
   generating: boolean
   onCoverLetterOutcome: (outcome: string) => void
+  userSkills?: string[]
 }) {
   const [activeTab, setActiveTab] = useState<Tab>('overview')
   const [coverLetter, setCoverLetter] = useState(job.cover_letter || '')
   const [copied, setCopied] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [linkCopied, setLinkCopied] = useState(false)
 
   // Tracking form state
   const [notes, setNotes] = useState(job.notes || '')
@@ -54,6 +57,13 @@ export function DetailPanel({
     await navigator.clipboard.writeText(coverLetter)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  const handleCopyLink = async () => {
+    if (!job.url) return
+    await navigator.clipboard.writeText(job.url)
+    setLinkCopied(true)
+    setTimeout(() => setLinkCopied(false), 2000)
   }
 
   const handleGenerate = async () => {
@@ -105,6 +115,28 @@ export function DetailPanel({
 
   const renderOverview = () => (
     <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-forwards">
+      <div className="space-y-5">
+        <h4 className="text-[10px] font-mono font-black text-[#555] tracking-[4px] uppercase">Skill Match</h4>
+        <div className="flex flex-wrap gap-2 p-6 rounded-3xl bg-white/[0.01] border border-white/[0.03]">
+          {job.stack?.map((skill, idx) => {
+            const isMatch = userSkills.some(s => s.toLowerCase() === skill.toLowerCase())
+            return (
+              <span key={`${skill}-${idx}`} className={`text-[11px] px-3 py-1.5 rounded-xl font-mono font-bold uppercase tracking-tight border transition-all ${
+                isMatch
+                  ? 'bg-[#00ff87]/5 border-[#00ff87]/20 text-[#00ff87] shadow-[0_0_15px_rgba(0,255,135,0.1)]'
+                  : 'bg-white/[0.02] border-white/5 text-[#444]'
+              }`}>
+                {skill}
+                {isMatch && <span className="ml-1.5">✓</span>}
+              </span>
+            )
+          })}
+          {(!job.stack || job.stack.length === 0) && (
+            <span className="text-[11px] text-[#444] font-mono italic">No specific stack identified</span>
+          )}
+        </div>
+      </div>
+
       <div className="space-y-5">
         <h4 className="text-[10px] font-mono font-black text-[#555] tracking-[4px] uppercase">Job Description</h4>
         <p className="text-[14px] leading-[1.8] text-white/70 whitespace-pre-wrap font-sans bg-white/[0.01] p-6 rounded-3xl border border-white/[0.03]">{job.description}</p>
@@ -340,7 +372,19 @@ export function DetailPanel({
                 <span className="text-[#888]">{job.location}</span>
             </div>
           </div>
-          <button onClick={onClose} className="text-[#444] hover:text-white transition-all text-2xl font-mono hover:rotate-90 p-2 leading-none">✕</button>
+          <div className="flex items-center gap-3">
+            {job.url && (
+              <button
+                onClick={handleCopyLink}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl font-mono text-[10px] font-black uppercase transition-all border ${
+                  linkCopied ? 'bg-[#00ff87]/10 border-[#00ff87]/30 text-[#00ff87]' : 'bg-white/5 border-white/5 text-[#555] hover:text-white hover:border-white/10'
+                }`}
+              >
+                {linkCopied ? 'Copied!' : 'Copy Link'}
+              </button>
+            )}
+            <button onClick={onClose} className="text-[#444] hover:text-white transition-all text-2xl font-mono hover:rotate-90 p-2 leading-none">✕</button>
+          </div>
         </div>
 
         <div className="flex items-center gap-5 flex-wrap relative z-10">

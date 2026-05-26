@@ -248,7 +248,7 @@ export default function DashboardPage() {
             <div className="fixed -top-[20rem] -right-[20rem] w-[60rem] h-[60rem] rounded-full bg-radial-gradient from-[#00ff8708] to-transparent z-0 pointer-events-none blur-[100px]" />
             <div className="fixed -bottom-[30rem] -left-[20rem] w-[70rem] h-[70rem] rounded-full bg-radial-gradient from-[#7b61ff05] to-transparent z-0 pointer-events-none blur-[120px]" />
 
-            <div className="relative z-10 max-w-7xl mx-auto px-6 py-12 md:px-8 space-y-12">
+            <div className="relative z-10 max-w-7xl mx-auto px-6 py-10 md:px-8 space-y-12">
 
                 {/* ── Header ── */}
                 <header className="flex flex-col md:flex-row md:items-center justify-between gap-8">
@@ -380,6 +380,7 @@ export default function DashboardPage() {
                                 <DetailPanel
                                     job={selected}
                                     country={profile?.country ?? undefined}
+                                    userSkills={profile?.skills ?? []}
                                     generating={generating}
                                     onClose={() => setSelected(null)}
                                     onGenerateCoverLetter={handleGenerateCoverLetter}
