@@ -28,14 +28,14 @@ export function JobCard({
       <div className="absolute inset-0 bg-gradient-to-br from-[#00ff87]/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
       <div className="flex justify-between items-start mb-6 relative z-10">
-        <div className="flex-1 mr-4">
-          <div className="font-syne font-extrabold text-[19px] text-white/95 mb-1.5 group-hover:text-white transition-all duration-300 leading-tight tracking-tight group-hover:translate-x-1">
+        <div className="flex-1 mr-4 overflow-hidden">
+          <div className="font-syne font-extrabold text-[19px] text-white/95 mb-1.5 group-hover:text-white transition-all duration-300 leading-tight tracking-tight group-hover:translate-x-1 truncate">
             {job.title}
           </div>
           <div className="text-[10px] text-[#666] font-mono tracking-[2.5px] flex items-center gap-2 uppercase font-black">
-            <span className="text-[#999] group-hover:text-[#aaa] transition-colors">{job.company}</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-white/10" />
-            <span className="truncate max-w-[180px] text-[#777]">{job.location || 'Remote'}</span>
+            <span className="text-[#999] group-hover:text-[#aaa] transition-colors truncate max-w-[120px]">{job.company}</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-white/10 shrink-0" />
+            <span className="truncate max-w-[150px] text-[#777]">{job.location || 'Remote'}</span>
           </div>
         </div>
         <div className="shrink-0 transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 group-hover:drop-shadow-[0_0_15px_rgba(0,255,135,0.2)]">

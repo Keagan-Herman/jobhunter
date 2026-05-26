@@ -117,7 +117,7 @@ export function detectWorkStyle(description: string): string {
   const d = description.toLowerCase()
   if (d.includes('fully remote') || d.includes('100% remote') || d.includes('work from anywhere')) return 'fully remote'
   if (d.includes('hybrid')) return 'hybrid'
-  if (d.includes('on-site') || d.includes('onsite') || d.includes('in office') || d.includes('in-office')) return 'on-site'
+  if (d.includes('on-site') || d.includes('onsite') || d.includes('in office') || d.includes('in-office') || d.includes('office-based')) return 'on-site'
   return 'unspecified'
 }
 

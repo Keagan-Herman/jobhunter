@@ -122,6 +122,11 @@ interface AdzunaJob {
   salary_min: number | null
   salary_max: number | null
   redirect_url: string
+  source?: string
+}
+
+interface AdzunaResponse {
+  results: AdzunaJob[]
 }
 
 // ✅ Fetch Adzuna for a single term
@@ -141,7 +146,7 @@ async function fetchAdzunaJobs(
     if (salaryMin) url.searchParams.set('salary_min', String(salaryMin))
 
     const res = await withTimeout(fetch(url.toString()), 10000, `Adzuna: ${term}`)
-    const data = await res.json()
+    const data = (await res.json()) as AdzunaResponse
     return data.results || []
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err)
@@ -160,6 +165,10 @@ interface JSearchJob {
   job_min_salary: number | null
   job_max_salary: number | null
   job_apply_link: string
+}
+
+interface JSearchResponse {
+  data: JSearchJob[]
 }
 
 // ✅ Fetch JSearch for a single term
@@ -186,7 +195,7 @@ async function fetchJSearchTerm(
       10000,
       `JSearch: ${term}`
     )
-    const data = await res.json()
+    const data = (await res.json()) as JSearchResponse
     return (data.data || []).map((job: JSearchJob) => ({
       id: `jsearch_${job.job_id}`,
       title: job.job_title,
@@ -320,7 +329,7 @@ export async function GET() {
         culture_fit,
         interview_prep,
         status: 'pending',
-        source: (job as AdzunaJob & { source?: string }).source || 'adzuna',
+        source: job.source || 'adzuna',
         seniority: detectSeniority(job.title),
         work_style: detectWorkStyle(description),
         stack_overlap: calculateStackOverlap(stack, userSkills)
