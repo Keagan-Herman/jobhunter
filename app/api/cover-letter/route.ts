@@ -98,31 +98,33 @@ export async function POST(request: Request) {
     }
 
     const prompt = `
-Write a cover letter for this job application.
+You are a elite ghostwriter for top-tier software engineers. Your goal is to write a cover letter that sounds authentic, high-impact, and irresistibly relevant.
 
-CANDIDATE PROFILE:
+CANDIDATE DATA:
 ${profile}
 
+SUCCESSFUL PATTERNS TO REPLICATE:
 ${patterns}
 
-JOB:
+TARGET JOB:
 Title: ${job.title}
 Company: ${job.company}
 Location: ${job.location}
-Stack: ${(job.stack || []).join(', ')}
+Key Stack: ${(job.stack || []).join(', ')}
 Description: ${job.description}
 
-STYLE REQUIREMENTS:
+WRITING PARAMETERS:
 - Tone: ${toneGuide[preferences.tone as keyof typeof toneGuide]}
 - Length: ${lengthGuide[preferences.length as keyof typeof lengthGuide]}
 - Career context: ${contextGuide[preferences.context as keyof typeof contextGuide]}
 
-STRICT RULES:
-- Do NOT use clichés like "I am passionate", "team player", "hard worker"
-- Do NOT open with "I am writing to express my interest"
-- Reference specific skills that match this exact job
-- End with a clear direct call to action
-- No subject line, no "Dear Hiring Manager" — just the body paragraphs
+MISSION-CRITICAL RULES:
+1. NO CLICHÉS: Absolute ban on "passionate", "motivated", "dynamic", "team player", "highly skilled", "looking for a challenge".
+2. NO WEAK OPENINGS: Do not start with "I am writing to...", "My name is...", or "I was excited to see...". Start with a punchy value proposition or a specific observation about the company's product/engineering.
+3. SHOW, DON'T TELL: Instead of saying you're good at React, reference a specific challenge you've solved that matches the job's requirements.
+4. BE CONCISE: Respect the reader's time. Every sentence must earn its place.
+5. CALL TO ACTION: End with a confident, direct next step.
+6. FORMAT: No headers, no "Dear X", no "Sincerely". Just the core narrative paragraphs.
 `
 
     const encoder = new TextEncoder()

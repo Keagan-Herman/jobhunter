@@ -60,7 +60,10 @@ export default function DashboardPage() {
             if (window.location.search.includes('firstTime=true')) {
                 setFirstTime(true)
             }
-            const handleResize = () => setListHeight(window.innerHeight - 380)
+            const handleResize = () => {
+                const offset = window.innerWidth >= 1024 ? 380 : 450
+                setListHeight(Math.max(400, window.innerHeight - offset))
+            }
             handleResize()
             window.addEventListener('resize', handleResize)
             return () => window.removeEventListener('resize', handleResize)
@@ -342,13 +345,24 @@ export default function DashboardPage() {
                                     {Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)}
                                 </div>
                             ) : filteredJobs.length === 0 ? (
-                                <div className="py-24 text-center flex-1 flex flex-col items-center justify-center">
-                                    <div className="text-5xl mb-6 opacity-20 filter grayscale">{''}</div>
-                                    <div className="text-xs text-[#444] font-mono uppercase tracking-[3px]">
-                                        {activeTab === 'pending' ? 'No pending jobs — run a scan!' : `No ${activeTab} jobs yet`}
+                                <div className="py-24 text-center flex-1 flex flex-col items-center justify-center px-12">
+                                    <div className="relative mb-10 group/empty">
+                                        <div className="w-24 h-24 rounded-[2rem] bg-white/[0.02] border border-white/5 flex items-center justify-center text-4xl grayscale opacity-20 group-hover/empty:grayscale-0 group-hover/empty:opacity-100 transition-all duration-700 group-hover/empty:scale-110 group-hover/empty:border-[#00ff8720]">
+                                            {activeTab === 'pending' ? '🔍' : activeTab === 'applied' ? '✉️' : activeTab === 'interviewing' ? '🤝' : '⏭️'}
+                                        </div>
+                                        <div className="absolute -inset-4 bg-[#00ff87]/5 rounded-full blur-2xl opacity-0 group-hover/empty:opacity-100 transition-opacity" />
                                     </div>
+                                    <h3 className="font-syne font-bold text-lg text-white/50 mb-2">No {activeTab} opportunities</h3>
+                                    <p className="text-xs text-[#444] font-mono uppercase tracking-[3px] mb-10 max-w-xs leading-relaxed">
+                                        {activeTab === 'pending'
+                                            ? 'Initiate a fresh scan to discover high-match roles tailored to your profile.'
+                                            : `You haven't moved any jobs to ${activeTab} yet.`}
+                                    </p>
                                     {activeTab === 'pending' && (
-                                        <button onClick={handleScan} className="bg-white/5 border border-white/5 text-[#555] px-6 py-2.5 rounded-xl font-mono text-[10px] font-bold uppercase tracking-widest hover:text-white hover:border-white/10 transition-all">Scan Now</button>
+                                        <button onClick={handleScan} className="group relative bg-[#00ff8710] border border-[#00ff8720] text-[#00ff87] px-8 py-3 rounded-2xl font-mono text-[10px] font-bold uppercase tracking-[2px] hover:bg-[#00ff87] hover:text-[#0a0a1a] transition-all duration-500 overflow-hidden">
+                                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer" />
+                                            Discover Jobs
+                                        </button>
                                     )}
                                 </div>
                             ) : (
