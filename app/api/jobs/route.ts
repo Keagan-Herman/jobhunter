@@ -49,45 +49,44 @@ async function scoreJob(
     }
 
     const prompt = `
-You are a senior recruiter scoring job fit. Be precise and calibrated.
+You are a world-class technical recruiter and career coach. Your task is to analyze a job listing against a candidate's profile with extreme precision.
 
-CANDIDATE:
+CANDIDATE CONTEXT:
 ${profile}
 
 ${feedbackContext}
 
 ${learnedSignals}
 
-JOB ANALYSIS:
+JOB METADATA:
 Title: ${title}
-Seniority Level: ${seniority}
-Work Style: ${workStyle}
-Stack (detected): ${stack.join(', ')}
-Stack Overlap with Candidate: ${stackOverlap}%
-Salary: ${jobSalaryMin ? `R${jobSalaryMin.toLocaleString()}` : 'Not specified'}
-Description: ${description?.slice(0, 1500)}
+Detected Seniority: ${seniority}
+Detected Work Style: ${workStyle}
+Detected Stack: ${stack.join(', ')}
+Calculated Stack Overlap: ${stackOverlap}%
+Salary Context: ${jobSalaryMin ? `R${jobSalaryMin.toLocaleString()}` : 'Not specified'}
+Full Description (excerpt): ${description?.slice(0, 2000)}
 
-SCORING GUIDE:
-- 90-100: Perfect match — strong stack overlap, right seniority, matches preferences
-- 75-89: Good match — most requirements met, minor gaps
-- 60-74: Decent match — transferable skills, some gaps
-- 40-59: Weak match — significant skill or preference gaps
-- Below 40: Poor match — wrong field, seniority, or preferences
+SCORING CALIBRATION:
+- 95-100: "Dream Job" - Matches all skills, preferences, and seniority perfectly.
+- 85-94: "Strong Fit" - Excellent stack match, right seniority, maybe minor preference gap.
+- 70-84: "Good Fit" - Solid match, but requires some learning or minor compromise.
+- 50-69: "Fair Fit" - Transferable skills present, but significant gaps in stack or seniority.
+- < 50: "Poor Fit" - Mismatched seniority, field, or core technology.
 
-Consider stack overlap (${stackOverlap}%) heavily in your score.
-Use past behaviour to calibrate further.
+CORE OBJECTIVES:
+1. Be brutally honest. If the stack overlap is low (${stackOverlap}%), the score MUST reflect that.
+2. Use "PAST BEHAVIOUR" and "LEARNED SIGNALS" to calibrate the score up or down.
+3. Culture Fit: Analyze the *vibe* of the description (e.g., startup-grind, corporate-stability, engineering-excellence).
+4. Interview Prep: Provide exactly 2 highly specific, technical, and high-leverage bullet points. No generic advice.
 
-Also provide:
-1. Culture Fit: A 1-2 sentence analysis of how well the candidate fits the likely company culture based on the description.
-2. Interview Prep: 2 specific, technical bullet points the candidate should focus on for this specific role.
-
-Respond ONLY with valid JSON, no markdown:
+OUTPUT FORMAT (Strict JSON, no markdown, no prose):
 {
-  "score": <0-100>,
-  "reason": "<one punchy sentence explaining the score>",
-  "stack": ["extracted", "tech", "stack"],
-  "culture_fit": "<analysis>",
-  "interview_prep": "<bullet points>"
+  "score": number,
+  "reason": "One punchy, sophisticated sentence explaining the score.",
+  "stack": ["refined", "tech", "stack", "list"],
+  "culture_fit": "A deep 1-2 sentence insight into company culture and fit.",
+  "interview_prep": "Point 1\\nPoint 2"
 }
 `
     const text = await generateContent(prompt)

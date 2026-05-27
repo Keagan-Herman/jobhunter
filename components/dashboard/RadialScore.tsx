@@ -14,19 +14,23 @@ export function RadialScore({ score, size = 48 }: { score: number, size?: number
 
   return (
     <div className="relative flex items-center justify-center group" style={{ width: size, height: size }}>
-      {/* Premium Outer Glow */}
+      {/* Premium Outer Glow - Layered */}
       <div
-        className="absolute inset-0 rounded-full blur-2xl opacity-0 transition-all duration-700 group-hover:opacity-30 group-hover:scale-125"
+        className="absolute inset-[-10%] rounded-full blur-2xl opacity-0 transition-all duration-1000 group-hover:opacity-20 group-hover:scale-150 pointer-events-none"
         style={{ backgroundColor: colors.primary }}
+      />
+      <div
+        className="absolute inset-0 rounded-full blur-xl opacity-0 transition-all duration-700 group-hover:opacity-40 pointer-events-none"
+        style={{ backgroundColor: colors.secondary }}
       />
 
       {/* Inner Glow Core */}
       <div
-        className="absolute inset-[20%] rounded-full blur-md opacity-10 transition-opacity duration-500 group-hover:opacity-30"
-        style={{ backgroundColor: colors.secondary }}
+        className="absolute inset-[25%] rounded-full blur-lg opacity-20 transition-opacity duration-500 group-hover:opacity-60 pointer-events-none"
+        style={{ backgroundColor: colors.primary }}
       />
 
-      <svg width={size} height={size} className="-rotate-90 relative z-10 overflow-visible">
+      <svg width={size} height={size} className="-rotate-90 relative z-10 overflow-visible drop-shadow-[0_0_8px_rgba(0,0,0,0.5)]">
         <defs>
           <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor={colors.primary} />
