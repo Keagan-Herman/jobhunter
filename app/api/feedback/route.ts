@@ -1,17 +1,20 @@
-import { createClient } from '@/lib/supabase/server'
+import { db } from '@/lib/db';
+import { jobs, jobFeedback, learnedSignals } from '@/lib/db/schema';
+import { eq, desc } from 'drizzle-orm';
 import { NextResponse } from 'next/server'
+import { v4 as uuidv4 } from 'uuid';
+import { ensureLocalUser } from '@/lib/db/user';
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const userId = await ensureLocalUser();
 
     const { jobId, action, reason } = await request.json()
 
     // Save feedback
-    await supabase.from('job_feedback').insert({
-      user_id: user.id,
+    await db.insert(jobFeedback).values({
+      id: uuidv4(),
+      user_id: userId,
       job_id: jobId,
       action,
       reason: reason || null
@@ -21,25 +24,28 @@ export async function POST(request: Request) {
     const status = action === 'skipped' ? 'skipped' :
                    action === 'pending' ? 'pending' : 'applied'
 
-    await supabase
-      .from('jobs')
-      .update({
+    await db.update(jobs)
+      .set({
         status,
-        score_reason: action === 'skipped' && reason ? `Skipped: ${reason}` : undefined
+        score_reason: (action === 'skipped' && reason) ? `Skipped: ${reason}` : undefined
       })
-      .eq('id', jobId)
+      .where(eq(jobs.id, jobId));
 
     // Extract signals if skipped
     if (action === 'skipped' && reason) {
-        const { data: job } = await supabase.from('jobs').select('*').eq('id', jobId).single()
+        const job = await db.query.jobs.findFirst({
+            where: eq(jobs.id, jobId)
+        });
+
         if (job) {
             // Add to learned_signals with negative outcome
             const signalType = reason.toLowerCase().includes('stack') ? 'stack' :
                                reason.toLowerCase().includes('senior') ? 'seniority' :
                                reason.toLowerCase().includes('salary') ? 'salary' : 'preference'
 
-            await supabase.from('learned_signals').insert({
-                user_id: user.id,
+            await db.insert(learnedSignals).values({
+                id: uuidv4(),
+                user_id: userId,
                 signal_type: signalType,
                 signal_value: reason,
                 weight: 0.5,
@@ -57,28 +63,32 @@ export async function POST(request: Request) {
 
 export async function GET() {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const userId = await ensureLocalUser();
 
     // Get last 20 feedback entries to build AI context
-    const { data: feedback } = await supabase
-      .from('job_feedback')
-      .select(`
-        action,
-        reason,
-        jobs (
-          title,
-          company,
-          stack,
-          score
-        )
-      `)
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(20)
+    const feedback = await db.query.jobFeedback.findMany({
+      where: eq(jobFeedback.user_id, userId),
+      orderBy: [desc(jobFeedback.created_at)],
+      limit: 20,
+      with: {
+        job: {
+            columns: {
+                title: true,
+                company: true,
+                stack: true,
+                score: true
+            }
+        }
+      }
+    });
 
-    return NextResponse.json({ feedback })
+    // Map to match the expected structure of the frontend/previous API
+    const formattedFeedback = feedback.map(f => ({
+        ...f,
+        jobs: f.job
+    }));
+
+    return NextResponse.json({ feedback: formattedFeedback })
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err)
     return NextResponse.json({ error: message }, { status: 500 })

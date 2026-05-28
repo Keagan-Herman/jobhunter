@@ -9,26 +9,19 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
-
-    - name: Set up Node.js
+    - name: Use Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '20'
         cache: 'npm'
-
-    - name: Install dependencies
-      run: npm install
-
+    - run: npm install
     - name: Run tests
       run: npm test
       env:
-        NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://mock.supabase.co' }}
-        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'mock' }}
-        SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY || 'mock' }}
         GROQ_API_KEY: ${{ secrets.GROQ_API_KEY || 'mock' }}
-        ADZUNA_APP_ID: 'mock'
-        ADZUNA_API_KEY: 'mock'
-        JSEARCH_API_KEY: 'mock'
+        ADZUNA_APP_ID: ${{ secrets.ADZUNA_APP_ID || 'mock' }}
+        ADZUNA_API_KEY: ${{ secrets.ADZUNA_API_KEY || 'mock' }}
+        JSEARCH_API_KEY: ${{ secrets.JSEARCH_API_KEY || 'mock' }}
+        RESEND_API_KEY: ${{ secrets.RESEND_API_KEY || 'mock' }}

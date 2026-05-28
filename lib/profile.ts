@@ -1,12 +1,12 @@
-import { SupabaseClient } from '@supabase/supabase-js'
-import { Profile } from '@/types'
+import { db } from '@/lib/db';
+import { profiles, jobFeedback, learnedSignals } from '@/lib/db/schema';
+import { eq, desc } from 'drizzle-orm';
+import { Profile } from '@/types';
 
-export async function getUserProfile(supabase: SupabaseClient, userId: string): Promise<{ profileText: string, profileData: Profile | null }> {
-  const { data } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', userId)
-    .single()
+export async function getUserProfile(userId: string): Promise<{ profileText: string, profileData: Profile | null }> {
+  const data = await db.query.profiles.findFirst({
+    where: eq(profiles.id, userId)
+  });
 
   if (!data) return {
     profileText: 'Software developer with full stack experience',
@@ -28,32 +28,26 @@ Projects: ${profile.projects || ''}
   return { profileText, profileData: profile }
 }
 
-export async function getUserFeedbackContext(supabase: SupabaseClient, userId: string): Promise<string> {
-  const { data: feedback } = await supabase
-    .from('job_feedback')
-    .select(`action, reason, jobs (title, company, stack)`)
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
-    .limit(20)
+export async function getUserFeedbackContext(userId: string): Promise<string> {
+  const feedback = await db.query.jobFeedback.findMany({
+    where: eq(jobFeedback.user_id, userId),
+    orderBy: [desc(jobFeedback.created_at)],
+    limit: 20,
+    with: {
+      job: true
+    }
+  });
 
   if (!feedback?.length) return ''
 
-  interface FeedbackItem {
-    action: string
-    reason: string | null
-    jobs: { title: string, company: string, stack: string[] | null } | null
-  }
-
-  const feedbackItems = feedback as unknown as FeedbackItem[]
-
-  const skipped = feedbackItems
-    .filter((f) => f.action === 'skipped' && f.jobs)
-    .map((f) => `- Skipped "${f.jobs!.title}" at ${f.jobs!.company}${f.reason ? ` because: ${f.reason}` : ''}`)
+  const skipped = feedback
+    .filter((f) => f.action === 'skipped' && f.job)
+    .map((f) => `- Skipped "${f.job!.title}" at ${f.job!.company}${f.reason ? ` because: ${f.reason}` : ''}`)
     .join('\n')
 
-  const applied = feedbackItems
-    .filter((f) => f.action === 'applied' && f.jobs)
-    .map((f) => `- Applied to "${f.jobs!.title}" at ${f.jobs!.company}${f.reason ? ` — liked: ${f.reason}` : ''}`)
+  const applied = feedback
+    .filter((f) => f.action === 'applied' && f.job)
+    .map((f) => `- Applied to "${f.job!.title}" at ${f.job!.company}${f.reason ? ` — liked: ${f.reason}` : ''}`)
     .join('\n')
 
   return `
@@ -66,33 +60,23 @@ ${skipped || 'None yet'}
 `.trim()
 }
 
-export async function getLearnedSignals(supabase: SupabaseClient, userId: string): Promise<string> {
-  const { data: signals } = await supabase
-    .from('learned_signals')
-    .select('signal_type, signal_value, weight, outcome')
-    .eq('user_id', userId)
-    .order('weight', { ascending: false })
-    .limit(20)
+export async function getLearnedSignals(userId: string): Promise<string> {
+  const signals = await db.query.learnedSignals.findMany({
+    where: eq(learnedSignals.user_id, userId),
+    orderBy: [desc(learnedSignals.weight)],
+    limit: 20,
+  });
 
   if (!signals?.length) return ''
 
-  interface LearnedSignal {
-    signal_type: string
-    signal_value: string
-    weight: number
-    outcome: string
-  }
-
-  const signalItems = signals as unknown as LearnedSignal[]
-
-  const positive = signalItems
+  const positive = signals
     .filter((s) => s.outcome === 'positive')
-    .map((s) => `- ${s.signal_type}: "${s.signal_value}" (strength: ${s.weight.toFixed(1)})`)
+    .map((s) => `- ${s.signal_type}: "${s.signal_value}" (strength: ${s.weight?.toFixed(1)})`)
     .join('\n')
 
-  const negative = signalItems
+  const negative = signals
     .filter((s) => s.outcome === 'negative')
-    .map((s) => `- ${s.signal_type}: "${s.signal_value}" (strength: ${s.weight.toFixed(1)})`)
+    .map((s) => `- ${s.signal_type}: "${s.signal_value}" (strength: ${s.weight?.toFixed(1)})`)
     .join('\n')
 
   return `

@@ -1,21 +1,29 @@
-import { SupabaseClient } from '@supabase/supabase-js'
+import { db } from '@/lib/db';
+import { jobs } from '@/lib/db/schema';
+import { eq, and } from 'drizzle-orm';
 
 export const scoreCache = {
-  async get(supabase: SupabaseClient, key: string) {
-    const { data } = await supabase
-      .from('jobs')
-      .select('score, score_reason, stack, score_is_fallback')
-      .eq('external_id', key.split('_')[0])
-      .eq('user_id', key.split('_')[1])
-      .eq('score_is_fallback', false)
-      .single()
+  async get(userId: string, externalId: string) {
+    const data = await db.query.jobs.findFirst({
+      where: and(
+        eq(jobs.external_id, externalId),
+        eq(jobs.user_id, userId),
+        eq(jobs.score_is_fallback, false)
+      ),
+      columns: {
+        score: true,
+        score_reason: true,
+        stack: true,
+        score_is_fallback: true
+      }
+    });
 
-    if (data) {
+    if (data && data.score !== null && data.score_reason !== null && data.stack !== null) {
         return {
             score: data.score,
             reason: data.score_reason,
             stack: data.stack,
-            score_is_fallback: data.score_is_fallback
+            score_is_fallback: !!data.score_is_fallback
         }
     }
     return null
@@ -23,14 +31,5 @@ export const scoreCache = {
 
   async set() {
     // In our case, the score is already being saved to the jobs table during the scan loop.
-    // So 'set' is implicitly handled by the insert.
-    // However, if we wanted a separate cache table:
-    /*
-    await supabase.from('score_cache').upsert({
-      key,
-      value,
-      expires_at: new Date(Date.now() + 86400 * 1000).toISOString()
-    })
-    */
   }
 }
