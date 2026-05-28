@@ -10,6 +10,7 @@ export default function OnboardingPage() {
   const [saving, setSaving] = useState(false)
   const [importError, setImportError] = useState('')
   const [importStep, setImportStep] = useState('')
+  const [importProgress, setImportProgress] = useState(0)
 
   // Step 2 fields
   const [fullName, setFullName] = useState('')
@@ -53,6 +54,7 @@ export default function OnboardingPage() {
     setImporting(true)
     setImportError('')
     setImportStep('Reading PDF...')
+    setImportProgress(10)
 
     const formData = new FormData()
     formData.append('cv', file)
@@ -62,13 +64,14 @@ export default function OnboardingPage() {
 
     try {
       // Simulate steps for better UX
-      timers.push(setTimeout(() => setImportStep('Analyzing with AI...'), 2000))
-      timers.push(setTimeout(() => setImportStep('Extracting skills & experience...'), 4500))
+      timers.push(setTimeout(() => { setImportStep('Analyzing with AI...'); setImportProgress(35) }, 2000))
+      timers.push(setTimeout(() => { setImportStep('Extracting skills & experience...'); setImportProgress(70) }, 4500))
 
       const res = await fetch('/api/parse-cv', { method: 'POST', body: formData })
       const data = await res.json()
       if (data.success) {
         setImportStep('Finalizing profile...')
+        setImportProgress(95)
         const p = data.profile
         if (p.full_name) setFullName(p.full_name)
         if (p.job_title) setJobTitle(p.job_title)
@@ -79,8 +82,10 @@ export default function OnboardingPage() {
         if (p.projects) setProjects(p.projects)
         if (p.search_terms?.length) setSearchTerms(p.search_terms.join(', '))
 
-        clearTimers()
-        setStep(2)
+        setTimeout(() => {
+            clearTimers()
+            setStep(2)
+        }, 800)
       } else {
         setImportError(data.error || 'Failed to parse CV')
         clearTimers()
@@ -175,16 +180,26 @@ export default function OnboardingPage() {
               ${importing ? 'border-[#00ff8740] bg-[#00ff8705]' : 'border-[#2a2a4a] hover:border-[#00ff8730] hover:bg-[#00ff8702]'}`}>
 
               {importing ? (
-                <div className="flex flex-col items-center animate-in fade-in duration-300">
-                  <div className="w-12 h-12 rounded-full border-3 border-[#00ff8710] border-t-[#00ff87] animate-spin mb-4" />
-                  <div className="text-sm font-bold text-[#00ff87] font-mono uppercase tracking-[2px] mb-1 animate-pulse">
+                <div className="flex flex-col items-center animate-in fade-in duration-300 w-full">
+                  <div className="w-12 h-12 rounded-full border-3 border-[#00ff8710] border-t-[#00ff87] animate-spin mb-6" />
+                  <div className="text-sm font-black text-[#00ff87] font-mono uppercase tracking-[3px] mb-4 animate-pulse">
                     {importStep}
                   </div>
-                  <div className="text-[11px] text-[#444] font-mono">This usually takes about 10-15 seconds</div>
+
+                  <div className="w-full max-w-[300px] h-1.5 bg-white/5 rounded-full overflow-hidden mb-4">
+                    <div
+                        className="h-full bg-[#00ff87] transition-all duration-1000 ease-out shadow-[0_0_15px_#00ff8780]"
+                        style={{ width: `${importProgress}%` }}
+                    />
+                  </div>
+
+                  <div className="text-[10px] text-[#444] font-mono uppercase tracking-widest">
+                    AI analysis in progress • {importProgress}%
+                  </div>
                 </div>
               ) : (
                 <>
-                  <div className="text-4xl mb-4 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 scale-100 group-hover:scale-110"></div>
+                  <div className="text-4xl mb-4 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 scale-100 group-hover:scale-110">📄</div>
                   <div className="text-[16px] font-bold text-[#e0e0f0] mb-1 font-syne">
                     Import your CV
                   </div>
@@ -383,7 +398,7 @@ export default function OnboardingPage() {
                 onClick={handleSave}
                 disabled={saving || !searchTerms}
                 className={`flex-[2] bg-[#00ff87] text-[#0a0a1a] py-4 rounded-2xl font-mono text-[11px] font-bold tracking-[2px] uppercase transition-all
-                  ${saving || !searchTerms ? 'opacity-50 cursor-not-allowed' : 'hover:brightness-110 shadow-lg shadow-[#00ff8730] hover:-translate-y-0.5 active:translate-y-0'}`}
+                  ${saving || !searchTerms ? 'opacity-50 cursor-not-allowed' : 'hover:brightness-110 shadow-lg shadow-[#00ff8720] hover:-translate-y-0.5 active:translate-y-0'}`}
               >
                 {saving ? 'Preparing Dashboard...' : 'Launch JobHunter'}
               </button>

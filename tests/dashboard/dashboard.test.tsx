@@ -65,11 +65,11 @@ describe('DashboardPage', () => {
 
     await waitFor(() => {
         expect(screen.getByText(/Job 1/i)).toBeInTheDocument()
-    })
+    }, { timeout: 3000 })
 
     // Check tabs
-    expect(screen.getAllByText(/pending/i).length).toBeGreaterThan(0)
-    expect(screen.getAllByText(/applied/i).length).toBeGreaterThan(0)
+    expect(screen.getAllByText(/pending/i, { selector: 'button' }).length).toBeGreaterThan(0)
+    expect(screen.getAllByText(/applied/i, { selector: 'button' }).length).toBeGreaterThan(0)
     // There are '1's in the stats grid and in the tabs
     expect(screen.getAllByText('1').length).toBeGreaterThanOrEqual(2)
   })
@@ -82,7 +82,7 @@ describe('DashboardPage', () => {
 
     render(<DashboardPage />)
 
-    const scanBtn = screen.getByText(/Scan Jobs/i)
+    const scanBtn = screen.getByText(/Scan For Jobs/i)
     fireEvent.click(scanBtn)
 
     await waitFor(() => {

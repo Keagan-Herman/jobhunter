@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Job } from '@/types'
 
 type Tab = 'overview' | 'letter' | 'tracking'
@@ -40,6 +40,9 @@ export function DetailPanel({
   const [saved, setSaved] = useState(false)
   const [linkCopied, setLinkCopied] = useState(false)
 
+  const [savingLetter, setSavingLetter] = useState(false)
+  const [savedLetter, setSavedLetter] = useState(false)
+
   // Tracking form state
   const [notes, setNotes] = useState(job.notes || '')
   const [interview_date, setInterviewDate] = useState(job.interview_date ? job.interview_date.slice(0, 16) : '')
@@ -47,6 +50,16 @@ export function DetailPanel({
   const [contact_email, setContactEmail] = useState(job.contact_email || '')
   const [offer_amount, setOfferAmount] = useState(job.offer_amount ? String(job.offer_amount) : '')
   const [follow_up_date, setFollowUpDate] = useState(job.follow_up_date ? job.follow_up_date.slice(0, 16) : '')
+
+  useEffect(() => {
+    setCoverLetter(job.cover_letter || '')
+    setNotes(job.notes || '')
+    setInterviewDate(job.interview_date ? job.interview_date.slice(0, 16) : '')
+    setContactName(job.contact_name || '')
+    setContactEmail(job.contact_email || '')
+    setOfferAmount(job.offer_amount ? String(job.offer_amount) : '')
+    setFollowUpDate(job.follow_up_date ? job.follow_up_date.slice(0, 16) : '')
+  }, [job])
 
   const currencyMap: Record<string, string> = {
     za: 'R', gb: '£', us: '$', au: '$', ca: '$', de: '€', nl: '€'
@@ -98,6 +111,25 @@ export function DetailPanel({
     }
   }
 
+  const handleSaveLetter = async () => {
+    setSavingLetter(true)
+    try {
+        const res = await fetch('/api/cover-letter/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ jobId: job.id, content: coverLetter })
+        })
+        if (res.ok) {
+            setSavedLetter(true)
+            setTimeout(() => setSavedLetter(false), 3000)
+        }
+    } catch (err) {
+        console.error('Save letter error:', err)
+    } finally {
+        setSavingLetter(false)
+    }
+  }
+
   const handleSave = async () => {
     setSaving(true)
     await onSaveTracking({
@@ -145,6 +177,12 @@ export function DetailPanel({
         <div className="p-8 rounded-[2.5rem] bg-[#00ff87]/[0.03] border border-[#00ff87]/15 space-y-4 relative overflow-hidden shadow-[inset_0_0_40px_rgba(0,255,135,0.02)] group/ai transition-all duration-500 hover:border-[#00ff87]/30">
           <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-[#00ff87] via-[#00d4ff] to-transparent opacity-40" />
           <div className="absolute -right-16 -top-16 w-64 h-64 bg-[#00ff87]/10 rounded-full blur-[80px] opacity-0 group-hover/ai:opacity-100 transition-opacity duration-1000" />
+
+          <svg className="absolute right-6 top-6 w-12 h-12 text-[#00ff87]/10 group-hover/ai:text-[#00ff87]/20 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M12 2L2 7L12 12L22 7L12 2Z" />
+            <path d="M2 17L12 22L22 17" />
+            <path d="M2 12L12 17L22 12" />
+          </svg>
 
           <div className="flex items-center justify-between relative z-10">
             <h4 className="text-[10px] font-mono font-black text-[#00ff87] tracking-[4px] uppercase flex items-center gap-2">
@@ -215,6 +253,12 @@ export function DetailPanel({
           </h4>
           <div className="p-8 rounded-[2.5rem] bg-[#7b61ff]/[0.02] border border-[#7b61ff]/10 hover:border-[#7b61ff]/30 transition-all duration-500 shadow-2xl relative overflow-hidden group/culture">
             <div className="absolute inset-0 bg-gradient-to-br from-[#7b61ff]/[0.05] to-transparent opacity-0 group-hover/culture:opacity-100 transition-opacity duration-700" />
+
+            <svg className="absolute -right-4 -bottom-4 w-24 h-24 text-[#7b61ff]/5 group-hover/culture:text-[#7b61ff]/10 transition-colors rotate-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 8V12L15 15" />
+            </svg>
+
             <div className="absolute top-0 right-0 p-6 opacity-[0.05] group-hover:opacity-[0.1] transition-opacity">
                <span className="text-3xl">✨</span>
             </div>
@@ -279,26 +323,31 @@ export function DetailPanel({
       {coverLetter && !generating && (
         <div className="space-y-10">
           <div className="flex items-center justify-between px-2">
-            <h4 className="text-[10px] font-mono font-black text-[#555] tracking-[4px] uppercase">AI-Generated Pitch</h4>
+            <h4 className="text-[10px] font-mono font-black text-[#555] tracking-[4px] uppercase">Pro-Workspace Editor</h4>
             <div className="flex gap-4">
               <button onClick={handleCopy}
                 className={`px-6 py-3 rounded-2xl font-mono text-[10px] font-black uppercase transition-all flex items-center gap-2 shadow-lg
                   ${copied ? 'bg-[#00ff8715] border border-[#00ff8740] text-[#00ff87]' : 'bg-[#12122a] border border-white/5 text-[#777] hover:text-white hover:border-white/10'}`}
               >{copied ? 'Copied' : 'Copy Pitch'}</button>
+              <button onClick={handleSaveLetter} disabled={savingLetter}
+                className={`px-6 py-3 rounded-2xl font-mono text-[10px] font-black uppercase transition-all flex items-center gap-2 shadow-lg
+                  ${savedLetter ? 'bg-[#00ff87]/10 border border-[#00ff87]/30 text-[#00ff87]' : 'bg-[#00ff87] border border-[#00ff87] text-[#0a0a1a] hover:brightness-110 active:scale-95 disabled:opacity-50'}`}
+              >{savingLetter ? 'Saving...' : savedLetter ? 'Saved ✓' : 'Save Changes'}</button>
               <button onClick={handleGenerate}
                 className="px-6 py-3 rounded-2xl bg-[#12122a] border border-white/5 text-[#777] font-mono text-[10px] font-black uppercase hover:text-white hover:border-white/10 transition-all shadow-lg"
               >Regenerate</button>
             </div>
           </div>
 
-          <div className="p-12 md:p-16 rounded-[3rem] bg-[#0d0d20]/40 backdrop-blur-md border border-white/5 shadow-[0_30px_60px_rgba(0,0,0,0.4)] relative overflow-hidden group">
-            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
-            <div className="space-y-8 max-w-[65ch] mx-auto relative z-10">
-              {coverLetter.split('\n\n').map((para, i) => (
-                  <p key={i} className="text-[16px] leading-[2] text-white/75 font-sans font-medium">{para}</p>
-              ))}
-            </div>
+          <div className="relative group">
+            <div className="absolute -inset-0.5 bg-gradient-to-b from-[#00ff87]/20 to-transparent rounded-[3.1rem] blur opacity-20 group-focus-within:opacity-100 transition-opacity duration-500" />
+            <textarea
+                value={coverLetter}
+                onChange={e => setCoverLetter(e.target.value)}
+                rows={20}
+                className="relative w-full p-12 md:p-16 rounded-[3rem] bg-[#0d0d20]/60 backdrop-blur-md border border-white/5 shadow-[0_30px_60px_rgba(0,0,0,0.4)] text-[16px] leading-[2] text-white/75 font-sans font-medium outline-none focus:border-[#00ff87]/30 transition-all resize-none"
+                placeholder="Start writing your masterpiece..."
+            />
           </div>
 
           {job.status === 'interviewing' && job.cover_letter_id && (

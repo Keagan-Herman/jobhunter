@@ -254,28 +254,37 @@ export default function DashboardPage() {
             <div className="relative z-10 max-w-7xl mx-auto px-6 py-10 md:px-8 space-y-12">
 
                 {/* ── Header ── */}
-                <header className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+                <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 bg-[#0d0d20]/40 backdrop-blur-xl border border-white/5 p-8 rounded-[2.5rem] shadow-2xl">
                     <div className="flex items-center gap-6">
-                        <h1 className="font-syne text-4xl font-extrabold tracking-tight text-white flex items-center gap-1">
-                            Job<span className="text-[#00ff87] text-glow-green">Hunter</span>
+                        <h1 className="font-syne text-4xl font-black tracking-tight text-white flex items-center gap-1 group cursor-default">
+                            Job<span className="text-[#00ff87] text-glow-green group-hover:scale-110 transition-transform duration-500">Hunter</span>
                         </h1>
-                        <div className="flex items-center gap-2 bg-[#0d0d20] border border-[#1e1e38] rounded-full px-3 py-1">
-                            <span className="text-[10px] text-[#00ff87] font-mono font-bold tracking-widest uppercase">Live</span>
+                        <div className="flex items-center gap-2.5 bg-[#00ff87]/5 border border-[#00ff87]/20 rounded-full px-4 py-1.5">
+                            <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00ff87] opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00ff87]"></span>
+                            </span>
+                            <span className="text-[9px] text-[#00ff87] font-mono font-black tracking-[3px] uppercase">Live Command</span>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-4 flex-wrap">
                         <button onClick={handleScan} disabled={scanning}
-                                className={`group relative flex items-center gap-2 px-6 py-3 rounded-2xl font-mono text-[11px] font-bold tracking-[2px] uppercase transition-all duration-300 shadow-[0_0_30px_-5px_#00ff8730] overflow-hidden
-                                ${scanning ? 'bg-white/[0.03] border border-white/5 text-[#00ff87] cursor-not-allowed' : 'bg-[#00ff87] text-[#0a0a1a] hover:brightness-110 active:scale-95'}`}>
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer" />
+                                className={`group relative flex items-center gap-3 px-8 py-4 rounded-2xl font-mono text-[11px] font-black tracking-[2px] uppercase transition-all duration-500 shadow-[0_20px_40px_-10px_rgba(0,255,135,0.2)] overflow-hidden
+                                ${scanning ? 'bg-white/[0.03] border border-white/5 text-[#00ff87] cursor-not-allowed' : 'bg-[#00ff87] text-[#0a0a1a] hover:brightness-110 hover:-translate-y-1 active:translate-y-0 active:scale-95'}`}>
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:animate-shimmer" />
                             {scanning ? (
-                                <><span className="w-3 h-3 border-2 border-[#00ff87] border-t-transparent rounded-full animate-spin" /> Scanning...</>
-                            ) : 'Scan Jobs'}
+                                <><span className="w-3.5 h-3.5 border-2 border-[#00ff87] border-t-transparent rounded-full animate-spin" /> Scanning Pipeline...</>
+                            ) : (
+                                <>
+                                    <span className="text-lg">⚡</span>
+                                    Scan For Jobs
+                                </>
+                            )}
                         </button>
 
                         <button onClick={handleRescore} disabled={rescoring}
-                                className="flex items-center gap-2 px-5 py-3 rounded-2xl border border-white/5 bg-white/[0.02] text-[#666] font-mono text-[11px] font-bold tracking-[2px] uppercase hover:bg-white/[0.05] hover:text-white transition-all disabled:opacity-50 hover:border-white/10 active:scale-95">
+                                className="flex items-center gap-2 px-6 py-4 rounded-2xl border border-white/5 bg-white/[0.02] text-[#666] font-mono text-[11px] font-black tracking-[2px] uppercase hover:bg-white/[0.05] hover:text-white transition-all duration-500 disabled:opacity-50 hover:border-white/10 active:scale-95">
                             {rescoring ? (
                                 <><span className="w-3 h-3 border-2 border-[#00ff87] border-t-transparent rounded-full animate-spin" /> Rescoring...</>
                             ) : 'Rescore'}
