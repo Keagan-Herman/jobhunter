@@ -1,8 +1,8 @@
-import { createClient } from '@/lib/supabase/server'
 import { generateContent } from '@/lib/groq'
 import { withTimeout } from '@/lib/timeout'
 import { NextResponse } from 'next/server'
 import { extractText } from 'unpdf'
+import { ensureLocalUser } from '@/lib/db/user';
 
 function cleanPdfText(text: string): string {
   return text
@@ -21,18 +21,7 @@ function coerceToArray(value: unknown): string[] {
 
 export async function POST(request: Request) {
   try {
-    // Auth check
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      const { isDev } = await import('@/lib/auth-mock')
-      if (isDev) {
-        // Use mock user for dev
-        return await handleParseCV(request)
-      }
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
+    await ensureLocalUser();
     return await handleParseCV(request)
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err)
@@ -43,7 +32,6 @@ export async function POST(request: Request) {
 
 async function handleParseCV(request: Request) {
   try {
-
     const formData = await request.formData()
     const file = formData.get('cv') as File
 
@@ -59,7 +47,6 @@ async function handleParseCV(request: Request) {
       return NextResponse.json({ error: 'File too large — max 5MB' }, { status: 400 })
     }
 
-    // Extract text using unpdf — works in serverless and edge environments
     let text: string
     try {
       const buffer = await file.arrayBuffer()
@@ -110,7 +97,7 @@ If any field is not found, use an empty string or empty array.
       return NextResponse.json({ error: 'AI timed out — please try again' }, { status: 500 })
     }
 
-    const clean = result.replace(/```json|```/g, '').trim()
+    const clean = result.replace(/\`\`\`json|\`\`\`/g, '').trim()
 
     let parsed
     try {

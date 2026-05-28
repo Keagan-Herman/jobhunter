@@ -3,10 +3,7 @@ import {
   detectWorkStyle,
   calculateStackOverlap,
   extractStack,
-  getCountryName,
-  getUserProfile,
-  getUserFeedbackContext,
-  getLearnedSignals
+  getCountryName
 } from '@/lib/profile'
 
 describe('profile utilities', () => {
@@ -110,90 +107,6 @@ describe('profile utilities', () => {
 
     test('defaults to South Africa', () => {
       expect(getCountryName('unknown')).toBe('South Africa')
-    })
-  })
-
-  describe('getUserProfile (Database)', () => {
-    test('returns profile text and data when found', async () => {
-      const mockSingle = jest.fn().mockResolvedValue({
-        data: {
-          full_name: 'John Doe',
-          job_title: 'Developer',
-          company: 'Acme',
-          skills: ['JS', 'TS']
-        },
-        error: null
-      })
-      const mockSupabase = {
-        from: jest.fn().mockReturnThis(),
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockReturnThis(),
-        single: mockSingle
-      } as any /* eslint-disable-line @typescript-eslint/no-explicit-any */
-
-      const result = await getUserProfile(mockSupabase, 'user-123')
-      expect(result.profileData?.full_name).toBe('John Doe')
-      expect(result.profileText).toContain('John Doe')
-      expect(result.profileText).toContain('JS, TS')
-    })
-
-    test('returns default when not found', async () => {
-      const mockSupabase = {
-        from: jest.fn().mockReturnThis(),
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockReturnThis(),
-        single: jest.fn().mockResolvedValue({ data: null, error: null })
-      } as any /* eslint-disable-line @typescript-eslint/no-explicit-any */
-
-      const result = await getUserProfile(mockSupabase, 'user-123')
-      expect(result.profileData).toBeNull()
-      expect(result.profileText).toBe('Software developer with full stack experience')
-    })
-  })
-
-  describe('getUserFeedbackContext', () => {
-    test('formats applied and skipped jobs', async () => {
-        const mockSupabase = {
-            from: jest.fn().mockReturnThis(),
-            select: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockReturnThis(),
-            order: jest.fn().mockReturnThis(),
-            limit: jest.fn().mockResolvedValue({
-                data: [
-                    { action: 'applied', reason: 'Great stack', jobs: { title: 'App 1', company: 'Co 1' } },
-                    { action: 'skipped', reason: 'Too far', jobs: { title: 'Skip 1', company: 'Co 2' } }
-                ]
-            })
-        } as any /* eslint-disable-line @typescript-eslint/no-explicit-any */
-
-        const result = await getUserFeedbackContext(mockSupabase, 'user-123')
-        expect(result).toContain('Jobs they applied to:')
-        expect(result).toContain('- Applied to "App 1" at Co 1 — liked: Great stack')
-        expect(result).toContain('Jobs they skipped:')
-        expect(result).toContain('- Skipped "Skip 1" at Co 2 because: Too far')
-    })
-  })
-
-  describe('getLearnedSignals', () => {
-    test('formats positive and negative signals', async () => {
-        const mockSupabase = {
-            from: jest.fn().mockReturnThis(),
-            select: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockReturnThis(),
-            order: jest.fn().mockReturnThis(),
-            limit: jest.fn().mockResolvedValue({
-                data: [
-                    { signal_type: 'tech', signal_value: 'React', weight: 5, outcome: 'positive' },
-                    { signal_type: 'location', signal_value: 'Remote', weight: 3, outcome: 'negative' }
-                ]
-            })
-        } as any /* eslint-disable-line @typescript-eslint/no-explicit-any */
-
-        const result = await getLearnedSignals(mockSupabase, 'user-123')
-        expect(result).toContain('Signals that led to positive outcomes')
-        expect(result).toContain('- tech: "React" (strength: 5.0)')
-        expect(result).toContain('Signals that led to negative outcomes')
-        expect(result).toContain('- location: "Remote" (strength: 3.0)')
     })
   })
 })

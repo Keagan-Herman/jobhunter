@@ -1,32 +1,33 @@
-import { createClient } from '@/lib/supabase/server'
+import { db } from '@/lib/db';
+import { jobs } from '@/lib/db/schema';
+import { eq, and } from 'drizzle-orm';
 import { generateContent } from '@/lib/groq'
 import { NextResponse } from 'next/server'
 import { getUserProfile, getUserFeedbackContext } from '@/lib/profile'
+import { ensureLocalUser } from '@/lib/db/user';
 
 export async function POST() {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const userId = await ensureLocalUser();
 
-    // Find all jobs with broken scores
-    const { data: jobs } = await supabase
-      .from('jobs')
-      .select('id, title, description, stack')
-      .eq('user_id', user.id)
-      .eq('score_is_fallback', true)
-      .eq('status', 'pending')
-      .limit(10) // do 10 at a time to avoid rate limits
+    const jobsToRescore = await db.query.jobs.findMany({
+      where: and(
+        eq(jobs.user_id, userId),
+        eq(jobs.score_is_fallback, true),
+        eq(jobs.status, 'pending')
+      ),
+      limit: 10
+    });
 
-    if (!jobs?.length) {
+    if (!jobsToRescore?.length) {
       return NextResponse.json({ message: 'No jobs need rescoring', rescored: 0 })
     }
 
-    const { profileText: profile } = await getUserProfile(supabase, user.id)
-    const feedbackContext = await getUserFeedbackContext(supabase, user.id)
-    let rescored = 0
+    const { profileText: profile } = await getUserProfile(userId)
+    const feedbackContext = await getUserFeedbackContext(userId)
+    let rescoredCount = 0
 
-    for (const job of jobs) {
+    for (const job of jobsToRescore) {
       try {
         const prompt = `
 You are a job matching engine. Score how well this job fits the candidate.
@@ -45,16 +46,14 @@ Respond ONLY with valid JSON, no markdown:
 {"score": <0-100>, "reason": "<one sentence why>"}
 `
         const text = await generateContent(prompt)
-        const clean = text.replace(/```json|```/g, '').trim()
+        const clean = text.replace(/\`\`\`json|\`\`\`/g, '').trim()
         const { score, reason } = JSON.parse(clean)
 
-        await supabase
-          .from('jobs')
-          .update({ score, score_reason: reason, score_is_fallback: false })
-          .eq('id', job.id)
+        await db.update(jobs)
+          .set({ score, score_reason: reason, score_is_fallback: false })
+          .where(eq(jobs.id, job.id));
 
-        console.log(`RESCORED: ${job.title} — ${score}`)
-        rescored++
+        rescoredCount++
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : String(err)
         console.log(`RESCORE FAILED: ${job.title} — ${message.slice(0, 50)}`)
@@ -63,8 +62,8 @@ Respond ONLY with valid JSON, no markdown:
 
     return NextResponse.json({
       success: true,
-      rescored,
-      remaining: jobs.length - rescored
+      rescored: rescoredCount,
+      remaining: jobsToRescore.length - rescoredCount
     })
 
   } catch (err: unknown) {

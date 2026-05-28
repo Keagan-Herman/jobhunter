@@ -1,8 +1,11 @@
-import { createClient } from '@/lib/supabase/server'
+import { db, initDb } from '@/lib/db';
+import { jobs, profiles, scanLogs } from '@/lib/db/schema';
+import { eq, and, inArray } from 'drizzle-orm';
 import { generateContent } from '@/lib/groq'
 import { NextResponse } from 'next/server'
 import { scoreCache } from '@/lib/cache'
 import { withTimeout } from '@/lib/timeout'
+import { LOCAL_USER_ID, ensureLocalUser } from '@/lib/db/user';
 import {
   getUserProfile,
   getUserFeedbackContext,
@@ -13,6 +16,9 @@ import {
   extractStack,
   getCountryName
 } from '@/lib/profile'
+import { v4 as uuidv4 } from 'uuid';
+
+initDb();
 
 interface ScoreResult {
   score: number
@@ -215,14 +221,10 @@ async function fetchJSearchTerm(
 
 export async function GET() {
   try {
-    const supabase = await createClient()
-
-    // Auth check
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const userId = await ensureLocalUser();
 
     // ✅ Fetch profile once — get both AI text and preferences
-    const { profileText, profileData } = await getUserProfile(supabase, user.id)
+    const { profileText, profileData } = await getUserProfile(userId)
 
     // Rate limiting check
     const lastScanAt = profileData?.last_scan_at
@@ -247,8 +249,8 @@ export async function GET() {
 
     // ✅ Fetch feedback and signals in parallel with job fetching
     const [feedbackContext, learnedSignals, ...jobResults] = await Promise.all([
-      getUserFeedbackContext(supabase, user.id),
-      getLearnedSignals(supabase, user.id),
+      getUserFeedbackContext(userId),
+      getLearnedSignals(userId),
       // ✅ All Adzuna + JSearch terms run in parallel
       ...searchTerms.map(term => fetchAdzunaJobs(term, country, remoteOnly, salaryMin)),
       ...searchTerms.slice(0, 2).map(term => fetchJSearchTerm(term, country, remoteOnly))
@@ -270,18 +272,21 @@ export async function GET() {
 
     // Batch check existence
     const externalIds = uniqueResults.map(j => String(j.id))
-    const { data: existingJobs } = await supabase
-      .from('jobs')
-      .select('external_id')
-      .in('external_id', externalIds)
-      .eq('user_id', user.id)
+    const existingJobs = await db.query.jobs.findMany({
+      where: and(
+        inArray(jobs.external_id, externalIds),
+        eq(jobs.user_id, userId)
+      ),
+      columns: {
+        external_id: true
+      }
+    });
 
     const existingSet = new Set(existingJobs?.map(j => j.external_id) || [])
     const resultsToScore = uniqueResults.filter(j => !existingSet.has(String(j.id)))
 
     let newJobs = 0
     let scored = 0
-    const jobsToInsert: Record<string, unknown>[] = []
 
     for (const job of resultsToScore) {
       const externalId = String(job.id)
@@ -291,8 +296,7 @@ export async function GET() {
       const stack = extractStack(description)
 
       // ✅ Check cache before hitting AI
-      const cacheKey = `${externalId}_${user.id}`
-      let scoreResult: ScoreResult | null = await scoreCache.get(supabase, cacheKey)
+      let scoreResult: ScoreResult | null = await scoreCache.get(userId, externalId)
 
       if (!scoreResult) {
         scoreResult = await scoreJob(
@@ -311,8 +315,9 @@ export async function GET() {
 
       const { score, reason, score_is_fallback, stack: aiStack, culture_fit, interview_prep } = scoreResult
 
-      jobsToInsert.push({
-        user_id: user.id,
+      await db.insert(jobs).values({
+        id: uuidv4(),
+        user_id: userId,
         external_id: externalId,
         title: job.title,
         company,
@@ -338,21 +343,19 @@ export async function GET() {
       scored++
     }
 
-    if (jobsToInsert.length > 0) {
-        await supabase.from('jobs').insert(jobsToInsert)
-    }
-
     // Update last_scan_at
-    await supabase.from('profiles').update({ last_scan_at: new Date().toISOString() }).eq('id', user.id)
+    await db.update(profiles)
+      .set({ last_scan_at: new Date().toISOString() })
+      .where(eq(profiles.id, userId));
 
     // ✅ Scan log counts all sources
-    const scanLog: Record<string, unknown> = {
+    await db.insert(scanLogs).values({
+      id: uuidv4(),
       jobs_found: uniqueResults.length,
       jobs_new: newJobs,
       jobs_scored: scored,
       status: 'success'
-    }
-    await supabase.from('scan_logs').insert(scanLog)
+    });
 
     return NextResponse.json({
       success: true,

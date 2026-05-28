@@ -7,12 +7,16 @@
 - Network:       http://192.168.0.2:3000
 
 ✓ Starting...
-Attention: Next.js now collects completely anonymous telemetry regarding usage.
-This information is used to shape Next.js' roadmap and prioritize features.
-You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
-https://nextjs.org/telemetry
-
-✓ Ready in 1646ms
-○ Compiling /dashboard ...
- GET /dashboard 200 in 5.8s (compile: 5.1s, proxy.ts: 356ms, render: 354ms)
- GET /dashboard 200 in 70ms (compile: 6ms, proxy.ts: 7ms, render: 57ms)
+✓ Ready in 1302ms
+○ Compiling / ...
+ GET / 200 in 3.8s (compile: 3.5s, render: 373ms)
+ GET /onboarding 200 in 790ms (compile: 623ms, proxy.ts: 87ms, render: 80ms)
+ GET /api/profile 200 in 1372ms (compile: 1339ms, render: 33ms)
+ GET /api/profile 200 in 13ms (compile: 4ms, render: 9ms)
+ POST /api/profile 200 in 17ms (compile: 3ms, render: 14ms)
+ GET /dashboard?firstTime=true 200 in 608ms (compile: 563ms, proxy.ts: 7ms, render: 38ms)
+ GET /api/profile 200 in 13ms (compile: 5ms, render: 8ms)
+ GET /api/profile 200 in 11ms (compile: 2ms, render: 9ms)
+ GET /api/jobs/all 200 in 245ms (compile: 236ms, render: 9ms)
+ GET /api/jobs/all 200 in 10ms (compile: 4ms, render: 6ms)
+[?25h

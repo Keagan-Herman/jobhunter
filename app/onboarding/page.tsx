@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
 export default function OnboardingPage() {
@@ -11,7 +10,6 @@ export default function OnboardingPage() {
   const [importError, setImportError] = useState('')
   const [importStep, setImportStep] = useState('')
 
-  // Step 2 fields
   const [fullName, setFullName] = useState('')
   const [jobTitle, setJobTitle] = useState('')
   const [company, setCompany] = useState('')
@@ -20,32 +18,28 @@ export default function OnboardingPage() {
   const [experience, setExperience] = useState('')
   const [projects, setProjects] = useState('')
 
-  // Step 3 fields
   const [searchTerms, setSearchTerms] = useState('')
   const [country, setCountry] = useState('za')
   const [salaryMin, setSalaryMin] = useState('')
   const [remoteOnly, setRemoteOnly] = useState(false)
 
-  const supabase = createClient()
   const router = useRouter()
 
   useEffect(() => {
     const check = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { router.push('/login'); return }
+      try {
+        const res = await fetch('/api/profile')
+        const data = await res.json()
 
-      // If profile already exists skip onboarding
-      const { data } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', user.id)
-        .single()
-
-      if (data) router.push('/dashboard')
+        if (data.profile && data.profile.full_name && data.profile.full_name !== 'Local User') {
+            router.push('/dashboard')
+        }
+      } catch (err) {
+        console.error('Check failed')
+      }
     }
     check()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [router])
 
   const handleImportCV = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -61,7 +55,6 @@ export default function OnboardingPage() {
     const clearTimers = () => timers.forEach(clearTimeout)
 
     try {
-      // Simulate steps for better UX
       timers.push(setTimeout(() => setImportStep('Analyzing with AI...'), 2000))
       timers.push(setTimeout(() => setImportStep('Extracting skills & experience...'), 4500))
 
@@ -96,27 +89,33 @@ export default function OnboardingPage() {
 
   const handleSave = async () => {
     setSaving(true)
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
 
-    await supabase.from('profiles').upsert({
-      id: user.id,
-      full_name: fullName,
-      job_title: jobTitle,
-      company,
-      education,
-      skills: skills.split(',').map(s => s.trim()).filter(Boolean),
-      experience,
-      projects,
-      search_terms: searchTerms.split(',').map(s => s.trim()).filter(Boolean),
-      country,
-      salary_min: salaryMin ? parseInt(salaryMin) : null,
-      remote_only: remoteOnly,
-      updated_at: new Date().toISOString()
-    })
+    try {
+        const res = await fetch('/api/profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                full_name: fullName,
+                job_title: jobTitle,
+                company,
+                education,
+                skills: skills.split(',').map(s => s.trim()).filter(Boolean),
+                experience,
+                projects,
+                search_terms: searchTerms.split(',').map(s => s.trim()).filter(Boolean),
+                country,
+                salary_min: salaryMin ? parseInt(salaryMin) : null,
+                remote_only: remoteOnly,
+            })
+        })
 
-    setSaving(false)
-    router.push('/dashboard?firstTime=true')
+        if (!res.ok) throw new Error('Failed to save profile')
+        router.push('/dashboard?firstTime=true')
+    } catch (err) {
+        console.error('Save failed', err)
+    } finally {
+        setSaving(false)
+    }
   }
 
   const progress = (step / 3) * 100
@@ -126,13 +125,10 @@ export default function OnboardingPage() {
 
   return (
     <div className="min-h-screen bg-[#080812] font-sans text-[#e0e0f0] px-6 py-12 flex flex-col items-center relative overflow-hidden">
-      {/* Background Glow */}
       <div className="fixed -top-40 -left-40 w-96 h-96 bg-[#00ff8705] rounded-full blur-[100px] pointer-events-none" />
       <div className="fixed -bottom-40 -right-40 w-96 h-96 bg-[#7b61ff05] rounded-full blur-[100px] pointer-events-none" />
 
       <div className="w-full max-w-[600px] relative z-10">
-
-        {/* Logo */}
         <div className="text-center mb-12">
           <h1 className="font-syne text-[32px] font-extrabold text-white tracking-tight">
             Job<span className="text-[#00ff87]">Hunter</span>
@@ -140,27 +136,24 @@ export default function OnboardingPage() {
           <div className="text-[11px] font-mono text-[#444] uppercase tracking-[4px] mt-2 font-bold">AI Career Copilot</div>
         </div>
 
-        {/* Progress bar */}
         <div className="mb-12">
           <div className="flex justify-between mb-4">
             {['Welcome', 'Your Profile', 'Preferences'].map((label, i) => (
               <div key={label} className="flex flex-col items-center gap-2">
-                <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-[12px] font-bold font-mono transition-all duration-500
-                  ${step > i + 1 ? 'bg-[#00ff87] text-[#0a0a1a] shadow-[0_0_15px_#00ff8740]' : step === i + 1 ? 'border-2 border-[#00ff87] text-[#00ff87] shadow-[0_0_15px_#00ff8720]' : 'bg-[#0d0d20] border-2 border-[#1e1e38] text-[#333]'}`}>
+                <div className={"w-8 h-8 rounded-xl flex items-center justify-center text-[12px] font-bold font-mono transition-all duration-500 " + (step > i + 1 ? 'bg-[#00ff87] text-[#0a0a1a] shadow-[0_0_15px_#00ff8740]' : step === i + 1 ? 'border-2 border-[#00ff87] text-[#00ff87] shadow-[0_0_15px_#00ff8720]' : 'bg-[#0d0d20] border-2 border-[#1e1e38] text-[#333]')}>
                   {step > i + 1 ? '' : i + 1}
                 </div>
-                <span className={`text-[10px] font-mono font-bold uppercase tracking-wider ${step === i + 1 ? 'text-[#00ff87]' : 'text-[#333]'}`}>
+                <span className={"text-[10px] font-mono font-bold uppercase tracking-wider " + (step === i + 1 ? 'text-[#00ff87]' : 'text-[#333]')}>
                   {label}
                 </span>
               </div>
             ))}
           </div>
           <div className="h-1 bg-[#1e1e38] rounded-full mt-2 overflow-hidden">
-            <div className="h-full bg-[#00ff87] rounded-full transition-all duration-700 ease-in-out shadow-[0_0_10px_#00ff8780]" style={{ width: `${progress}%` }} />
+            <div className="h-full bg-[#00ff87] rounded-full transition-all duration-700 ease-in-out shadow-[0_0_10px_#00ff8780]" style={{ width: progress + "%" }} />
           </div>
         </div>
 
-        {/* Step 1 — Welcome */}
         {step === 1 && (
           <div className="bg-[#0d0d20]/80 backdrop-blur-xl border border-[#1e1e38] rounded-3xl p-10 animate-in fade-in slide-in-from-bottom-4 duration-700 shadow-2xl">
             <h2 className="font-syne text-[26px] font-extrabold text-white mb-3 leading-tight tracking-tight">
@@ -170,10 +163,7 @@ export default function OnboardingPage() {
               JobHunter uses advanced AI to curate the best opportunities for you, score your fit instantly, and generate high-impact cover letters.
             </p>
 
-            {/* CV Import */}
-            <div className={`bg-[#0a0a1a] border-2 border-dashed rounded-2xl p-8 text-center mb-6 group transition-all duration-300
-              ${importing ? 'border-[#00ff8740] bg-[#00ff8705]' : 'border-[#2a2a4a] hover:border-[#00ff8730] hover:bg-[#00ff8702]'}`}>
-
+            <div className={"bg-[#0a0a1a] border-2 border-dashed rounded-2xl p-8 text-center mb-6 group transition-all duration-300 " + (importing ? 'border-[#00ff8740] bg-[#00ff8705]' : 'border-[#2a2a4a] hover:border-[#00ff8730] hover:bg-[#00ff8702]')}>
               {importing ? (
                 <div className="flex flex-col items-center animate-in fade-in duration-300">
                   <div className="w-12 h-12 rounded-full border-3 border-[#00ff8710] border-t-[#00ff87] animate-spin mb-4" />
@@ -218,7 +208,6 @@ export default function OnboardingPage() {
           </div>
         )}
 
-        {/* Step 2 — Profile */}
         {step === 2 && (
           <div className="bg-[#0d0d20]/80 backdrop-blur-xl border border-[#1e1e38] rounded-3xl p-10 animate-in fade-in slide-in-from-bottom-4 duration-700 shadow-2xl">
             <h2 className="font-syne text-[26px] font-extrabold text-white mb-2 tracking-tight">
@@ -257,7 +246,7 @@ export default function OnboardingPage() {
               <div>
                 <label className={labelClasses}>Experience Highlights</label>
                 <textarea
-                  className={`${inputClasses} resize-none leading-relaxed`}
+                  className={inputClasses + " resize-none leading-relaxed"}
                   value={experience}
                   onChange={e => setExperience(e.target.value)}
                   placeholder="Key achievements and responsibilities..."
@@ -267,7 +256,7 @@ export default function OnboardingPage() {
               <div>
                 <label className={labelClasses}>Notable Projects</label>
                 <textarea
-                  className={`${inputClasses} resize-none leading-relaxed`}
+                  className={inputClasses + " resize-none leading-relaxed"}
                   value={projects}
                   onChange={e => setProjects(e.target.value)}
                   placeholder="Personal or open-source projects..."
@@ -286,16 +275,13 @@ export default function OnboardingPage() {
               <button
                 onClick={() => setStep(3)}
                 disabled={!fullName || !skills}
-                className={`flex-[2] bg-[#00ff87] text-[#0a0a1a] py-4 rounded-2xl font-mono text-[11px] font-bold tracking-[2px] uppercase transition-all
-                  ${!fullName || !skills ? 'opacity-50 cursor-not-allowed' : 'hover:brightness-110 shadow-lg shadow-[#00ff8720] hover:-translate-y-0.5 active:translate-y-0'}`}
-              >
+                className={"flex-[2] bg-[#00ff87] text-[#0a0a1a] py-4 rounded-2xl font-mono text-[11px] font-bold tracking-[2px] uppercase transition-all " + (!fullName || !skills ? 'opacity-50 cursor-not-allowed' : 'hover:brightness-110 shadow-lg shadow-[#00ff8720] hover:-translate-y-0.5 active:translate-y-0')}>
                 Next to Preferences
               </button>
             </div>
           </div>
         )}
 
-        {/* Step 3 — Preferences */}
         {step === 3 && (
           <div className="bg-[#0d0d20]/80 backdrop-blur-xl border border-[#1e1e38] rounded-3xl p-10 animate-in fade-in slide-in-from-bottom-4 duration-700 shadow-2xl">
             <h2 className="font-syne text-[26px] font-extrabold text-white mb-2 tracking-tight">
@@ -325,7 +311,7 @@ export default function OnboardingPage() {
                     <select
                         value={country}
                         onChange={e => setCountry(e.target.value)}
-                        className={`${inputClasses} appearance-none cursor-pointer pr-10`}
+                        className={inputClasses + " appearance-none cursor-pointer pr-10"}
                     >
                         <option value="za">South Africa</option>
                         <option value="gb">United Kingdom</option>
@@ -336,7 +322,6 @@ export default function OnboardingPage() {
                         <option value="nl">Netherlands</option>
                         <option value="sg">Singapore</option>
                     </select>
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#333]"></div>
                 </div>
               </div>
 
@@ -362,11 +347,8 @@ export default function OnboardingPage() {
                   </div>
                   <div
                     onClick={() => setRemoteOnly(!remoteOnly)}
-                    className={`w-12 h-6.5 rounded-full relative transition-all duration-300 ease-in-out
-                      ${remoteOnly ? 'bg-[#00ff87]' : 'bg-[#1e1e38]'}`}
-                  >
-                    <div className={`w-5 h-5 rounded-full bg-white absolute top-0.75 transition-all duration-300 shadow-sm
-                      ${remoteOnly ? 'left-[23px]' : 'left-1'}`} />
+                    className={"w-12 h-6.5 rounded-full relative transition-all duration-300 ease-in-out " + (remoteOnly ? 'bg-[#00ff87]' : 'bg-[#1e1e38]')}>
+                    <div className={"w-5 h-5 rounded-full bg-white absolute top-0.75 transition-all duration-300 shadow-sm " + (remoteOnly ? 'left-[23px]' : 'left-1')} />
                   </div>
                 </label>
               </div>
@@ -382,9 +364,7 @@ export default function OnboardingPage() {
               <button
                 onClick={handleSave}
                 disabled={saving || !searchTerms}
-                className={`flex-[2] bg-[#00ff87] text-[#0a0a1a] py-4 rounded-2xl font-mono text-[11px] font-bold tracking-[2px] uppercase transition-all
-                  ${saving || !searchTerms ? 'opacity-50 cursor-not-allowed' : 'hover:brightness-110 shadow-lg shadow-[#00ff8730] hover:-translate-y-0.5 active:translate-y-0'}`}
-              >
+                className={"flex-[2] bg-[#00ff87] text-[#0a0a1a] py-4 rounded-2xl font-mono text-[11px] font-bold tracking-[2px] uppercase transition-all " + (saving || !searchTerms ? 'opacity-50 cursor-not-allowed' : 'hover:brightness-110 shadow-lg shadow-[#00ff8720] hover:-translate-y-0.5 active:translate-y-0')}>
                 {saving ? 'Preparing Dashboard...' : 'Launch JobHunter'}
               </button>
             </div>

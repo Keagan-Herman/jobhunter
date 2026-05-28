@@ -1,10 +1,11 @@
-import { createClient } from '@/lib/supabase/server'
+import { db } from '@/lib/db';
+import { profiles, jobs } from '@/lib/db/schema';
+import { eq, and, gte, isNotNull } from 'drizzle-orm';
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
 
 export async function GET(request: Request) {
   try {
-    // ✅ Support both header and query param for Vercel crons
     const resend = new Resend(process.env.RESEND_API_KEY!)
     const authHeader = request.headers.get('authorization')
     const url = new URL(request.url)
@@ -18,42 +19,36 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const supabase = await createClient()
+    const userProfiles = await db.query.profiles.findMany({
+      where: isNotNull(profiles.full_name)
+    });
 
-    // Get all users with notifications enabled who have an email
-    const { data: profiles } = await supabase
-      .from('profiles')
-      .select('id, full_name, email, email_notifications, last_notified_at')
-      .eq('email_notifications', true)
-      .not('email', 'is', null)
-
-    if (!profiles?.length) {
+    if (!userProfiles?.length) {
       return NextResponse.json({ message: 'No users to notify' })
     }
 
     let notified = 0
     let errors = 0
 
-    for (const profile of profiles) {
+    for (const profile of userProfiles) {
       try {
         if (!profile.email) continue
 
-        // ✅ Only get jobs added since last notification
         const since = profile.last_notified_at || new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
 
-        const { data: newJobs } = await supabase
-          .from('jobs')
-          .select('id, title, company, score, location')
-          .eq('user_id', profile.id)
-          .eq('status', 'pending')
-          .gte('score', 75)
-          .gte('fetched_at', since) // ✅ only new jobs since last run
-          .order('score', { ascending: false })
-          .limit(5)
+        const newJobs = await db.query.jobs.findMany({
+            where: and(
+                eq(jobs.user_id, profile.id),
+                eq(jobs.status, 'pending'),
+                gte(jobs.score, 75),
+                gte(jobs.created_at, since)
+            ),
+            orderBy: (jobs, { desc }) => [desc(jobs.score)],
+            limit: 5
+        });
 
         if (!newJobs?.length) continue
 
-        // ✅ Send via Resend
         await resend.emails.send({
           from: 'JobHunter <notifications@yourdomain.com>',
           to: profile.email,
@@ -94,16 +89,15 @@ export async function GET(request: Request) {
           `
         })
 
-        // ✅ Update last notified timestamp
-        await supabase
-          .from('profiles')
-          .update({ last_notified_at: new Date().toISOString() })
-          .eq('id', profile.id)
+        await db.update(profiles)
+          .set({
+              last_notified_at: new Date().toISOString()
+            })
+          .where(eq(profiles.id, profile.id));
 
         notified++
 
       } catch (userErr: unknown) {
-        // ✅ Per-user error handling — one failure doesn't kill the rest
         const message = userErr instanceof Error ? userErr.message : String(userErr)
         console.log(`[NOTIFY] Failed for ${profile.email}: ${message}`)
         errors++

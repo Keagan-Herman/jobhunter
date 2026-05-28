@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
 export default function ProfilePage() {
@@ -23,38 +22,36 @@ export default function ProfilePage() {
   const [coverLetterLength, setCoverLetterLength] = useState('short')
   const [careerContext, setCareerContext] = useState('experienced')
 
-  const supabase = createClient()
   const router = useRouter()
 
   useEffect(() => {
     const load = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { router.push('/login'); return }
+      try {
+        const res = await fetch('/api/profile')
+        const data = await res.json()
 
-      const { data } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single()
-
-      if (data) {
-        setFullName(data.full_name || '')
-        setJobTitle(data.job_title || '')
-        setCompany(data.company || '')
-        setEducation(data.education || '')
-        setSkills((data.skills || []).join(', '))
-        setExperience(data.experience || '')
-        setProjects(data.projects || '')
-        setSearchTerms((data.search_terms || []).join(', '))
-        setEmailNotifications(data.email_notifications ?? true)
-        setCoverLetterTone(data.cover_letter_tone || 'professional')
-        setCoverLetterLength(data.cover_letter_length || 'short')
-        setCareerContext(data.career_context || 'experienced')
+        if (data.profile) {
+          const profile = data.profile
+          setFullName(profile.full_name || '')
+          setJobTitle(profile.job_title || '')
+          setCompany(profile.company || '')
+          setEducation(profile.education || '')
+          setSkills((profile.skills || []).join(', '))
+          setExperience(profile.experience || '')
+          setProjects(profile.projects || '')
+          setSearchTerms((profile.search_terms || []).join(', '))
+          setEmailNotifications(profile.email_notifications ?? true)
+          setCoverLetterTone(profile.cover_letter_tone || 'professional')
+          setCoverLetterLength(profile.cover_letter_length || 'short')
+          setCareerContext(profile.career_context || 'experienced')
+        }
+      } catch (err) {
+        console.error('Failed to load profile')
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
     }
     load()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleImportCV = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -98,30 +95,36 @@ export default function ProfilePage() {
   const handleSave = async () => {
     setSaving(true)
     setSaved(false)
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
 
-    await supabase.from('profiles').upsert({
-      id: user.id,
-      email: user.email,
-      full_name: fullName,
-      job_title: jobTitle,
-      company,
-      education,
-      skills: skills.split(',').map(s => s.trim()).filter(Boolean),
-      experience,
-      projects,
-      search_terms: searchTerms.split(',').map(s => s.trim()).filter(Boolean),
-      updated_at: new Date().toISOString(),
-      email_notifications: emailNotifications,
-      cover_letter_tone: coverLetterTone,
-      cover_letter_length: coverLetterLength,
-      career_context: careerContext,
-    })
+    try {
+        const res = await fetch('/api/profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                full_name: fullName,
+                job_title: jobTitle,
+                company,
+                education,
+                skills: skills.split(',').map(s => s.trim()).filter(Boolean),
+                experience,
+                projects,
+                search_terms: searchTerms.split(',').map(s => s.trim()).filter(Boolean),
+                email_notifications: emailNotifications,
+                cover_letter_tone: coverLetterTone,
+                cover_letter_length: coverLetterLength,
+                career_context: careerContext,
+            })
+        })
 
-    setSaving(false)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 3000)
+        if (!res.ok) throw new Error('Failed to save profile')
+
+        setSaved(true)
+        setTimeout(() => setSaved(false), 3000)
+    } catch (err) {
+        console.error('Save failed', err)
+    } finally {
+        setSaving(false)
+    }
   }
 
   if (loading) return (
@@ -139,7 +142,6 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-[#080812] text-[#e0e0f0] px-4 py-12 md:px-8">
       <div className="max-w-3xl mx-auto space-y-12">
-        {/* Header */}
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-1">
             <h1 className="font-syne text-3xl md:text-4xl font-extrabold text-white tracking-tight">
@@ -157,15 +159,12 @@ export default function ProfilePage() {
           </button>
         </header>
 
-        {/* CV Import */}
         <section className="bg-[#0a0a1a] border border-dashed border-[#2a2a4a] rounded-2xl p-8 text-center group hover:border-[#00ff8740] transition-colors shadow-2xl">
-          <div className="text-4xl mb-4"></div>
           <h3 className="text-lg font-semibold text-white mb-2">Import your CV</h3>
           <p className="text-sm text-[#555] mb-6 max-w-xs mx-auto font-sans">
             Auto-fill your entire profile from your CV. We support PDF format.
           </p>
-          <label className={`inline-flex items-center gap-2 px-8 py-3 rounded-xl border border-[#00ff87] text-[#00ff87] font-mono text-[11px] font-bold tracking-widest uppercase cursor-pointer transition-all hover:bg-[#00ff8710]
-            ${importing ? 'opacity-60 cursor-not-allowed' : ''}`}>
+          <label className={"inline-flex items-center gap-2 px-8 py-3 rounded-xl border border-[#00ff87] text-[#00ff87] font-mono text-[11px] font-bold tracking-widest uppercase cursor-pointer transition-all hover:bg-[#00ff8710] " + (importing ? 'opacity-60 cursor-not-allowed' : '')}>
             {importing ? (
               <><div className="w-3 h-3 border-2 border-[#00ff87] border-t-transparent rounded-full animate-spin" /> Processing...</>
             ) : 'Upload PDF'}
@@ -178,9 +177,7 @@ export default function ProfilePage() {
           )}
         </section>
 
-        {/* Main Form */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-          {/* Left Column: Personal & Bio */}
           <div className="md:col-span-7 space-y-8">
             <div className="bg-[#0d0d20] border border-[#1e1e38] rounded-2xl p-6 md:p-8 space-y-6 shadow-2xl">
               <h2 className="font-syne text-xl font-bold text-white mb-2">Core Profile</h2>
@@ -209,7 +206,7 @@ export default function ProfilePage() {
                 <div>
                   <label className={labelClasses}>Experience Summary</label>
                   <textarea
-                    className={`${inputClasses} resize-none leading-relaxed h-32`}
+                    className={inputClasses + " resize-none leading-relaxed h-32"}
                     value={experience}
                     onChange={e => setExperience(e.target.value)}
                     placeholder="Briefly describe your career journey..."
@@ -218,7 +215,7 @@ export default function ProfilePage() {
                 <div>
                   <label className={labelClasses}>Notable Projects</label>
                   <textarea
-                    className={`${inputClasses} resize-none leading-relaxed h-24`}
+                    className={inputClasses + " resize-none leading-relaxed h-24"}
                     value={projects}
                     onChange={e => setProjects(e.target.value)}
                     placeholder="Projects that showcase your best work..."
@@ -228,9 +225,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Right Column: Preferences & Style */}
           <div className="md:col-span-5 space-y-8">
-            {/* Preferences */}
             <div className="bg-[#0d0d20] border border-[#1e1e38] rounded-2xl p-6 md:p-8 space-y-6 shadow-2xl">
               <h2 className="font-syne text-xl font-bold text-white">Job Search</h2>
               <div className="space-y-6">
@@ -253,22 +248,16 @@ export default function ProfilePage() {
                     </div>
                     <div
                       onClick={() => setEmailNotifications(!emailNotifications)}
-                      className={`w-11 h-6 rounded-full relative transition-colors duration-300 ease-in-out
-                        ${emailNotifications ? 'bg-[#00ff87]' : 'bg-[#1e1e38]'}`}
-                    >
-                      <div className={`w-4.5 h-4.5 rounded-full bg-white absolute top-0.75 transition-all duration-300 ease-in-out
-                        ${emailNotifications ? 'left-[23px]' : 'left-0.75'}`} />
+                      className={"w-11 h-6 rounded-full relative transition-colors duration-300 ease-in-out " + (emailNotifications ? 'bg-[#00ff87]' : 'bg-[#1e1e38]')}>
+                      <div className={"w-4.5 h-4.5 rounded-full bg-white absolute top-0.75 transition-all duration-300 ease-in-out " + (emailNotifications ? 'left-[23px]' : 'left-0.75')} />
                     </div>
                   </label>
                 </div>
               </div>
             </div>
 
-            {/* AI Style */}
             <div className="bg-[#0d0d20] border border-[#1e1e38] rounded-2xl p-6 md:p-8 space-y-6 shadow-2xl">
               <h2 className="font-syne text-xl font-bold text-white">Cover Letter Style</h2>
-
-              {/* Tone */}
               <div className="space-y-3">
                 <label className={labelClasses}>Tone</label>
                 <div className="grid grid-cols-1 gap-2">
@@ -280,8 +269,7 @@ export default function ProfilePage() {
                     <button
                       key={opt.value}
                       onClick={() => setCoverLetterTone(opt.value)}
-                      className={`px-4 py-2.5 rounded-xl text-xs font-mono font-bold tracking-tight text-left transition-all border
-                        ${coverLetterTone === opt.value ? 'bg-[#00ff8710] border-[#00ff87] text-[#00ff87]' : 'bg-[#0a0a1a] border-[#1e1e38] text-[#444] hover:border-[#333]'}`}
+                      className={"px-4 py-2.5 rounded-xl text-xs font-mono font-bold tracking-tight text-left transition-all border " + (coverLetterTone === opt.value ? 'bg-[#00ff8710] border-[#00ff87] text-[#00ff87]' : 'bg-[#0a0a1a] border-[#1e1e38] text-[#444] hover:border-[#333]')}
                     >
                       {opt.label}
                     </button>
@@ -289,7 +277,6 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              {/* Length */}
               <div className="space-y-3">
                 <label className={labelClasses}>Length</label>
                 <div className="grid grid-cols-2 gap-2">
@@ -300,8 +287,7 @@ export default function ProfilePage() {
                     <button
                       key={opt.value}
                       onClick={() => setCoverLetterLength(opt.value)}
-                      className={`px-3 py-2.5 rounded-xl text-[10px] font-mono font-bold tracking-widest uppercase transition-all border text-center
-                        ${coverLetterLength === opt.value ? 'bg-[#00ff8710] border-[#00ff87] text-[#00ff87]' : 'bg-[#0a0a1a] border-[#1e1e38] text-[#444] hover:border-[#333]'}`}
+                      className={"px-3 py-2.5 rounded-xl text-[10px] font-mono font-bold tracking-widest uppercase transition-all border text-center " + (coverLetterLength === opt.value ? 'bg-[#00ff8710] border-[#00ff87] text-[#00ff87]' : 'bg-[#0a0a1a] border-[#1e1e38] text-[#444] hover:border-[#333]')}
                     >
                       {opt.label}
                     </button>
@@ -309,7 +295,6 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              {/* Context */}
               <div className="space-y-3">
                 <label className={labelClasses}>Career Stage</label>
                 <div className="grid grid-cols-1 gap-2">
@@ -321,8 +306,7 @@ export default function ProfilePage() {
                     <button
                       key={opt.value}
                       onClick={() => setCareerContext(opt.value)}
-                      className={`px-4 py-2.5 rounded-xl text-xs font-mono font-bold tracking-tight text-left transition-all border
-                        ${careerContext === opt.value ? 'bg-[#00ff8710] border-[#00ff87] text-[#00ff87]' : 'bg-[#0a0a1a] border-[#1e1e38] text-[#444] hover:border-[#333]'}`}
+                      className={"px-4 py-2.5 rounded-xl text-xs font-mono font-bold tracking-tight text-left transition-all border " + (careerContext === opt.value ? 'bg-[#00ff8710] border-[#00ff87] text-[#00ff87]' : 'bg-[#0a0a1a] border-[#1e1e38] text-[#444] hover:border-[#333]')}
                     >
                       {opt.label}
                     </button>
@@ -333,7 +317,6 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Footer Actions */}
         <footer className="sticky bottom-8 z-50 py-6 border-t border-[#1a1a32] bg-[#080812]/80 backdrop-blur-xl rounded-2xl shadow-[0_-10px_40px_-20px_#00ff8740] flex flex-col md:flex-row items-center justify-between gap-6 px-8">
           <div className="text-[11px] font-mono text-[#333] tracking-[2px] uppercase text-center md:text-left">
             Your data is private & secure
@@ -341,9 +324,7 @@ export default function ProfilePage() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className={`w-full md:w-fit min-w-[240px] py-4 rounded-xl font-mono text-xs font-bold tracking-[3px] uppercase transition-all duration-500 shadow-2xl
-              ${saved ? 'bg-[#00ff8720] border border-[#00ff8740] text-[#00ff87]' : 'bg-[#00ff87] text-[#0a0a1a] hover:brightness-110 active:translate-y-px'}`}
-          >
+            className={"w-full md:w-fit min-w-[240px] py-4 rounded-xl font-mono text-xs font-bold tracking-[3px] uppercase transition-all duration-500 shadow-2xl " + (saved ? 'bg-[#00ff8720] border border-[#00ff8740] text-[#00ff87]' : 'bg-[#00ff87] text-[#0a0a1a] hover:brightness-110 active:translate-y-px')}>
             {saving ? 'Processing...' : saved ? 'Profile Updated' : 'Save All Changes'}
           </button>
         </footer>

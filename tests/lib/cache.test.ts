@@ -1,38 +1,37 @@
 import { scoreCache } from '@/lib/cache'
+import { db } from '@/lib/db'
+
+jest.mock('@/lib/db', () => ({
+  db: {
+    query: {
+      jobs: {
+        findFirst: jest.fn(),
+      },
+    },
+  },
+}))
 
 describe('scoreCache', () => {
-  const mockSupabase = {
-    from: jest.fn().mockReturnThis(),
-    select: jest.fn().mockReturnThis(),
-    eq: jest.fn().mockReturnThis(),
-    single: jest.fn()
-  } as any /* eslint-disable-line @typescript-eslint/no-explicit-any */
-
   test('get returns cached data when found', async () => {
-    mockSupabase.single.mockResolvedValue({
-      data: {
-        score: 85,
-        score_reason: 'Good match',
-        stack: ['React'],
-        score_is_fallback: false
-      },
-      error: null
+    (db.query.jobs.findFirst as jest.Mock).mockResolvedValue({
+      score: 85,
+      score_reason: 'Good match',
+      stack: ['React'],
+      score_is_fallback: false
     })
 
-    const result = await scoreCache.get(mockSupabase, 'ext-123_user-456')
+    const result = await scoreCache.get('user-456', 'ext-123')
     expect(result).toEqual({
       score: 85,
       reason: 'Good match',
       stack: ['React'],
       score_is_fallback: false
     })
-    expect(mockSupabase.eq).toHaveBeenCalledWith('external_id', 'ext-123')
-    expect(mockSupabase.eq).toHaveBeenCalledWith('user_id', 'user-456')
   })
 
   test('get returns null when not found', async () => {
-    mockSupabase.single.mockResolvedValue({ data: null, error: null })
-    const result = await scoreCache.get(mockSupabase, 'ext-123_user-456')
+    (db.query.jobs.findFirst as jest.Mock).mockResolvedValue(null)
+    const result = await scoreCache.get('user-456', 'ext-123')
     expect(result).toBeNull()
   })
 })

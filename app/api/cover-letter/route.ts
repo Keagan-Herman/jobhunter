@@ -1,17 +1,23 @@
-import { createClient } from '@/lib/supabase/server'
+import { db } from '@/lib/db';
+import { jobs, profiles, coverLetters, coverLetterPatterns } from '@/lib/db/schema';
+import { eq, and, desc } from 'drizzle-orm';
 import { streamContent } from '@/lib/groq'
 import { NextResponse } from 'next/server'
 import { getUserProfile } from '@/lib/profile'
-import { SupabaseClient } from '@supabase/supabase-js'
+import { ensureLocalUser } from '@/lib/db/user';
+import { v4 as uuidv4 } from 'uuid';
 
-async function getUserPreferences(supabase: SupabaseClient, userId: string): Promise<{
+async function getUserPreferences(userId: string): Promise<{
   tone: string, length: string, context: string
 }> {
-  const { data } = await supabase
-    .from('profiles')
-    .select('cover_letter_tone, cover_letter_length, career_context')
-    .eq('id', userId)
-    .single()
+  const data = await db.query.profiles.findFirst({
+    where: eq(profiles.id, userId),
+    columns: {
+      cover_letter_tone: true,
+      cover_letter_length: true,
+      career_context: true
+    }
+  });
 
   return {
     tone: data?.cover_letter_tone || 'professional',
@@ -20,28 +26,21 @@ async function getUserPreferences(supabase: SupabaseClient, userId: string): Pro
   }
 }
 
-async function getSuccessfulPatterns(supabase: SupabaseClient, userId: string): Promise<string> {
-  const { data: patterns } = await supabase
-    .from('cover_letter_patterns')
-    .select('pattern, job_title, company')
-    .eq('user_id', userId)
-    .eq('outcome', 'interviewed')
-    .order('created_at', { ascending: false })
-    .limit(5)
+async function getSuccessfulPatterns(userId: string): Promise<string> {
+  const patterns = await db.query.coverLetterPatterns.findMany({
+    where: and(
+        eq(coverLetterPatterns.user_id, userId),
+        eq(coverLetterPatterns.outcome, 'interviewed')
+    ),
+    orderBy: [desc(coverLetterPatterns.created_at)],
+    limit: 5
+  });
 
   if (!patterns?.length) return ''
 
-  interface Pattern {
-    pattern: string
-    job_title: string
-    company: string
-  }
-
-  const patternItems = patterns as unknown as Pattern[]
-
   return `
 PATTERNS FROM YOUR SUCCESSFUL COVER LETTERS (that led to interviews):
-${patternItems.map((p) => `- ${p.pattern} (worked for ${p.job_title} at ${p.company})`).join('\n')}
+${patterns.map((p) => `- ${p.pattern} (worked for ${p.job_title} at ${p.company})`).join('\n')}
 
 Incorporate these patterns naturally into this cover letter.
   `.trim()
@@ -49,36 +48,24 @@ Incorporate these patterns naturally into this cover letter.
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient()
-
-    // Check user is logged in
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const userId = await ensureLocalUser();
 
     const { jobId } = await request.json()
     if (!jobId) {
       return NextResponse.json({ error: 'jobId is required' }, { status: 400 })
     }
 
-    // Fetch the job
-    const { data: job, error } = await supabase
-      .from('jobs')
-      .select('*')
-      .eq('id', jobId)
-      .single()
+    const job = await db.query.jobs.findFirst({
+      where: eq(jobs.id, jobId)
+    });
 
-    if (error || !job) {
+    if (!job) {
       return NextResponse.json({ error: 'Job not found' }, { status: 404 })
     }
 
-    // Fetch user profile
-    const { profileText: profile } = await getUserProfile(supabase, user.id)
-
-    const preferences = await getUserPreferences(supabase, user.id)
-
-    const patterns = await getSuccessfulPatterns(supabase, user.id)
+    const { profileText: profile } = await getUserProfile(userId)
+    const preferences = await getUserPreferences(userId)
+    const patterns = await getSuccessfulPatterns(userId)
 
     const toneGuide = {
       professional: 'formal, confident and polished — like a senior professional',
@@ -139,27 +126,24 @@ MISSION-CRITICAL RULES:
             controller.enqueue(encoder.encode(chunk))
           }
 
-          // Once finished, save to DB in background
-          const existingRes = await supabase
-            .from('cover_letters')
-            .select('id, version')
-            .eq('job_id', jobId)
-            .order('version', { ascending: false })
-            .limit(1)
-            .maybeSingle()
+          const existing = await db.query.coverLetters.findFirst({
+            where: eq(coverLetters.job_id, jobId),
+            orderBy: [desc(coverLetters.version)],
+            columns: {
+                id: true,
+                version: true
+            }
+          });
 
-          const existing = existingRes?.data
+          const nextVersion = existing?.version ? existing.version + 1 : 1
 
-          const nextVersion = (existing as { version: number } | null)?.version ? (existing as { version: number }).version + 1 : 1
-
-          await supabase
-            .from('cover_letters')
-            .insert({
+          await db.insert(coverLetters).values({
+              id: uuidv4(),
               job_id: jobId,
               content: fullContent,
               version: nextVersion,
-              user_id: user.id
-            })
+              user_id: userId
+          });
 
           controller.close()
         } catch (err: unknown) {
