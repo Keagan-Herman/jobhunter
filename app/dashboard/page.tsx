@@ -223,9 +223,9 @@ export default function DashboardPage() {
         setSelected(null)
     }
 
-    const filteredJobs = jobs.filter(j => j.status === activeTab)
+    const filteredJobs: Job[] = jobs.filter(j => j.status === activeTab)
 
-    const stats = {
+    const stats: { pending: number; applied: number; interviewing: number; total: number } = {
         pending: jobs.filter(j => j.status === 'pending').length,
         applied: jobs.filter(j => j.status === 'applied').length,
         interviewing: jobs.filter(j => j.status === 'interviewing').length,
@@ -248,6 +248,16 @@ export default function DashboardPage() {
                         <div className="flex items-center gap-2 bg-[#0d0d20] border border-[#1e1e38] rounded-full px-3 py-1">
                             <span className="text-[10px] text-[#00ff87] font-mono font-bold tracking-widest uppercase">Local</span>
                         </div>
+
+                        {(scanning || rescoring || generating) && (
+                            <div className="flex items-center gap-2 bg-[#00ff87]/5 border border-[#00ff87]/20 rounded-full px-3 py-1 animate-in fade-in zoom-in duration-300">
+                                <span className="relative flex h-2 w-2">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00ff87] opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00ff87]"></span>
+                                </span>
+                                <span className="text-[10px] text-[#00ff87] font-mono font-bold tracking-widest uppercase">Live Command</span>
+                            </div>
+                        )}
                     </div>
 
                     <div className="flex items-center gap-4 flex-wrap">
@@ -323,22 +333,22 @@ export default function DashboardPage() {
                                     {Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)}
                                 </div>
                             ) : filteredJobs.length === 0 ? (
-                                <div className="py-24 text-center flex-1 flex flex-col items-center justify-center px-12">
+                                <div className="py-24 text-center flex-1 flex flex-col items-center justify-center px-12 animate-in fade-in duration-700">
                                     <div className="relative mb-10 group/empty">
-                                        <div className="w-24 h-24 rounded-[2rem] bg-white/[0.02] border border-white/5 flex items-center justify-center text-4xl grayscale opacity-20 group-hover/empty:grayscale-0 group-hover/empty:opacity-100 transition-all duration-700 group-hover/empty:scale-110 group-hover/empty:border-[#00ff8720]">
+                                        <div className="w-24 h-24 rounded-[2rem] bg-white/[0.02] border border-white/5 flex items-center justify-center text-4xl grayscale opacity-20 group-hover/empty:grayscale-0 group-hover/empty:opacity-100 transition-all duration-700 group-hover/empty:scale-110 group-hover/empty:rotate-6 group-hover/empty:border-[#00ff8740] shadow-2xl">
                                             {activeTab === 'pending' ? '🔍' : activeTab === 'applied' ? '✉️' : activeTab === 'interviewing' ? '🤝' : '⏭️'}
                                         </div>
-                                        <div className="absolute -inset-4 bg-[#00ff87]/5 rounded-full blur-2xl opacity-0 group-hover/empty:opacity-100 transition-opacity" />
+                                        <div className="absolute -inset-8 bg-[#00ff87]/5 rounded-full blur-3xl opacity-0 group-hover/empty:opacity-100 transition-opacity duration-700" />
                                     </div>
-                                    <h3 className="font-syne font-bold text-lg text-white/50 mb-2">No {activeTab} opportunities</h3>
-                                    <p className="text-xs text-[#444] font-mono uppercase tracking-[3px] mb-10 max-w-xs leading-relaxed">
+                                    <h3 className="font-syne font-extrabold text-2xl text-white/90 mb-3 tracking-tight">No {activeTab} opportunities</h3>
+                                    <p className="text-[10px] text-[#555] font-mono uppercase tracking-[4px] mb-12 max-w-xs leading-relaxed font-bold">
                                         {activeTab === 'pending'
                                             ? 'Initiate a fresh scan to discover high-match roles tailored to your profile.'
                                             : "You haven't moved any jobs to " + activeTab + " yet."}
                                     </p>
                                     {activeTab === 'pending' && (
-                                        <button onClick={handleScan} className="group relative bg-[#00ff8710] border border-[#00ff8720] text-[#00ff87] px-8 py-3 rounded-2xl font-mono text-[10px] font-bold uppercase tracking-[2px] hover:bg-[#00ff87] hover:text-[#0a0a1a] transition-all duration-500 overflow-hidden">
-                                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer" />
+                                        <button onClick={handleScan} className="group relative bg-[#00ff8710] border border-[#00ff8720] text-[#00ff87] px-10 py-4 rounded-2xl font-mono text-[11px] font-black uppercase tracking-[3px] hover:bg-[#00ff87] hover:text-[#0a0a1a] transition-all duration-500 overflow-hidden shadow-lg shadow-[#00ff8710] hover:shadow-[#00ff8730]">
+                                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:animate-shimmer" />
                                             Discover Jobs
                                         </button>
                                     )}

@@ -162,6 +162,6 @@ MISSION-CRITICAL RULES:
 
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err)
-    return NextResponse.json({ error: message }, { status: 500 })
+    return NextResponse.json({ error: message, success: false }, { status: 500 })
   }
 }
