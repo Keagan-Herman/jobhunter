@@ -11,6 +11,23 @@ export function OverviewTab({
     <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-forwards">
       <div className="space-y-5">
         <h4 className="text-[10px] font-mono font-black text-[#555] tracking-[4px] uppercase flex items-center gap-2">
+          Alignment Matrix
+          <div className="h-px flex-1 bg-white/[0.03]" />
+        </h4>
+        <div className="grid grid-cols-3 gap-4 mb-8">
+          {[
+            { label: 'Seniority', value: job.seniority || 'Mid', color: 'text-[#00ff87]', bg: 'bg-[#00ff87]/5' },
+            { label: 'Work Style', value: job.work_style || 'Remote', color: 'text-[#00d4ff]', bg: 'bg-[#00d4ff]/5' },
+            { label: 'Stack Match', value: `${job.stack_overlap || 0}%`, color: 'text-[#ffd60a]', bg: 'bg-[#ffd60a]/5' }
+          ].map(item => (
+            <div key={item.label} className={"p-5 rounded-2xl border border-white/5 " + item.bg}>
+              <div className="text-[9px] font-mono text-[#555] uppercase tracking-[2px] mb-2 font-bold">{item.label}</div>
+              <div className={"text-[15px] font-syne font-black uppercase tracking-tight " + item.color}>{item.value}</div>
+            </div>
+          ))}
+        </div>
+
+        <h4 className="text-[10px] font-mono font-black text-[#555] tracking-[4px] uppercase flex items-center gap-2">
           Skill Alignment
           <div className="h-px flex-1 bg-white/[0.03]" />
         </h4>

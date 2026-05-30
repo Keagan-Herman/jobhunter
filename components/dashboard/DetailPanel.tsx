@@ -180,6 +180,7 @@ export function DetailPanel({
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-12 bg-[#080812]/40 scrollbar-hide">
+        <div className="animate-in fade-in slide-in-from-right-4 duration-500 fill-mode-forwards">
         {activeTab === 'overview' && <OverviewTab job={job} userSkills={userSkills} />}
         {activeTab === 'letter' && (
           <LetterTab
@@ -214,6 +215,7 @@ export function DetailPanel({
             onInterviewOutcome={onInterviewOutcome}
           />
         )}
+        </div>
       </div>
 
       {/* Actions Footer */}

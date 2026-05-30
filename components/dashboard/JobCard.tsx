@@ -19,13 +19,13 @@ export function JobCard({
   return (
     <div
       className={`p-6 border-b border-white/5 cursor-pointer transition-all duration-500 ease-out hover:bg-white/[0.04] group relative overflow-hidden
-        ${isSelected ? 'bg-white/[0.06] before:absolute before:left-0 before:top-4 before:bottom-4 before:w-1 before:bg-[#00ff87] before:rounded-r-full before:shadow-[0_0_20px_#00ff87]' : ''}
-        animate-in fade-in slide-in-from-bottom-4 fill-mode-forwards`}
+        ${isSelected ? 'bg-white/[0.06] before:absolute before:left-0 before:top-4 before:bottom-4 before:w-1.5 before:bg-[#00ff87] before:rounded-r-full before:shadow-[0_0_20px_#00ff87]' : ''}
+        hover:border-white/10 animate-in fade-in slide-in-from-bottom-4 fill-mode-forwards`}
       style={{ animationDelay, opacity: 0 }}
       onClick={onClick}
     >
       {/* Hover Light Effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#00ff87]/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[#00ff87]/[0.05] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
       <div className="flex justify-between items-start mb-6 relative z-10">
         <div className="flex-1 mr-4 overflow-hidden">
@@ -45,7 +45,7 @@ export function JobCard({
 
       <div className="flex gap-2.5 flex-wrap mb-6 relative z-10">
         {(job.stack || []).slice(0, 4).map(s => (
-          <span key={s} className="text-[9px] px-3 py-1.5 rounded-xl bg-white/[0.03] text-[#7b61ff] font-mono font-black tracking-tight uppercase border border-white/5 transition-all duration-500 hover:scale-110 hover:bg-[#7b61ff]/10 hover:border-[#7b61ff]/30 hover:shadow-[0_0_15px_rgba(123,97,255,0.2)] cursor-default">
+          <span key={s} className="text-[9px] px-3 py-1.5 rounded-xl bg-[#7b61ff]/5 text-[#7b61ff] font-mono font-black tracking-tight uppercase border border-[#7b61ff]/10 transition-all duration-500 hover:scale-110 hover:bg-[#7b61ff]/15 hover:border-[#7b61ff]/40 hover:shadow-[0_0_15px_rgba(123,97,255,0.2)] cursor-default">
             {s}
           </span>
         ))}

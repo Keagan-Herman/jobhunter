@@ -91,6 +91,20 @@ export function RadialScore({ score, size = 48 }: { score: number, size?: number
           strokeLinecap="round"
           className="transition-all duration-1000 ease-out"
         />
+
+        {/* Ultra-sharp inner definition stroke */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="transparent"
+          stroke="white"
+          strokeWidth="0.5"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+          className="transition-all duration-1000 ease-out opacity-30"
+        />
       </svg>
 
       <div className="absolute inset-0 flex flex-col items-center justify-center z-20">

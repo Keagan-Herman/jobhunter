@@ -17,6 +17,8 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(true)
     const [scanning, setScanning] = useState(false)
     const [generating, setGenerating] = useState(false)
+    const [rescoring, setRescoring] = useState(false)
+    const [activeProcess, setActiveProcess] = useState<'scanning' | 'rescoring' | 'generating' | null>(null)
     const [activeTab, setActiveTab] = useState<'pending' | 'applied' | 'interviewing' | 'skipped'>('pending')
     const [scanResult, setScanResult] = useState('')
     const [profile, setProfile] = useState<Profile | null>(null)
@@ -25,8 +27,6 @@ export default function DashboardPage() {
 
     const [showSkipModal, setShowSkipModal] = useState(false)
     const [skipJobId, setSkipJobId] = useState<string | null>(null)
-
-    const [rescoring, setRescoring] = useState(false)
     const [rescoreResult, setRescoreResult] = useState('')
 
     const [listHeight, setListHeight] = useState(600)
@@ -91,7 +91,9 @@ export default function DashboardPage() {
 
     const handleScan = async () => {
         setScanning(true)
+        setActiveProcess('scanning')
         setScanResult('')
+        setError('')
         try {
             const res = await fetch('/api/jobs')
             const data = await res.json()
@@ -99,17 +101,21 @@ export default function DashboardPage() {
                 setScanResult("Found " + data.found + " jobs, saved " + data.saved + " new")
                 await fetchJobs()
             } else {
-                setScanResult("" + (data.error || 'Scan failed'))
+                setError(data.error || 'Scan failed')
             }
-        } catch {
-            setScanResult('Scan failed')
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Scan failed')
+        } finally {
+            setScanning(false)
+            setActiveProcess(null)
         }
-        setScanning(false)
     }
 
     const handleRescore = async () => {
         setRescoring(true)
+        setActiveProcess('rescoring')
         setRescoreResult('')
+        setError('')
         try {
             const res = await fetch('/api/rescore', { method: 'POST' })
             const data = await res.json()
@@ -117,46 +123,55 @@ export default function DashboardPage() {
                 setRescoreResult("Rescored " + data.rescored + " jobs")
                 await fetchJobs()
             } else {
-                setRescoreResult(data.message || "" + (data.error || 'Rescore failed'))
+                setError(data.message || data.error || 'Rescore failed')
             }
-        } catch {
-            setRescoreResult('Rescore failed')
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Rescore failed')
+        } finally {
+            setRescoring(false)
+            setActiveProcess(null)
         }
-        setRescoring(false)
     }
 
     const handleGenerateCoverLetter = async (content: string) => {
         if (!selected) return
 
-        if (!content) {
-            setGenerating(true)
-            return
-        }
-
         try {
+            if (!content) {
+                setGenerating(true)
+                setActiveProcess('generating')
+                return
+            }
+
             const updatedJob: Job = {
                 ...selected,
                 cover_letter: content
             }
             setJobs(prev => prev.map(j => j.id === selected.id ? updatedJob : j))
             setSelected(updatedJob)
-        } catch {
-            setError('Failed to update cover letter.')
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to update cover letter.')
+        } finally {
+            if (content) {
+                setGenerating(false)
+                setActiveProcess(null)
+            }
         }
-        setGenerating(false)
     }
 
     const handleStatusUpdate = async (jobId: string, status: Job['status'], reason?: string) => {
-        setJobs(prev => prev.map(j => j.id === jobId ? { ...j, status } : j))
-        if (selected?.id === jobId) setSelected(prev => prev ? { ...prev, status } : null)
+        setJobs((prev: Job[]) => prev.map(j => j.id === jobId ? { ...j, status } : j))
+        if (selected?.id === jobId) setSelected((prev: Job | null) => prev ? { ...prev, status } : null)
 
         try {
-            await fetch('/api/feedback', {
+            const res = await fetch('/api/feedback', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ jobId, action: status === 'skipped' ? 'skipped' : 'applied', reason })
             })
-        } catch {
+            if (!res.ok) throw new Error('Failed to update status')
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to update status')
             await fetchJobs()
         }
     }
@@ -249,13 +264,15 @@ export default function DashboardPage() {
                             <span className="text-[10px] text-[#00ff87] font-mono font-bold tracking-widest uppercase">Local</span>
                         </div>
 
-                        {(scanning || rescoring || generating) && (
-                            <div className="flex items-center gap-2 bg-[#00ff87]/5 border border-[#00ff87]/20 rounded-full px-3 py-1 animate-in fade-in zoom-in duration-300">
+                        {activeProcess && (
+                            <div className="flex items-center gap-2 bg-[#00ff87]/5 border border-[#00ff87]/20 rounded-full px-4 py-1.5 animate-in fade-in zoom-in duration-300">
                                 <span className="relative flex h-2 w-2">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00ff87] opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00ff87]"></span>
                                 </span>
-                                <span className="text-[10px] text-[#00ff87] font-mono font-bold tracking-widest uppercase">Live Command</span>
+                                <span className="text-[10px] text-[#00ff87] font-mono font-bold tracking-widest uppercase flex items-center gap-2">
+                                    Live Command: <span className="text-white brightness-125">{activeProcess === 'scanning' ? 'Scanning Jobs' : activeProcess === 'rescoring' ? 'Rescoring' : 'Generating'}</span>
+                                </span>
                             </div>
                         )}
                     </div>
