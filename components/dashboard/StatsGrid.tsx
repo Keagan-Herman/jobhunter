@@ -24,7 +24,8 @@ export function StatsGrid({ stats }: { stats: { pending: number, applied: number
           </div>
 
           {/* Premium accent line */}
-          <div className={`absolute bottom-0 left-0 right-0 h-1 opacity-0 transition-all duration-500 group-hover:opacity-100 ${s.accent}`} />
+          <div className={`absolute bottom-0 left-0 right-0 h-1 opacity-0 transition-all duration-700 group-hover:opacity-100 ${s.accent} blur-[1px]`} />
+          <div className={`absolute bottom-0 left-1/4 right-1/4 h-[2px] opacity-0 transition-all duration-500 group-hover:opacity-100 ${s.accent.replace('20', '50')} group-hover:w-full group-hover:left-0`} />
 
           {/* Subtle Inner Border */}
           <div className="absolute inset-0 border border-white/[0.02] rounded-[2rem] pointer-events-none" />
