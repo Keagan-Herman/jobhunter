@@ -117,70 +117,70 @@ export function DetailPanel({
   }
 
   return (
-    <div className="bg-glass border-l border-white/5 flex flex-col h-[calc(100vh-140px)] sticky top-6 animate-in fade-in slide-in-from-right-8 duration-1000 shadow-[20px_0_100px_rgba(0,0,0,0.9)] overflow-hidden rounded-l-[4rem]">
+    <div className="bg-glass border-l border-premium flex flex-col h-[calc(100vh-140px)] sticky top-6 animate-in fade-in slide-in-from-right-8 duration-1000 shadow-[40px_0_120px_rgba(0,0,0,1)] overflow-hidden rounded-l-[4.5rem]">
       {/* Header */}
-      <div className="p-12 pb-10 shrink-0 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-2.5 h-full bg-gradient-to-b from-[#00ff87] to-transparent opacity-50" />
-        <div className="absolute -right-24 -top-24 w-80 h-80 bg-[#00ff87]/5 rounded-full blur-[100px]" />
+      <div className="p-14 pb-12 shrink-0 relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-3 h-full bg-gradient-to-b from-[#00ff87] via-[#00ff87]/30 to-transparent opacity-40" />
+        <div className="absolute -right-32 -top-32 w-96 h-96 bg-[#00ff87]/10 rounded-full blur-[120px]" />
 
-        <div className="flex justify-between items-start mb-10 relative z-10">
-          <div className="flex-1 pr-12">
-            <h3 className="font-syne font-black text-[32px] text-white mb-4 leading-tight tracking-tight drop-shadow-2xl">{job.title}</h3>
-            <div className="text-[11px] font-mono font-black text-[#666] tracking-[4px] uppercase flex items-center gap-3">
-                <span className="text-[#aaa]">{job.company}</span>
-                <span className="w-2 h-2 rounded-full bg-white/10" />
-                <span className="text-[#888]">{job.location}</span>
+        <div className="flex justify-between items-start mb-12 relative z-10">
+          <div className="flex-1 pr-16">
+            <h3 className="font-syne font-black text-[38px] text-white mb-5 leading-[1.1] tracking-tighter drop-shadow-2xl selection:bg-[#00ff8720]">{job.title}</h3>
+            <div className="text-[11px] font-mono font-black text-[#555] tracking-[5px] uppercase flex items-center gap-4">
+                <span className="text-[#aaa] hover:text-white transition-colors duration-300">{job.company}</span>
+                <span className="w-2.5 h-2.5 rounded-full bg-white/10 shrink-0" />
+                <span className="text-[#888]">{job.location || 'Remote'}</span>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             {job.url && (
               <button
                 onClick={handleCopyLink}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl font-mono text-[10px] font-black uppercase transition-all border ${
-                  linkCopied ? 'bg-[#00ff87]/10 border-[#00ff87]/30 text-[#00ff87]' : 'bg-white/5 border-white/5 text-[#555] hover:text-white hover:border-white/10'
+                className={`flex items-center gap-2.5 px-6 py-3 rounded-2xl font-mono text-[10px] font-black uppercase transition-all duration-500 border shadow-2xl active:scale-95 ${
+                  linkCopied ? 'bg-[#00ff87]/10 border-[#00ff87]/40 text-[#00ff87]' : 'bg-[#12122a] border-premium text-[#777] hover:text-white hover:border-white/20 hover:scale-105'
                 }`}
               >
-                {linkCopied ? 'Copied!' : 'Copy Link'}
+                {linkCopied ? 'Copied URL!' : 'Copy Link'}
               </button>
             )}
-            <button onClick={onClose} className="text-[#444] hover:text-white transition-all text-2xl font-mono hover:rotate-90 p-2 leading-none">✕</button>
+            <button onClick={onClose} className="text-[#444] hover:text-white transition-all duration-500 text-3xl font-mono hover:rotate-90 p-3 leading-none bg-white/[0.02] rounded-2xl border border-transparent hover:border-white/10 active:scale-90">✕</button>
           </div>
         </div>
 
-        <div className="flex items-center gap-5 flex-wrap relative z-10">
+        <div className="flex items-center gap-6 flex-wrap relative z-10">
             {(job.salary_min || job.salary_max) && (
-              <div className="text-[14px] font-black text-[#00ff87] font-mono bg-[#00ff87]/5 border border-[#00ff87]/10 px-6 py-2.5 rounded-2xl shadow-xl tracking-tighter">
+              <div className="text-[15px] font-black text-[#00ff87] font-mono bg-[#00ff87]/5 border border-[#00ff87]/10 px-8 py-3 rounded-2xl shadow-2xl tracking-tighter hover:bg-[#00ff87]/10 transition-colors duration-500">
                 {currency}{job.salary_min?.toLocaleString()} – {currency}{job.salary_max?.toLocaleString()}
               </div>
             )}
-            <div className="flex gap-2.5 flex-wrap">
+            <div className="flex gap-3 flex-wrap">
               {(job.stack || []).slice(0, 5).map(s => (
-                <span key={s} className="text-[9px] px-4 py-2 rounded-xl bg-white/[0.04] text-[#7b61ff] font-mono font-black border border-white/5 uppercase tracking-tight shadow-md transition-colors hover:border-[#7b61ff]/30">{s}</span>
+                <span key={s} className="text-[9px] px-5 py-2.5 rounded-xl bg-[#12122a] text-[#7b61ff] font-mono font-black border border-[#7b61ff]/10 uppercase tracking-wider shadow-lg transition-all duration-500 hover:border-[#7b61ff]/40 hover:scale-110 hover:shadow-[0_0_20px_rgba(123,97,255,0.15)]">{s}</span>
               ))}
             </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex px-12 border-b border-white/5 bg-white/[0.02] backdrop-blur-3xl z-20 relative">
+      <div className="flex px-14 border-b border-premium bg-white/[0.02] backdrop-blur-3xl z-20 relative">
         {(['overview', 'letter', 'tracking'] as const).map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-10 py-7 font-mono text-[10px] font-black tracking-[5px] uppercase transition-all relative
-              ${activeTab === tab ? 'text-[#00ff87]' : 'text-[#555] hover:text-[#999]'}`}
+            className={`px-12 py-8 font-mono text-[11px] font-black tracking-[6px] uppercase transition-all duration-500 relative
+              ${activeTab === tab ? 'text-[#00ff87]' : 'text-[#444] hover:text-[#888]'}`}
           >
             {tab}
             {activeTab === tab && (
-              <div className="absolute bottom-0 left-8 right-8 h-[3px] bg-[#00ff87] shadow-[0_0_25px_rgba(0,255,135,0.6)] rounded-t-full" />
+              <div className="absolute bottom-0 left-8 right-8 h-[4px] bg-[#00ff87] shadow-[0_-5px_25px_rgba(0,255,135,0.6)] rounded-t-full animate-in slide-in-from-bottom-2" />
             )}
           </button>
         ))}
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-12 bg-[#080812]/40 scrollbar-hide">
-        <div className="animate-in fade-in slide-in-from-right-4 duration-500 fill-mode-forwards">
+      <div className="flex-1 overflow-y-auto p-14 bg-[#080812]/40 scrollbar-hide">
+        <div className="animate-in fade-in slide-in-from-right-6 duration-700 fill-mode-forwards">
         {activeTab === 'overview' && <OverviewTab job={job} userSkills={userSkills} />}
         {activeTab === 'letter' && (
           <LetterTab
@@ -219,24 +219,24 @@ export function DetailPanel({
       </div>
 
       {/* Actions Footer */}
-      <div className="p-12 border-t border-white/5 flex gap-6 shrink-0 bg-[#0d0d20]/80 backdrop-blur-xl z-20">
+      <div className="p-14 border-t border-premium flex gap-8 shrink-0 bg-[#0d0d20]/90 backdrop-blur-2xl z-20 rounded-bl-[4.5rem]">
         {job.status === 'pending' && (
           <>
             <button onClick={() => onStatusUpdate(job.id, 'applied')}
-              className="flex-1 relative bg-[#00ff87] text-[#0a0a1a] py-5 rounded-[2rem] font-black font-mono text-[11px] tracking-[3px] uppercase hover:brightness-110 shadow-[0_20px_40px_rgba(0,255,135,0.2)] transition-all hover:-translate-y-1 active:translate-y-0 group overflow-hidden"
+              className="flex-[2] relative bg-[#00ff87] text-[#0a0a1a] py-6 rounded-[2.5rem] font-black font-mono text-[11px] tracking-[4px] uppercase hover:brightness-110 shadow-[0_25px_50px_rgba(0,255,135,0.25)] transition-all duration-500 hover:-translate-y-1 active:translate-y-0 group overflow-hidden"
             >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer" />
                 Mark Applied
             </button>
             <button onClick={() => onStatusUpdate(job.id, 'skipped')}
-              className="px-12 bg-white/[0.04] border border-white/5 text-[#666] py-5 rounded-[2rem] font-mono text-[11px] font-black uppercase hover:border-white/15 hover:text-[#aaa] transition-all active:scale-[0.98] shadow-xl"
+              className="flex-1 bg-white/[0.02] border border-premium text-[#555] py-6 rounded-[2.5rem] font-mono text-[11px] font-black uppercase hover:border-white/10 hover:text-[#999] transition-all duration-500 active:scale-[0.98] shadow-2xl"
             >Skip Job</button>
           </>
         )}
 
         {job.status === 'applied' && (
           <button onClick={() => onStatusUpdate(job.id, 'interviewing')}
-            className="flex-1 bg-[#00d4ff] text-[#0a0a1a] py-5 rounded-[2rem] font-black font-mono text-[11px] tracking-[3px] uppercase hover:brightness-110 shadow-[0_20px_40px_rgba(0,212,255,0.2)] transition-all hover:-translate-y-1 group relative overflow-hidden"
+            className="flex-1 bg-[#00d4ff] text-[#0a0a1a] py-6 rounded-[2.5rem] font-black font-mono text-[11px] tracking-[4px] uppercase hover:brightness-110 shadow-[0_25px_50px_rgba(0,212,255,0.25)] transition-all duration-500 hover:-translate-y-1 group relative overflow-hidden"
           >
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer" />
               Got Interview!
@@ -245,13 +245,13 @@ export function DetailPanel({
 
         {job.status === 'skipped' && (
           <button onClick={() => onStatusUpdate(job.id, 'pending')}
-            className="flex-1 bg-[#ffd60a]/[0.03] border border-[#ffd60a]/20 text-[#ffd60a] py-5 rounded-[2rem] font-black font-mono text-[11px] tracking-[3px] uppercase hover:bg-[#ffd60a]/[0.08] transition-all shadow-xl"
+            className="flex-1 bg-[#ffd60a]/[0.02] border border-[#ffd60a]/20 text-[#ffd60a] py-6 rounded-[2.5rem] font-black font-mono text-[11px] tracking-[4px] uppercase hover:bg-[#ffd60a]/[0.06] transition-all duration-500 shadow-2xl active:scale-[0.98]"
           >Undo Skip</button>
         )}
 
         {job.status === 'interviewing' && (
-           <div className="flex-1 text-center py-6 px-10 rounded-[2rem] bg-[#00d4ff]/[0.04] border border-[#00d4ff]/10 shadow-[inset_0_0_20px_rgba(0,212,255,0.05)]">
-              <span className="text-[11px] font-mono font-black text-[#00d4ff] uppercase tracking-[6px] animate-pulse">In Interview Phase</span>
+           <div className="flex-1 text-center py-7 px-12 rounded-[2.5rem] bg-[#00d4ff]/[0.03] border border-[#00d4ff]/20 shadow-[inset_0_0_30px_rgba(0,212,255,0.05)]">
+              <span className="text-[11px] font-mono font-black text-[#00d4ff] uppercase tracking-[8px] animate-pulse">In Interview Phase</span>
            </div>
         )}
       </div>

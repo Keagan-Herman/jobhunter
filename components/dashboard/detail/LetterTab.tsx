@@ -36,39 +36,42 @@ export function LetterTab({
       )}
 
       {generating && (
-        <div className="flex flex-col items-center justify-center py-32 text-center space-y-10">
+        <div className="flex flex-col items-center justify-center py-40 text-center space-y-12">
           <div className="relative">
-            <div className="w-24 h-24 rounded-full border-4 border-[#00ff8710] border-t-[#00ff87] animate-spin" />
-            <div className="absolute inset-0 flex items-center justify-center text-3xl animate-pulse font-syne font-black text-[#00ff87]">JH</div>
+            <div className="w-32 h-32 rounded-full border-[6px] border-[#00ff8710] border-t-[#00ff87] animate-spin duration-[1.5s]" />
+            <div className="absolute inset-0 w-32 h-32 rounded-full border-[6px] border-transparent border-b-[#00d4ff] animate-spin-reverse duration-[2s]" />
+            <div className="absolute inset-0 flex items-center justify-center text-4xl animate-pulse font-syne font-black text-[#00ff87] drop-shadow-[0_0_15px_rgba(0,255,135,0.5)]">JH</div>
           </div>
-          <div className="space-y-4">
-            <h4 className="font-syne font-black text-3xl text-[#00ff87] animate-pulse tracking-tight">Crafting your story...</h4>
-            <p className="text-[11px] text-[#555] font-mono uppercase tracking-[4px] font-black">Analyzing nuances & matching impact</p>
+          <div className="space-y-6">
+            <h4 className="font-syne font-black text-4xl text-white tracking-tighter">
+              Crafting <span className="text-[#00ff87] animate-pulse">your story</span>...
+            </h4>
+            <p className="text-[11px] text-[#555] font-mono uppercase tracking-[6px] font-black animate-in fade-in slide-in-from-bottom-2 duration-1000">Analyzing nuances & matching impact</p>
           </div>
         </div>
       )}
 
       {coverLetter && !generating && (
-        <div className="space-y-10">
-          <div className="flex items-center justify-between px-2">
-            <h4 className="text-[10px] font-mono font-black text-[#555] tracking-[4px] uppercase">AI-Generated Pitch</h4>
-            <div className="flex gap-4">
+        <div className="space-y-12">
+          <div className="flex items-center justify-between px-4">
+            <h4 className="text-[10px] font-mono font-black text-[#444] tracking-[5px] uppercase">AI-Generated Pitch</h4>
+            <div className="flex gap-5">
               <button onClick={handleCopy}
-                className={`px-6 py-3 rounded-2xl font-mono text-[10px] font-black uppercase transition-all flex items-center gap-2 shadow-lg
-                  ${copied ? 'bg-[#00ff8715] border border-[#00ff8740] text-[#00ff87]' : 'bg-[#12122a] border border-white/5 text-[#777] hover:text-white hover:border-white/10'}`}
-              >{copied ? 'Copied' : 'Copy Pitch'}</button>
+                className={`px-8 py-4 rounded-2xl font-mono text-[10px] font-black uppercase transition-all duration-500 flex items-center gap-3 shadow-2xl active:scale-95
+                  ${copied ? 'bg-[#00ff87]/10 border border-[#00ff87]/40 text-[#00ff87] scale-105' : 'bg-[#12122a] border-premium text-[#777] hover:text-white hover:border-white/20'}`}
+              >{copied ? 'Copied to Clipboard' : 'Copy Pitch'}</button>
               <button onClick={handleGenerate}
-                className="px-6 py-3 rounded-2xl bg-[#12122a] border border-white/5 text-[#777] font-mono text-[10px] font-black uppercase hover:text-white hover:border-white/10 transition-all shadow-lg"
+                className="px-8 py-4 rounded-2xl bg-[#12122a] border-premium text-[#777] font-mono text-[10px] font-black uppercase hover:text-white hover:border-white/20 transition-all duration-500 shadow-2xl active:scale-95"
               >Regenerate</button>
             </div>
           </div>
 
-          <div className="p-12 md:p-16 rounded-[3rem] bg-[#0d0d20]/40 backdrop-blur-md border border-white/5 shadow-[0_30px_60px_rgba(0,0,0,0.4)] relative overflow-hidden group">
-            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
-            <div className="space-y-8 max-w-[65ch] mx-auto relative z-10">
+          <div className="p-16 md:p-20 rounded-[4rem] bg-glass border-premium shadow-[0_40px_80px_rgba(0,0,0,0.5)] relative overflow-hidden group selection:bg-[#00ff8720] selection:text-[#00ff87]">
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+            <div className="space-y-10 max-w-[65ch] mx-auto relative z-10">
               {coverLetter.split('\n\n').map((para, i) => (
-                  <p key={i} className="text-[16px] leading-[2] text-white/75 font-sans font-medium">{para}</p>
+                  <p key={i} className="text-[19px] leading-[2.1] text-white/80 font-serif italic tracking-tight">{para}</p>
               ))}
             </div>
           </div>
