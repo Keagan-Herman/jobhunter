@@ -11,6 +11,8 @@
   --radius-xl: 0.75rem;
   --radius-2xl: 1rem;
   --radius-3xl: 1.5rem;
+
+  --color-premium: rgba(255, 255, 255, 0.08);
 }
 
 @layer utilities {
@@ -21,7 +23,7 @@
   }
 
   .border-premium {
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--color-premium);
   }
 
   .text-glow-green {
@@ -39,6 +41,15 @@
 
   .animate-shimmer {
     animation: shimmer 2s infinite;
+  }
+
+  @keyframes spin-reverse {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(-360deg); }
+  }
+
+  .animate-spin-reverse {
+    animation: spin-reverse 1s linear infinite;
   }
 }
 
