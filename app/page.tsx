@@ -8,10 +8,13 @@ export default function SplashPage() {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setMounted(true)
+    const timer = setTimeout(() => setMounted(true), 0)
+    return () => clearTimeout(timer)
   }, [])
 
-  if (!mounted) return null
+  if (!mounted) {
+    return <div className="min-h-screen bg-[#080812]" />
+  }
 
   return (
     <div className="min-h-screen bg-[#080812] text-[#e0e0f0] font-sans relative overflow-hidden flex flex-col items-center justify-center px-6">

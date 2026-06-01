@@ -112,6 +112,7 @@ Return ONLY valid JSON:
         const text = await generateContent(prompt)
         const clean = text.replace(/\`\`\`json|\`\`\`/g, '').trim()
         const { factors } = JSON.parse(clean)
+        console.log('Offer factors:', factors)
       } catch {}
     }
 

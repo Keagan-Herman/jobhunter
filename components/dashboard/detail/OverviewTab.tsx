@@ -16,11 +16,12 @@ export function OverviewTab({
         </h4>
         <div className="grid grid-cols-3 gap-4 mb-8">
           {[
-            { label: 'Seniority', value: job.seniority || 'Mid', color: 'text-[#00ff87]', bg: 'bg-[#00ff87]/5' },
-            { label: 'Work Style', value: job.work_style || 'Remote', color: 'text-[#00d4ff]', bg: 'bg-[#00d4ff]/5' },
-            { label: 'Stack Match', value: `${job.stack_overlap || 0}%`, color: 'text-[#ffd60a]', bg: 'bg-[#ffd60a]/5' }
+            { label: 'Seniority', value: job.seniority || 'Mid', color: 'text-[#00ff87]', bg: 'bg-[#00ff87]/5', icon: '👤' },
+            { label: 'Work Style', value: job.work_style || 'Remote', color: 'text-[#00d4ff]', bg: 'bg-[#00d4ff]/5', icon: '🏠' },
+            { label: 'Stack Match', value: `${job.stack_overlap || 0}%`, color: 'text-[#ffd60a]', bg: 'bg-[#ffd60a]/5', icon: '⚡' }
           ].map(item => (
-            <div key={item.label} className={"p-6 rounded-[2rem] bg-glass border-premium shadow-xl transition-all duration-500 hover:-translate-y-1 " + item.bg}>
+            <div key={item.label} className={"p-6 rounded-[2rem] bg-glass border-premium shadow-xl transition-all duration-500 hover:-translate-y-1 group/matrix relative overflow-hidden " + item.bg}>
+              <div className="absolute top-2 right-4 text-[10px] opacity-20 group-hover/matrix:opacity-100 transition-opacity duration-500">{item.icon}</div>
               <div className="text-[9px] font-mono text-[#555] uppercase tracking-[3px] mb-3 font-black">{item.label}</div>
               <div className={"text-[18px] font-syne font-black uppercase tracking-tight " + item.color}>{item.value}</div>
             </div>

@@ -45,7 +45,7 @@ export default function ProfilePage() {
           setCoverLetterLength(profile.cover_letter_length || 'short')
           setCareerContext(profile.career_context || 'experienced')
         }
-      } catch (err) {
+      } catch {
         console.error('Failed to load profile')
       } finally {
         setLoading(false)

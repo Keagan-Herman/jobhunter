@@ -5,7 +5,7 @@ import { generateContent } from '@/lib/groq'
 import { NextResponse } from 'next/server'
 import { scoreCache } from '@/lib/cache'
 import { withTimeout } from '@/lib/timeout'
-import { LOCAL_USER_ID, ensureLocalUser } from '@/lib/db/user';
+import { ensureLocalUser } from '@/lib/db/user';
 import {
   getUserProfile,
   getUserFeedbackContext,
