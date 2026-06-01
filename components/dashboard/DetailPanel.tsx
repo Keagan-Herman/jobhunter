@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Job } from '@/types'
 import { OverviewTab } from './detail/OverviewTab'
 import { LetterTab } from './detail/LetterTab'
@@ -41,6 +41,8 @@ export function DetailPanel({
   const [copied, setCopied] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [letterSaving, setLetterSaving] = useState(false)
+  const [letterSaved, setLetterSaved] = useState(false)
   const [linkCopied, setLinkCopied] = useState(false)
 
   // Tracking form state
@@ -114,6 +116,34 @@ export function DetailPanel({
     setSaving(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 3000)
+  }
+
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  const handleUpdateCoverLetter = (newContent: string) => {
+    setCoverLetter(newContent)
+    setLetterSaving(true)
+    setLetterSaved(false)
+
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
+
+    saveTimeoutRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch('/api/cover-letter/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ jobId: job.id, content: newContent })
+        })
+        if (res.ok) {
+          setLetterSaved(true)
+          setTimeout(() => setLetterSaved(false), 3000)
+        }
+      } catch (err) {
+        console.error('Failed to save cover letter', err)
+      } finally {
+        setLetterSaving(false)
+      }
+    }, 1000)
   }
 
   return (
@@ -191,6 +221,9 @@ export function DetailPanel({
             handleCopy={handleCopy}
             copied={copied}
             onCoverLetterOutcome={onCoverLetterOutcome}
+            onUpdateContent={handleUpdateCoverLetter}
+            saving={letterSaving}
+            saved={letterSaved}
           />
         )}
         {activeTab === 'tracking' && (

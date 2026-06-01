@@ -34,7 +34,7 @@ export default function OnboardingPage() {
         if (data.profile && data.profile.full_name && data.profile.full_name !== 'Local User') {
             router.push('/dashboard')
         }
-      } catch (err) {
+      } catch {
         console.error('Check failed')
       }
     }

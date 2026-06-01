@@ -7,7 +7,10 @@ export function LetterTab({
   handleGenerate,
   handleCopy,
   copied,
-  onCoverLetterOutcome
+  onCoverLetterOutcome,
+  onUpdateContent,
+  saving,
+  saved
 }: {
   job: Job
   coverLetter: string
@@ -16,6 +19,9 @@ export function LetterTab({
   handleCopy: () => void
   copied: boolean
   onCoverLetterOutcome: (outcome: string) => void
+  onUpdateContent: (content: string) => void
+  saving?: boolean
+  saved?: boolean
 }) {
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-forwards">
@@ -66,14 +72,30 @@ export function LetterTab({
             </div>
           </div>
 
-          <div className="p-16 md:p-20 rounded-[4rem] bg-glass border-premium shadow-[0_40px_80px_rgba(0,0,0,0.5)] relative overflow-hidden group selection:bg-[#00ff8720] selection:text-[#00ff87]">
-            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
-            <div className="space-y-10 max-w-[65ch] mx-auto relative z-10">
-              {coverLetter.split('\n\n').map((para, i) => (
-                  <p key={i} className="text-[19px] leading-[2.1] text-white/80 font-serif italic tracking-tight">{para}</p>
-              ))}
+          <div className="relative group/editor">
+            <div className="p-16 md:p-20 rounded-[4rem] bg-glass border-premium shadow-[0_40px_80px_rgba(0,0,0,0.5)] relative overflow-hidden group selection:bg-[#00ff8720] selection:text-[#00ff87]">
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+
+              <textarea
+                value={coverLetter}
+                onChange={(e) => onUpdateContent(e.target.value)}
+                className="w-full bg-transparent border-none outline-none text-[19px] leading-[2.1] text-white/80 font-serif italic tracking-tight resize-none h-[600px] relative z-10 scrollbar-hide"
+                spellCheck="false"
+              />
             </div>
+
+            {saving && (
+              <div className="absolute top-6 right-10 flex items-center gap-2 bg-white/5 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 animate-in fade-in duration-300">
+                <div className="w-2 h-2 rounded-full bg-[#00ff87] animate-pulse" />
+                <span className="text-[9px] font-mono font-black text-[#00ff87] uppercase tracking-widest">Saving...</span>
+              </div>
+            )}
+            {saved && !saving && (
+              <div className="absolute top-6 right-10 flex items-center gap-2 bg-[#00ff87]/10 backdrop-blur-md px-4 py-2 rounded-full border border-[#00ff87]/20 animate-in fade-in zoom-in duration-500">
+                <span className="text-[9px] font-mono font-black text-[#00ff87] uppercase tracking-widest">✓ Draft Saved</span>
+              </div>
+            )}
           </div>
 
           {job.status === 'interviewing' && job.cover_letter_id && (
