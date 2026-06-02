@@ -26,18 +26,18 @@ export default function SplashPage() {
 
       <div className="relative z-10 max-w-4xl w-full text-center space-y-12">
         <div className="space-y-4 animate-in fade-in zoom-in duration-1000">
-          <div className="inline-block px-4 py-1.5 rounded-full bg-[#0d0d20] border border-[#1e1e38] mb-6">
+          <div className="inline-block px-4 py-1.5 rounded-full bg-[#0d0d20] border border-[#1e1e38] mb-4 md:mb-6">
              <span className="text-[10px] text-[#00ff87] font-mono font-bold tracking-[3px] uppercase">Personal Edition</span>
           </div>
-          <h1 className="font-syne text-6xl md:text-8xl font-black tracking-tighter text-white">
+          <h1 className="font-syne text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter text-white leading-none">
             Job<span className="text-[#00ff87] text-glow-green">Hunter</span>
           </h1>
-          <p className="font-mono text-xs md:text-sm text-[#444] tracking-[6px] uppercase font-bold">
+          <p className="font-mono text-[10px] md:text-sm text-[#444] tracking-[2px] sm:tracking-[4px] md:tracking-[6px] uppercase font-bold">
             Autonomous AI Career Strategist
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-12 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 py-8 md:py-12 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
           {[
             { title: 'Intelligent Scan', desc: 'LLM-powered job discovery across multiple global sources.' },
             { title: 'Match Analysis', desc: 'Brutally honest fit scoring based on your unique technical profile.' },
@@ -50,16 +50,16 @@ export default function SplashPage() {
           ))}
         </div>
 
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500">
+        <div className="space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500">
           <button
             onClick={() => router.push('/onboarding')}
-            className="group relative px-12 py-5 bg-[#00ff87] text-[#0a0a1a] rounded-2xl font-mono text-sm font-black tracking-[4px] uppercase overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-[0_20px_50px_rgba(0,255,135,0.2)]"
+            className="group relative px-8 md:px-12 py-4 md:py-5 bg-[#00ff87] text-[#0a0a1a] rounded-2xl font-mono text-xs md:text-sm font-black tracking-[4px] uppercase overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-[0_20px_50px_rgba(0,255,135,0.25)]"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:animate-shimmer" />
             Initialize System
           </button>
 
-          <div className="flex items-center justify-center gap-8 text-[#333] font-mono text-[10px] tracking-[2px] uppercase">
+          <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8 text-[#333] font-mono text-[10px] tracking-[2px] uppercase">
              <div className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#00ff87]" />
                 SQLite Backend
@@ -76,8 +76,8 @@ export default function SplashPage() {
         </div>
       </div>
 
-      <footer className="absolute bottom-8 left-0 right-0 text-center animate-in fade-in duration-1000 delay-700">
-         <p className="text-[10px] font-mono text-[#222] tracking-widest uppercase">
+      <footer className="py-8 md:absolute md:bottom-8 left-0 right-0 text-center animate-in fade-in duration-1000 delay-700">
+         <p className="text-[10px] font-mono text-[#222] tracking-widest uppercase px-6">
             Designed for elite software engineers
          </p>
       </footer>

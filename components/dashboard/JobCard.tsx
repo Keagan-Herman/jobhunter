@@ -29,14 +29,14 @@ function JobCardComponent({
       <div className="absolute inset-0 bg-gradient-to-br from-[#00ff87]/[0.05] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
       <div className="flex justify-between items-start mb-6 relative z-10">
-        <div className="flex-1 mr-4 overflow-hidden">
-          <div className="font-syne font-extrabold text-[20px] text-white/95 mb-1.5 group-hover:text-white transition-all duration-500 leading-tight tracking-tight group-hover:translate-x-1 truncate">
+        <div className="flex-1 mr-4">
+          <div className="font-syne font-extrabold text-[18px] md:text-[20px] text-white/95 mb-1.5 group-hover:text-white transition-all duration-500 leading-tight tracking-tight group-hover:translate-x-1 line-clamp-2">
             {job.title}
           </div>
-          <div className="text-[10px] text-[#666] font-mono tracking-[2.5px] flex items-center gap-2 uppercase font-black">
-            <span className="text-[#999] group-hover:text-[#aaa] transition-colors truncate max-w-[120px]">{job.company}</span>
+          <div className="text-[10px] text-[#666] font-mono tracking-[1.5px] md:tracking-[2.5px] flex flex-wrap items-center gap-2 uppercase font-black">
+            <span className="text-[#999] group-hover:text-[#aaa] transition-colors line-clamp-1">{job.company}</span>
             <span className="w-1.5 h-1.5 rounded-full bg-white/10 shrink-0" />
-            <span className="truncate max-w-[150px] text-[#777]">{job.location || 'Remote'}</span>
+            <span className="line-clamp-1 text-[#777]">{job.location || 'Remote'}</span>
           </div>
         </div>
         <div className="shrink-0 transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 group-hover:drop-shadow-[0_0_15px_rgba(0,255,135,0.2)]">
@@ -81,9 +81,9 @@ function JobCardComponent({
         )}
       </div>
 
-      <div className="flex justify-between items-center mt-7 pt-5 border-t border-white/[0.03] relative z-10">
+      <div className="flex justify-between items-center mt-auto pt-4 border-t border-white/[0.03] relative z-10">
         {job.score_reason && (
-          <div className="text-[11px] text-[#444] font-medium italic flex-1 mr-4 line-clamp-1 group-hover:text-[#888] transition-all duration-500 group-hover:translate-x-1">
+          <div className="text-[11px] text-[#444] font-medium italic flex-1 mr-4 line-clamp-2 group-hover:text-[#888] transition-all duration-500 group-hover:translate-x-1">
             &quot;{job.score_reason}&quot;
           </div>
         )}
