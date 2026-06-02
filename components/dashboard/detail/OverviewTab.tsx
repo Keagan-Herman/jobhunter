@@ -14,16 +14,16 @@ export function OverviewTab({
           Alignment Matrix
           <div className="h-px flex-1 bg-white/[0.03]" />
         </h4>
-        <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           {[
             { label: 'Seniority', value: job.seniority || 'Mid', color: 'text-[#00ff87]', bg: 'bg-[#00ff87]/5', icon: '👤' },
             { label: 'Work Style', value: job.work_style || 'Remote', color: 'text-[#00d4ff]', bg: 'bg-[#00d4ff]/5', icon: '🏠' },
             { label: 'Stack Match', value: `${job.stack_overlap || 0}%`, color: 'text-[#ffd60a]', bg: 'bg-[#ffd60a]/5', icon: '⚡' }
           ].map(item => (
-            <div key={item.label} className={"p-7 rounded-[2rem] bg-glass border-premium shadow-xl transition-all duration-500 hover:-translate-y-1 group/matrix relative overflow-hidden hover:border-white/20 " + item.bg}>
+            <div key={item.label} className={"p-5 md:p-7 rounded-[2rem] bg-glass border-premium shadow-xl transition-all duration-500 hover:-translate-y-1 group/matrix relative overflow-hidden hover:border-white/20 " + item.bg}>
               <div className="absolute top-2 right-4 text-[10px] opacity-20 group-hover/matrix:opacity-100 transition-opacity duration-500">{item.icon}</div>
               <div className="text-[9px] font-mono text-[#555] uppercase tracking-[3px] mb-3 font-black">{item.label}</div>
-              <div className={"text-[18px] font-syne font-black uppercase tracking-tight " + item.color}>{item.value}</div>
+              <div className={"text-[16px] md:text-[18px] font-syne font-black uppercase tracking-tight " + item.color}>{item.value}</div>
             </div>
           ))}
         </div>
@@ -32,7 +32,7 @@ export function OverviewTab({
           Skill Alignment
           <div className="h-px flex-1 bg-white/[0.03]" />
         </h4>
-        <div className="flex flex-wrap gap-2.5 p-8 rounded-[2.5rem] bg-glass border-premium shadow-2xl">
+        <div className="flex flex-wrap gap-2.5 p-6 md:p-8 rounded-[2.5rem] bg-glass border-premium shadow-2xl">
           {job.stack?.map((skill, idx) => {
             const isMatch = userSkills.some(s => s.toLowerCase() === skill.toLowerCase())
             return (
@@ -59,11 +59,11 @@ export function OverviewTab({
 
       {/* AI Fit Analysis - Promoted to top */}
       {job.score_reason && (
-        <div className="p-10 rounded-[3rem] bg-glass border-premium space-y-6 relative overflow-hidden shadow-2xl group/ai transition-all duration-700 hover:border-[#00ff87]/30">
+        <div className="p-6 md:p-10 rounded-[2.5rem] md:rounded-[3rem] bg-glass border-premium space-y-6 relative overflow-hidden shadow-2xl group/ai transition-all duration-700 hover:border-[#00ff87]/30">
           <div className="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-[#00ff87] via-[#00d4ff] to-transparent opacity-60" />
           <div className="absolute -right-24 -top-24 w-80 h-80 bg-[#00ff87]/5 rounded-full blur-[100px] opacity-0 group-hover/ai:opacity-100 transition-opacity duration-1000" />
 
-          <div className="flex items-center justify-between relative z-10">
+          <div className="flex flex-wrap items-center justify-between gap-4 relative z-10">
             <h4 className="text-[10px] font-mono font-black text-[#00ff87] tracking-[5px] uppercase flex items-center gap-3">
               <span className="relative flex h-2.5 w-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00ff87] opacity-75"></span>
@@ -78,7 +78,7 @@ export function OverviewTab({
             )}
           </div>
 
-          <p className="text-[20px] text-white leading-relaxed font-syne font-bold italic relative z-10 tracking-tight drop-shadow-sm">
+          <p className="text-[18px] md:text-[20px] text-white leading-relaxed font-syne font-bold italic relative z-10 tracking-tight drop-shadow-sm">
             &quot;{job.score_reason}&quot;
           </p>
         </div>
@@ -89,20 +89,20 @@ export function OverviewTab({
           Role Details
           <div className="h-px flex-1 bg-white/[0.03]" />
         </h4>
-        <div className="grid grid-cols-2 gap-6">
-          <div className="p-8 rounded-[2.5rem] bg-glass border-premium group hover:border-white/10 transition-all duration-500 shadow-2xl relative overflow-hidden">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="p-6 md:p-8 rounded-[2.5rem] bg-glass border-premium group hover:border-white/10 transition-all duration-500 shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 right-0 p-5 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-700 rotate-12">
               <div className="w-16 h-16 border-4 border-white rounded-full flex items-center justify-center font-mono text-3xl font-black">S</div>
             </div>
             <div className="text-[10px] font-mono text-[#444] uppercase tracking-[4px] mb-3 font-black">Seniority</div>
-            <div className="text-[22px] font-black text-white capitalize font-syne tracking-tight group-hover:text-[#00ff87] transition-colors duration-500">{job.seniority || 'Mid Level'}</div>
+            <div className="text-[20px] md:text-[22px] font-black text-white capitalize font-syne tracking-tight group-hover:text-[#00ff87] transition-colors duration-500">{job.seniority || 'Mid Level'}</div>
           </div>
-          <div className="p-8 rounded-[2.5rem] bg-glass border-premium group hover:border-white/10 transition-all duration-500 shadow-2xl relative overflow-hidden">
+          <div className="p-6 md:p-8 rounded-[2.5rem] bg-glass border-premium group hover:border-white/10 transition-all duration-500 shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 right-0 p-5 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-700 -rotate-12">
               <div className="w-16 h-16 border-4 border-white rounded-2xl flex items-center justify-center font-mono text-3xl font-black">W</div>
             </div>
             <div className="text-[10px] font-mono text-[#444] uppercase tracking-[4px] mb-3 font-black">Work Style</div>
-            <div className="text-[22px] font-black text-white capitalize font-syne tracking-tight group-hover:text-[#00d4ff] transition-colors duration-500">{job.work_style || 'Not specified'}</div>
+            <div className="text-[20px] md:text-[22px] font-black text-white capitalize font-syne tracking-tight group-hover:text-[#00d4ff] transition-colors duration-500">{job.work_style || 'Not specified'}</div>
           </div>
         </div>
       </div>
@@ -113,8 +113,8 @@ export function OverviewTab({
           <div className="h-px flex-1 bg-white/[0.03]" />
         </h4>
         <div className="relative group/desc">
-          <div className="bg-glass border-premium p-10 rounded-[3rem] shadow-2xl group-hover/desc:border-white/10 transition-all duration-700">
-            <p className="text-[16px] leading-[2] text-white/70 whitespace-pre-wrap font-sans font-medium selection:bg-[#00ff8720] selection:text-[#00ff87]">{job.description}</p>
+          <div className="bg-glass border-premium p-6 md:p-10 rounded-[2.5rem] md:rounded-[3rem] shadow-2xl group-hover/desc:border-white/10 transition-all duration-700">
+            <p className="text-[14px] md:text-[16px] leading-[1.8] md:leading-[2] text-white/70 whitespace-pre-wrap font-sans font-medium selection:bg-[#00ff8720] selection:text-[#00ff87]">{job.description}</p>
           </div>
           {job.url && (
             <div className="mt-8 flex justify-center">
@@ -132,12 +132,12 @@ export function OverviewTab({
             Culture Pulse
             <div className="h-px flex-1 bg-white/[0.03]" />
           </h4>
-          <div className="p-10 rounded-[3rem] bg-glass border-premium hover:border-[#7b61ff]/30 transition-all duration-700 shadow-2xl relative overflow-hidden group/culture">
+          <div className="p-6 md:p-10 rounded-[2.5rem] md:rounded-[3rem] bg-glass border-premium hover:border-[#7b61ff]/30 transition-all duration-700 shadow-2xl relative overflow-hidden group/culture">
             <div className="absolute inset-0 bg-gradient-to-br from-[#7b61ff]/[0.03] to-transparent opacity-0 group-hover/culture:opacity-100 transition-opacity duration-700" />
             <div className="absolute top-0 right-0 p-8 opacity-[0.05] group-hover:opacity-[0.1] transition-all duration-700 group-hover:scale-110 group-hover:rotate-12">
                <span className="text-4xl">✨</span>
             </div>
-            <p className="text-[18px] text-white/90 leading-relaxed italic relative z-10 font-syne font-bold tracking-tight">&quot;{job.culture_fit}&quot;</p>
+            <p className="text-[16px] md:text-[18px] text-white/90 leading-relaxed italic relative z-10 font-syne font-bold tracking-tight">&quot;{job.culture_fit}&quot;</p>
           </div>
         </div>
       )}
@@ -148,12 +148,12 @@ export function OverviewTab({
             Winning Strategy
             <div className="h-px flex-1 bg-white/[0.03]" />
           </h4>
-          <div className="p-10 rounded-[3rem] bg-glass border-premium hover:border-[#00d4ff]/30 transition-all duration-700 shadow-2xl relative overflow-hidden group/prep">
+          <div className="p-6 md:p-10 rounded-[2.5rem] md:rounded-[3rem] bg-glass border-premium hover:border-[#00d4ff]/30 transition-all duration-700 shadow-2xl relative overflow-hidden group/prep">
              <div className="absolute inset-0 bg-gradient-to-tr from-[#00d4ff]/[0.03] to-transparent opacity-0 group-hover/prep:opacity-100 transition-opacity duration-700" />
-            <div className="text-[16px] text-white/80 leading-[2] whitespace-pre-wrap font-sans font-medium relative z-10">
+            <div className="text-[14px] md:text-[16px] text-white/80 leading-[1.8] md:leading-[2] whitespace-pre-wrap font-sans font-medium relative z-10">
               {job.interview_prep.split('\n').map((line, i) => (
-                <div key={i} className="mb-6 last:mb-0 flex gap-5 group/line">
-                    <div className="mt-3 w-2 h-2 rounded-full bg-[#00d4ff] shadow-[0_0_15px_#00d4ff] transition-all duration-500 group-hover/line:scale-150 group-hover/line:shadow-[0_0_25px_#00d4ff]" />
+                <div key={i} className="mb-4 md:mb-6 last:mb-0 flex gap-3 md:gap-5 group/line">
+                    <div className="mt-2 md:mt-3 w-1.5 md:w-2 h-1.5 md:h-2 rounded-full bg-[#00d4ff] shadow-[0_0_15px_#00d4ff] transition-all duration-500 group-hover/line:scale-150 group-hover/line:shadow-[0_0_25px_#00d4ff]" />
                     <span className="flex-1 group-hover/line:text-white transition-colors duration-300">{line}</span>
                 </div>
               ))}

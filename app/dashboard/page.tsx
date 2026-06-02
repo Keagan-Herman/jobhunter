@@ -61,8 +61,8 @@ export default function DashboardPage() {
                 setFirstTime(true)
             }
             const handleResize = () => {
-                const offset = window.innerWidth >= 1024 ? 380 : 450
-                setListHeight(Math.max(400, window.innerHeight - offset))
+                const offset = window.innerWidth >= 1024 ? 420 : 500
+                setListHeight(Math.max(300, window.innerHeight - offset))
             }
             handleResize()
             window.addEventListener('resize', handleResize)
@@ -255,9 +255,9 @@ export default function DashboardPage() {
             <div className="fixed -bottom-[30rem] -left-[20rem] w-[70rem] h-[70rem] rounded-full bg-radial-gradient from-[#7b61ff05] to-transparent z-0 pointer-events-none blur-[120px]" />
 
             <div className="relative z-10 max-w-7xl mx-auto px-6 py-12 md:px-8 space-y-12">
-                <header className="flex flex-col md:flex-row md:items-center justify-between gap-8">
-                    <div className="flex items-center gap-6">
-                        <h1 className="font-syne text-4xl font-extrabold tracking-tight text-white flex items-center gap-1">
+                <header className="flex flex-col xl:flex-row xl:items-center justify-between gap-8">
+                    <div className="flex flex-wrap items-center gap-4 md:gap-6">
+                        <h1 className="font-syne text-3xl md:text-4xl font-extrabold tracking-tight text-white flex items-center gap-1">
                             Job<span className="text-[#00ff87] text-glow-green">Hunter</span>
                         </h1>
                         <div className="flex items-center gap-2 bg-[#0d0d20] border border-[#1e1e38] rounded-full px-3 py-1">
@@ -277,7 +277,7 @@ export default function DashboardPage() {
                         )}
                     </div>
 
-                    <div className="flex items-center gap-4 flex-wrap">
+                    <div className="flex items-center gap-3 md:gap-4 flex-wrap">
                         <button onClick={handleScan} disabled={scanning}
                                 className={"group relative flex items-center gap-2 px-6 py-3 rounded-2xl font-mono text-[11px] font-bold tracking-[2px] uppercase transition-all duration-300 shadow-[0_0_30px_-5px_#00ff8730] overflow-hidden " + (scanning ? 'bg-white/[0.03] border border-white/5 text-[#00ff87] cursor-not-allowed' : 'bg-[#00ff87] text-[#0a0a1a] hover:brightness-110 active:scale-95')}>
                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer" />
@@ -332,13 +332,13 @@ export default function DashboardPage() {
                 <StatsGrid stats={stats} />
 
                 <div className="space-y-8">
-                    <div className="flex gap-2 border-b border-white/5 pb-px">
+                    <div className="flex flex-wrap gap-1 md:gap-2 border-b border-white/5 pb-px overflow-x-auto scrollbar-hide">
                         {(['pending', 'applied', 'interviewing', 'skipped'] as const).map(tab => (
                             <button key={tab}
                                     onClick={() => { setActiveTab(tab) }}
-                                    className={"px-8 py-5 font-mono text-[10px] font-bold tracking-[3px] uppercase transition-all relative " + (activeTab === tab ? 'text-[#00ff87]' : 'text-[#444] hover:text-[#777]')}>
-                                {tab} <span className={"ml-2 px-2 py-0.5 rounded-md text-[9px] " + (activeTab === tab ? 'bg-[#00ff87]/10 text-[#00ff87]' : 'bg-white/5 text-[#555]')}>{jobs.filter(j => j.status === tab).length}</span>
-                                {activeTab === tab && <div className="absolute bottom-0 left-4 right-4 h-[2px] bg-[#00ff87] shadow-[0_0_15px_#00ff87]" />}
+                                    className={"px-4 md:px-8 py-4 md:py-5 font-mono text-[9px] md:text-[10px] font-bold tracking-[2px] md:tracking-[3px] uppercase transition-all relative shrink-0 " + (activeTab === tab ? 'text-[#00ff87]' : 'text-[#444] hover:text-[#777]')}>
+                                {tab} <span className={"ml-1 md:ml-2 px-1.5 md:px-2 py-0.5 rounded-md text-[8px] md:text-[9px] " + (activeTab === tab ? 'bg-[#00ff87]/10 text-[#00ff87]' : 'bg-white/5 text-[#555]')}>{jobs.filter(j => j.status === tab).length}</span>
+                                {activeTab === tab && <div className="absolute bottom-0 left-2 md:left-4 right-2 md:right-4 h-[2px] bg-[#00ff87] shadow-[0_0_15px_#00ff87]" />}
                             </button>
                         ))}
                     </div>
@@ -373,8 +373,9 @@ export default function DashboardPage() {
                             ) : (
                                 <div className="flex-1">
                                     <List
+                                        key={`${activeTab}-${filteredJobs.length}`}
                                         rowCount={filteredJobs.length}
-                                        rowHeight={195}
+                                        rowHeight={220}
                                         className="scrollbar-hide"
                                         style={{ height: listHeight, width: '100%' }}
                                         rowProps={{}}
