@@ -343,81 +343,77 @@ export default function DashboardPage() {
                         ))}
                     </div>
 
-                    <div className={"grid gap-10 " + (selected ? 'lg:grid-cols-2' : 'grid-cols-1')}>
-                        <div className="bg-glass border-premium rounded-[2.5rem] overflow-hidden h-[calc(100vh-380px)] shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col relative">
-                            {loading ? (
-                                <div className="overflow-hidden flex-1">
-                                    {Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)}
-                                </div>
-                            ) : filteredJobs.length === 0 ? (
-                                <div className="py-24 text-center flex-1 flex flex-col items-center justify-center px-12 animate-in fade-in duration-700">
-                                    <div className="relative mb-10 group/empty">
-                                        <div className="w-24 h-24 rounded-[2rem] bg-white/[0.02] border border-white/5 flex items-center justify-center text-4xl grayscale opacity-20 group-hover/empty:grayscale-0 group-hover/empty:opacity-100 transition-all duration-700 group-hover/empty:scale-110 group-hover/empty:rotate-6 group-hover/empty:border-[#00ff8740] shadow-2xl">
-                                            {activeTab === 'pending' ? '🔍' : activeTab === 'applied' ? '✉️' : activeTab === 'interviewing' ? '🤝' : '⏭️'}
-                                        </div>
-                                        <div className="absolute -inset-8 bg-[#00ff87]/5 rounded-full blur-3xl opacity-0 group-hover/empty:opacity-100 transition-opacity duration-700" />
+                    <div className="bg-glass border-premium rounded-[2.5rem] overflow-hidden h-[calc(100vh-380px)] shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col relative">
+                        {loading ? (
+                            <div className="overflow-hidden flex-1">
+                                {Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)}
+                            </div>
+                        ) : filteredJobs.length === 0 ? (
+                            <div className="py-24 text-center flex-1 flex flex-col items-center justify-center px-12 animate-in fade-in duration-700">
+                                <div className="relative mb-10 group/empty">
+                                    <div className="w-24 h-24 rounded-[2rem] bg-white/[0.02] border border-white/5 flex items-center justify-center text-4xl grayscale opacity-20 group-hover/empty:grayscale-0 group-hover/empty:opacity-100 transition-all duration-700 group-hover/empty:scale-110 group-hover/empty:rotate-6 group-hover/empty:border-[#00ff8740] shadow-2xl">
+                                        {activeTab === 'pending' ? '🔍' : activeTab === 'applied' ? '✉️' : activeTab === 'interviewing' ? '🤝' : '⏭️'}
                                     </div>
-                                    <h3 className="font-syne font-extrabold text-2xl text-white/90 mb-3 tracking-tight">No {activeTab} opportunities</h3>
-                                    <p className="text-[10px] text-[#555] font-mono uppercase tracking-[4px] mb-12 max-w-xs leading-relaxed font-bold">
-                                        {activeTab === 'pending'
-                                            ? 'Initiate a fresh scan to discover high-match roles tailored to your profile.'
-                                            : "You haven't moved any jobs to " + activeTab + " yet."}
-                                    </p>
-                                    {activeTab === 'pending' && (
-                                        <button onClick={handleScan} className="group relative bg-[#00ff8710] border border-[#00ff8720] text-[#00ff87] px-10 py-4 rounded-2xl font-mono text-[11px] font-black uppercase tracking-[3px] hover:bg-[#00ff87] hover:text-[#0a0a1a] transition-all duration-500 overflow-hidden shadow-lg shadow-[#00ff8710] hover:shadow-[#00ff8730]">
-                                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:animate-shimmer" />
-                                            Discover Jobs
-                                        </button>
+                                    <div className="absolute -inset-8 bg-[#00ff87]/5 rounded-full blur-3xl opacity-0 group-hover/empty:opacity-100 transition-opacity duration-700" />
+                                </div>
+                                <h3 className="font-syne font-extrabold text-2xl text-white/90 mb-3 tracking-tight">No {activeTab} opportunities</h3>
+                                <p className="text-[10px] text-[#555] font-mono uppercase tracking-[4px] mb-12 max-w-xs leading-relaxed font-bold">
+                                    {activeTab === 'pending'
+                                        ? 'Initiate a fresh scan to discover high-match roles tailored to your profile.'
+                                        : "You haven't moved any jobs to " + activeTab + " yet."}
+                                </p>
+                                {activeTab === 'pending' && (
+                                    <button onClick={handleScan} className="group relative bg-[#00ff8710] border border-[#00ff8720] text-[#00ff87] px-10 py-4 rounded-2xl font-mono text-[11px] font-black uppercase tracking-[3px] hover:bg-[#00ff87] hover:text-[#0a0a1a] transition-all duration-500 overflow-hidden shadow-lg shadow-[#00ff8710] hover:shadow-[#00ff8730]">
+                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:animate-shimmer" />
+                                        Discover Jobs
+                                    </button>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="flex-1">
+                                <List
+                                    key={`${activeTab}-${filteredJobs.length}`}
+                                    rowCount={filteredJobs.length}
+                                    rowHeight={220}
+                                    className="scrollbar-hide"
+                                    style={{ height: listHeight, width: '100%' }}
+                                    rowProps={{}}
+                                    rowComponent={({ index, style }) => (
+                                        <div style={style}>
+                                            <JobCard
+                                                job={filteredJobs[index]}
+                                                isSelected={selected?.id === filteredJobs[index].id}
+                                                index={index}
+                                                onClick={() => setSelected(filteredJobs[index])}
+                                            />
+                                        </div>
                                     )}
-                                </div>
-                            ) : (
-                                <div className="flex-1">
-                                    <List
-                                        key={`${activeTab}-${filteredJobs.length}`}
-                                        rowCount={filteredJobs.length}
-                                        rowHeight={220}
-                                        className="scrollbar-hide"
-                                        style={{ height: listHeight, width: '100%' }}
-                                        rowProps={{}}
-                                        rowComponent={({ index, style }) => (
-                                            <div style={style}>
-                                                <JobCard
-                                                    job={filteredJobs[index]}
-                                                    isSelected={selected?.id === filteredJobs[index].id}
-                                                    index={index}
-                                                    onClick={() => setSelected(filteredJobs[index])}
-                                                />
-                                            </div>
-                                        )}
-                                    />
-                                </div>
-                            )}
-                        </div>
-
-                        {selected && (
-                            <div className="relative">
-                                <DetailPanel
-                                    job={selected}
-                                    country={profile?.country ?? undefined}
-                                    userSkills={profile?.skills ?? []}
-                                    generating={generating}
-                                    onClose={() => setSelected(null)}
-                                    onGenerateCoverLetter={handleGenerateCoverLetter}
-                                    onStatusUpdate={(id, status) => {
-                                        if (status === 'skipped') {
-                                            setSkipJobId(id)
-                                            setShowSkipModal(true)
-                                        } else {
-                                            handleStatusUpdate(id, status)
-                                        }
-                                    }}
-                                    onInterviewOutcome={handleInterviewOutcome}
-                                    onSaveTracking={handleSaveTracking}
-                                    onCoverLetterOutcome={handleCoverLetterOutcome}
                                 />
                             </div>
                         )}
                     </div>
+
+                    {selected && (
+                        <DetailPanel
+                            job={selected}
+                            country={profile?.country ?? undefined}
+                            userSkills={profile?.skills ?? []}
+                            generating={generating}
+                            onClose={() => setSelected(null)}
+                            onGenerateCoverLetter={handleGenerateCoverLetter}
+                            onStatusUpdate={(id, status) => {
+                                if (status === 'skipped') {
+                                    setSkipJobId(id)
+                                    setShowSkipModal(true)
+                                } else {
+                                    handleStatusUpdate(id, status)
+                                }
+                            }}
+                            onInterviewOutcome={handleInterviewOutcome}
+                            onSaveTracking={handleSaveTracking}
+                            onCoverLetterOutcome={handleCoverLetterOutcome}
+                        />
+                    )}
                 </div>
             </div>
 
