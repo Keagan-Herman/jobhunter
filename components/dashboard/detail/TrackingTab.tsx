@@ -50,12 +50,12 @@ export function TrackingTab({
           <div className="space-y-4">
             <label className="text-[10px] text-[#555] font-mono uppercase ml-2 font-black tracking-[3px]">Contact Name</label>
             <input value={contact_name} onChange={e => setContactName(e.target.value)} placeholder="Jane Smith"
-              className="w-full bg-[#0d0d20] border border-white/5 rounded-2xl p-6 text-white/90 text-[15px] outline-none focus:border-[#00ff87]/40 focus:ring-4 focus:ring-[#00ff87]/5 transition-all duration-500 hover:border-white/10 shadow-2xl font-medium" />
+              className="w-full bg-glass border border-white/5 rounded-2xl p-6 text-white/90 text-[15px] outline-none focus:border-[#00ff87]/40 focus:ring-2 focus:ring-[#00ff87]/20 transition-all duration-500 hover:border-white/10 shadow-2xl font-medium" />
           </div>
           <div className="space-y-4">
             <label className="text-[10px] text-[#555] font-mono uppercase ml-2 font-black tracking-[3px]">Contact Email</label>
             <input value={contact_email} onChange={e => setContactEmail(e.target.value)} placeholder="jane@company.com"
-              className="w-full bg-[#0d0d20] border border-white/5 rounded-2xl p-6 text-white/90 text-[15px] outline-none focus:border-[#00ff87]/40 focus:ring-4 focus:ring-[#00ff87]/5 transition-all duration-500 hover:border-white/10 shadow-2xl font-medium" />
+              className="w-full bg-glass border border-white/5 rounded-2xl p-6 text-white/90 text-[15px] outline-none focus:border-[#00ff87]/40 focus:ring-2 focus:ring-[#00ff87]/20 transition-all duration-500 hover:border-white/10 shadow-2xl font-medium" />
           </div>
         </div>
       </div>
@@ -69,12 +69,12 @@ export function TrackingTab({
           <div className="space-y-4">
             <label className="text-[10px] text-[#555] font-mono uppercase ml-2 font-black tracking-[3px]">Interview Date</label>
             <input type="datetime-local" value={interview_date} onChange={e => setInterviewDate(e.target.value)}
-              className="w-full bg-[#0d0d20] border border-white/5 rounded-2xl p-6 text-white/90 text-[15px] outline-none focus:border-[#00ff87]/40 focus:ring-4 focus:ring-[#00ff87]/5 color-scheme-dark transition-all duration-500 hover:border-white/10 shadow-2xl font-medium" />
+              className="w-full bg-glass border border-white/5 rounded-2xl p-6 text-white/90 text-[15px] outline-none focus:border-[#00ff87]/40 focus:ring-2 focus:ring-[#00ff87]/20 color-scheme-dark transition-all duration-500 hover:border-white/10 shadow-2xl font-medium" />
           </div>
           <div className="space-y-4">
             <label className="text-[10px] text-[#555] font-mono uppercase ml-2 font-black tracking-[3px]">Follow Up Date</label>
             <input type="datetime-local" value={follow_up_date} onChange={e => setFollowUpDate(e.target.value)}
-              className="w-full bg-[#0d0d20] border border-white/5 rounded-2xl p-6 text-white/90 text-[15px] outline-none focus:border-[#00ff87]/40 focus:ring-4 focus:ring-[#00ff87]/5 color-scheme-dark transition-all duration-500 hover:border-white/10 shadow-2xl font-medium" />
+              className="w-full bg-glass border border-white/5 rounded-2xl p-6 text-white/90 text-[15px] outline-none focus:border-[#00ff87]/40 focus:ring-2 focus:ring-[#00ff87]/20 color-scheme-dark transition-all duration-500 hover:border-white/10 shadow-2xl font-medium" />
           </div>
         </div>
       </div>
@@ -89,7 +89,7 @@ export function TrackingTab({
             <div className="space-y-4">
               <label className="text-[10px] text-[#555] font-mono uppercase ml-2 font-black tracking-[3px]">Offer Amount ({currency})</label>
               <input type="number" value={offer_amount} onChange={e => setOfferAmount(e.target.value)} placeholder="e.g. 120000"
-                className="w-full bg-[#0d0d20] border border-white/5 rounded-2xl p-7 text-white/95 text-[22px] font-syne font-black outline-none focus:border-[#00ff87]/40 focus:ring-4 focus:ring-[#00ff87]/5 transition-all duration-500 hover:border-white/10 shadow-2xl" />
+                className="w-full bg-glass border border-white/5 rounded-2xl p-7 text-white/95 text-[22px] font-syne font-black outline-none focus:border-[#00ff87]/40 focus:ring-2 focus:ring-[#00ff87]/20 transition-all duration-500 hover:border-white/10 shadow-2xl" />
             </div>
             <div className="grid grid-cols-1 gap-6">
               {[
@@ -120,7 +120,7 @@ export function TrackingTab({
         <textarea value={notes} onChange={e => setNotes(e.target.value)}
           placeholder="Interview highlights, cultural red flags, questions to ask..."
           rows={8}
-          className="w-full bg-[#0d0d20] border border-white/5 rounded-[3rem] p-10 text-white/80 text-[16px] outline-none focus:border-[#00ff87]/40 focus:ring-4 focus:ring-[#00ff87]/5 resize-none transition-all duration-500 hover:border-white/10 leading-[2] shadow-2xl font-medium"
+          className="w-full bg-glass border border-white/5 rounded-[3rem] p-10 text-white/80 text-[16px] outline-none focus:border-[#00ff87]/40 focus:ring-2 focus:ring-[#00ff87]/20 resize-none transition-all duration-500 hover:border-white/10 leading-[2] shadow-2xl font-medium"
         />
       </div>
 

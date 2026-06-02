@@ -1,8 +1,9 @@
+import React from 'react'
 import { StatusBadge } from './Badges'
 import { RadialScore } from './RadialScore'
 import { Job } from '@/types'
 
-export function JobCard({
+function JobCardComponent({
   job,
   isSelected,
   onClick,
@@ -29,7 +30,7 @@ export function JobCard({
 
       <div className="flex justify-between items-start mb-6 relative z-10">
         <div className="flex-1 mr-4 overflow-hidden">
-          <div className="font-syne font-extrabold text-[19px] text-white/95 mb-1.5 group-hover:text-white transition-all duration-300 leading-tight tracking-tight group-hover:translate-x-1 truncate">
+          <div className="font-syne font-extrabold text-[20px] text-white/95 mb-1.5 group-hover:text-white transition-all duration-500 leading-tight tracking-tight group-hover:translate-x-1 truncate">
             {job.title}
           </div>
           <div className="text-[10px] text-[#666] font-mono tracking-[2.5px] flex items-center gap-2 uppercase font-black">
@@ -93,3 +94,5 @@ export function JobCard({
     </div>
   )
 }
+
+export const JobCard = React.memo(JobCardComponent)

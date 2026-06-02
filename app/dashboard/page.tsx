@@ -254,7 +254,7 @@ export default function DashboardPage() {
             <div className="fixed -top-[20rem] -right-[20rem] w-[60rem] h-[60rem] rounded-full bg-radial-gradient from-[#00ff8708] to-transparent z-0 pointer-events-none blur-[100px]" />
             <div className="fixed -bottom-[30rem] -left-[20rem] w-[70rem] h-[70rem] rounded-full bg-radial-gradient from-[#7b61ff05] to-transparent z-0 pointer-events-none blur-[120px]" />
 
-            <div className="relative z-10 max-w-7xl mx-auto px-6 py-10 md:px-8 space-y-12">
+            <div className="relative z-10 max-w-7xl mx-auto px-6 py-12 md:px-8 space-y-12">
                 <header className="flex flex-col md:flex-row md:items-center justify-between gap-8">
                     <div className="flex items-center gap-6">
                         <h1 className="font-syne text-4xl font-extrabold tracking-tight text-white flex items-center gap-1">
@@ -265,9 +265,9 @@ export default function DashboardPage() {
                         </div>
 
                         {activeProcess && (
-                            <div className="flex items-center gap-2 bg-[#00ff87]/5 border border-[#00ff87]/20 rounded-full px-4 py-1.5 animate-in fade-in zoom-in duration-300">
+                            <div className="flex items-center gap-2 bg-[#00ff87]/5 border border-[#00ff87]/20 rounded-full px-4 py-1.5 animate-in fade-in zoom-in duration-300 backdrop-blur-md">
                                 <span className="relative flex h-2 w-2">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00ff87] opacity-75"></span>
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00ff87] opacity-50 duration-1000"></span>
                                     <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00ff87]"></span>
                                 </span>
                                 <span className="text-[10px] text-[#00ff87] font-mono font-bold tracking-widest uppercase flex items-center gap-2">
