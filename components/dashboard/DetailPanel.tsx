@@ -155,7 +155,7 @@ export function DetailPanel({
 
         <div className="flex justify-between items-start mb-12 relative z-10">
           <div className="flex-1 pr-16">
-            <h3 className="font-syne font-black text-[38px] text-white mb-5 leading-[1.1] tracking-tighter drop-shadow-2xl selection:bg-[#00ff8720]">{job.title}</h3>
+            <h3 className="font-syne font-black text-[42px] text-white mb-5 leading-[1.1] tracking-tighter drop-shadow-2xl selection:bg-[#00ff8720]">{job.title}</h3>
             <div className="text-[11px] font-mono font-black text-[#555] tracking-[5px] uppercase flex items-center gap-4">
                 <span className="text-[#aaa] hover:text-white transition-colors duration-300">{job.company}</span>
                 <span className="w-2.5 h-2.5 rounded-full bg-white/10 shrink-0" />
@@ -173,7 +173,7 @@ export function DetailPanel({
                 {linkCopied ? 'Copied URL!' : 'Copy Link'}
               </button>
             )}
-            <button onClick={onClose} className="text-[#444] hover:text-white transition-all duration-500 text-3xl font-mono hover:rotate-90 p-3 leading-none bg-white/[0.02] rounded-2xl border border-transparent hover:border-white/10 active:scale-90">✕</button>
+            <button onClick={onClose} className="text-[#444] hover:text-white transition-all duration-500 text-3xl font-mono hover:rotate-180 hover:scale-110 p-3 leading-none bg-white/[0.02] rounded-2xl border border-transparent hover:border-white/10 active:scale-90">✕</button>
           </div>
         </div>
 
