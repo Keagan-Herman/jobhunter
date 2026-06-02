@@ -53,6 +53,17 @@ export function RadialScore({ score, size = 48 }: { score: number, size?: number
           className="opacity-20"
         />
 
+        {/* Inner rim definition */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="transparent"
+          stroke="white"
+          strokeWidth="0.5"
+          className="opacity-10"
+        />
+
         {/* Background track */}
         <circle
           cx={size / 2}
