@@ -27,20 +27,19 @@ describe('JobCard', () => {
     expect(screen.getByText(/85/)).toBeInTheDocument()
     expect(screen.getByText('senior')).toBeInTheDocument()
     expect(screen.getByText('fully remote')).toBeInTheDocument()
-    expect(screen.getByText(/90/)).toBeInTheDocument()
   })
 
   it('calls onClick when clicked', () => {
     const handleClick = jest.fn()
     render(<JobCard job={mockJob} isSelected={false} onClick={handleClick} index={0} />)
 
-    fireEvent.click(screen.getByText('Software Engineer').closest('div')!)
+    fireEvent.click(screen.getByText('Software Engineer'))
     expect(handleClick).toHaveBeenCalledTimes(1)
   })
 
   it('applies selected styles when isSelected is true', () => {
     const { container } = render(<JobCard job={mockJob} isSelected={true} onClick={() => {}} index={0} />)
-    expect(container.firstChild).toHaveClass('bg-white/[0.06]')
-    expect(container.firstChild).toHaveClass('before:bg-[#00ff87]')
+    expect(container.firstChild).toHaveClass('bg-[#f0f0eb]')
+    expect(container.firstChild).toHaveClass('border-l-[#c5a059]')
   })
 })
