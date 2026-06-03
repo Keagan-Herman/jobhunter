@@ -17,15 +17,15 @@ export function StatsGrid({ stats }: { stats: { pending: number, applied: number
           <div className={`absolute -right-6 -top-6 w-24 h-24 rounded-full blur-3xl opacity-20 transition-all duration-700 group-hover:opacity-50 group-hover:scale-150 ${s.glow}`} />
 
           <div className="relative z-10">
-            <div className="text-[10px] text-[#666] tracking-[3px] uppercase font-mono font-black mb-3 group-hover:text-[#999] transition-colors">{s.label}</div>
-            <div className={`text-4xl font-black ${s.color} font-syne tracking-tighter drop-shadow-sm`}>
+            <div className="text-[9px] text-[#555] tracking-[4px] uppercase font-mono font-black mb-3 group-hover:text-[#888] transition-colors group-hover:translate-x-1 duration-500">{s.label}</div>
+            <div className={`text-4xl md:text-5xl font-black ${s.color} font-syne tracking-tighter drop-shadow-sm group-hover:scale-105 transition-transform duration-500 origin-left`}>
               {s.value.toLocaleString()}
             </div>
           </div>
 
           {/* Premium accent line */}
-          <div className={`absolute bottom-0 left-0 right-0 h-1 opacity-0 transition-all duration-700 group-hover:opacity-100 ${s.accent} blur-[1px]`} />
-          <div className={`absolute bottom-0 left-1/4 right-1/4 h-[2px] opacity-0 transition-all duration-500 group-hover:opacity-100 ${s.accent.replace('20', '50')} group-hover:w-full group-hover:left-0`} />
+          <div className={`absolute bottom-0 left-0 right-0 h-1 opacity-0 transition-all duration-700 group-hover:opacity-100 ${s.accent} blur-[2px]`} />
+          <div className={`absolute bottom-0 left-1/3 right-1/3 h-[2px] opacity-0 transition-all duration-700 ease-out group-hover:opacity-100 ${s.accent.replace('20', '60')} group-hover:left-0 group-hover:right-0 group-hover:w-full blur-[0.5px]`} />
 
           {/* Subtle Inner Border */}
           <div className="absolute inset-0 border border-white/[0.02] rounded-[2rem] pointer-events-none" />

@@ -42,17 +42,26 @@ export function LetterTab({
       )}
 
       {generating && (
-        <div className="flex flex-col items-center justify-center py-32 text-center space-y-10">
+        <div className="flex flex-col items-center justify-center py-32 text-center space-y-10 animate-in fade-in duration-700">
           <div className="relative">
-            <div className="w-24 h-24 rounded-full border-[4px] border-[#00ff8710] border-t-[#00ff87] animate-spin duration-[1.5s]" />
-            <div className="absolute inset-0 w-24 h-24 rounded-full border-[4px] border-transparent border-b-[#00d4ff] animate-spin-reverse duration-[2s]" />
-            <div className="absolute inset-0 flex items-center justify-center text-3xl font-syne font-black text-[#00ff87]">JH</div>
+            <div className="w-28 h-28 rounded-full border-[4px] border-[#00ff8710] border-t-[#00ff87] animate-spin duration-[1.5s] shadow-[0_0_40px_rgba(0,255,135,0.1)]" />
+            <div className="absolute inset-0 w-28 h-28 rounded-full border-[4px] border-transparent border-b-[#00d4ff] animate-spin-reverse duration-[2s]" />
+            <div className="absolute inset-0 flex items-center justify-center">
+               <div className="w-12 h-12 bg-white/[0.03] rounded-2xl backdrop-blur-md border border-white/10 flex items-center justify-center font-syne font-black text-[#00ff87] text-xl animate-pulse">JH</div>
+            </div>
           </div>
           <div className="space-y-4">
             <h4 className="font-syne font-black text-3xl text-white tracking-tighter">
               Crafting <span className="text-[#00ff87] animate-pulse">your story</span>...
             </h4>
-            <p className="text-[10px] text-[#555] font-mono uppercase tracking-[4px] font-black">Analyzing nuances & matching impact</p>
+            <div className="flex flex-col gap-2">
+                <p className="text-[10px] text-[#555] font-mono uppercase tracking-[4px] font-black">Analyzing nuances & matching impact</p>
+                <div className="flex justify-center gap-1">
+                    {[0, 1, 2].map(i => (
+                        <div key={i} className="w-1.5 h-1.5 bg-[#00ff87] rounded-full animate-bounce" style={{ animationDelay: `${i * 150}ms` }} />
+                    ))}
+                </div>
+            </div>
           </div>
         </div>
       )}
@@ -73,13 +82,16 @@ export function LetterTab({
           </div>
 
           <div className="relative group/editor">
-            <div className="p-10 md:p-14 rounded-[3rem] bg-glass border-premium shadow-[0_30px_60px_rgba(0,0,0,0.5)] relative overflow-hidden group selection:bg-[#00ff8720] selection:text-[#00ff87]">
+            <div className="p-10 md:p-16 rounded-[3.5rem] bg-[#0d0d20]/60 border-premium shadow-[0_40px_80px_rgba(0,0,0,0.6)] relative overflow-hidden group selection:bg-[#00ff8720] selection:text-[#00ff87] backdrop-blur-2xl">
+              <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-[#0d0d20]/40 to-transparent pointer-events-none z-20" />
               <textarea
                 value={coverLetter}
                 onChange={(e) => onUpdateContent(e.target.value)}
-                className="w-full bg-transparent border-none outline-none text-[16px] md:text-[17px] leading-[1.8] text-white/80 font-serif italic tracking-tight resize-none h-[450px] relative z-10 scrollbar-hide"
+                className="w-full bg-transparent border-none outline-none text-[17px] md:text-[19px] leading-[1.9] text-white/85 font-serif italic tracking-normal resize-none h-[500px] relative z-10 scrollbar-hide custom-cursor-green"
                 spellCheck="false"
+                placeholder="Draft your story here..."
               />
+              <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-[#0d0d20]/40 to-transparent pointer-events-none z-20" />
             </div>
 
             {saving && (

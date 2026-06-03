@@ -14,16 +14,17 @@ export function OverviewTab({
           Alignment Matrix
           <div className="h-px flex-1 bg-white/[0.03]" />
         </h4>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           {[
-            { label: 'Seniority', value: job.seniority || 'Mid', color: 'text-[#00ff87]', bg: 'bg-[#00ff87]/5', icon: '👤' },
-            { label: 'Work Style', value: job.work_style || 'Remote', color: 'text-[#00d4ff]', bg: 'bg-[#00d4ff]/5', icon: '🏠' },
-            { label: 'Stack Match', value: `${job.stack_overlap || 0}%`, color: 'text-[#ffd60a]', bg: 'bg-[#ffd60a]/5', icon: '⚡' }
+            { label: 'Seniority', value: job.seniority || 'Mid', color: 'text-[#00ff87]', glow: 'shadow-[0_0_20px_rgba(0,255,135,0.1)]', icon: '👤' },
+            { label: 'Work Style', value: job.work_style || 'Remote', color: 'text-[#00d4ff]', glow: 'shadow-[0_0_20px_rgba(0,212,255,0.1)]', icon: '🏠' },
+            { label: 'Stack Match', value: `${job.stack_overlap || 0}%`, color: 'text-[#ffd60a]', glow: 'shadow-[0_0_20px_rgba(255,214,10,0.1)]', icon: '⚡' }
           ].map(item => (
-            <div key={item.label} className={"p-4 md:p-5 rounded-2xl bg-glass border-premium shadow-xl transition-all duration-500 hover:-translate-y-1 group/matrix relative overflow-hidden hover:border-white/20 " + item.bg}>
-              <div className="absolute top-2 right-4 text-[9px] opacity-20 group-hover/matrix:opacity-100 transition-opacity duration-500">{item.icon}</div>
-              <div className="text-[8px] font-mono text-[#555] uppercase tracking-[2px] mb-2 font-black">{item.label}</div>
-              <div className={"text-[14px] md:text-[16px] font-syne font-black uppercase tracking-tight " + item.color}>{item.value}</div>
+            <div key={item.label} className={"p-6 rounded-[2rem] bg-white/[0.02] border border-white/5 transition-all duration-700 hover:-translate-y-2 group/matrix relative overflow-hidden hover:border-white/10 hover:bg-white/[0.04] " + item.glow}>
+              <div className="absolute -right-2 -top-2 text-4xl opacity-[0.03] group-hover/matrix:opacity-10 group-hover/matrix:scale-125 transition-all duration-700 group-hover/matrix:rotate-12">{item.icon}</div>
+              <div className="text-[9px] font-mono text-[#555] uppercase tracking-[3px] mb-3 font-black group-hover:text-[#888] transition-colors">{item.label}</div>
+              <div className={"text-[18px] md:text-[22px] font-syne font-black uppercase tracking-tight " + item.color}>{item.value}</div>
+              <div className="absolute bottom-0 left-0 h-1 w-0 bg-white/10 group-hover/matrix:w-full transition-all duration-1000" />
             </div>
           ))}
         </div>
@@ -32,22 +33,25 @@ export function OverviewTab({
           Skill Alignment
           <div className="h-px flex-1 bg-white/[0.03]" />
         </h4>
-        <div className="flex flex-wrap gap-2 p-5 md:p-6 rounded-3xl bg-glass border-premium shadow-2xl">
+        <div className="flex flex-wrap gap-2.5 p-6 md:p-8 rounded-[2.5rem] bg-white/[0.01] border border-white/5 shadow-2xl group/skills relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent opacity-0 group-hover/skills:opacity-100 transition-opacity duration-1000" />
           {job.stack?.map((skill, idx) => {
             const isMatch = userSkills.some(s => s.toLowerCase() === skill.toLowerCase())
             return (
-              <div key={`${skill}-${idx}`} className={`group/skill relative text-[9px] px-3.5 py-2 rounded-lg font-mono font-black uppercase tracking-wider border transition-all duration-500 ${
+              <div key={`${skill}-${idx}`} className={`group/skill relative text-[9px] px-4 py-2.5 rounded-xl font-mono font-black uppercase tracking-wider border transition-all duration-500 flex items-center gap-2 ${
                 isMatch
-                  ? 'bg-[#00ff87]/[0.03] border-[#00ff87]/30 text-[#00ff87] shadow-[0_0_20px_rgba(0,255,135,0.05)] hover:bg-[#00ff87]/[0.08] hover:border-[#00ff87]/50 hover:scale-105'
-                  : 'bg-white/[0.01] border-white/5 text-[#444] hover:border-white/10 hover:text-[#666]'
+                  ? 'bg-[#00ff87]/[0.05] border-[#00ff87]/20 text-[#00ff87] shadow-[0_0_20px_rgba(0,255,135,0.05)] hover:bg-[#00ff87]/[0.1] hover:border-[#00ff87]/40 hover:scale-105 active:scale-95'
+                  : 'bg-white/[0.02] border-white/5 text-[#555] hover:border-white/10 hover:text-[#888] hover:bg-white/[0.04]'
               }`}>
-                {skill}
-                {isMatch && (
-                  <span className="ml-2 inline-flex relative h-1.5 w-1.5">
+                {isMatch ? (
+                  <span className="relative flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00ff87] opacity-40"></span>
-                    <span className="text-[9px] relative">✓</span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00ff87]"></span>
                   </span>
+                ) : (
+                  <span className="w-1.5 h-1.5 rounded-full bg-white/5" />
                 )}
+                {skill}
               </div>
             )
           })}
@@ -59,27 +63,33 @@ export function OverviewTab({
 
       {/* AI Fit Analysis */}
       {job.score_reason && (
-        <div className="p-5 md:p-8 rounded-3xl bg-glass border-premium space-y-4 relative overflow-hidden shadow-2xl group/ai transition-all duration-700 hover:border-[#00ff87]/30">
-          <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-[#00ff87] via-[#00d4ff] to-transparent opacity-60" />
+        <div className="p-8 md:p-12 rounded-[3rem] bg-glass border-premium space-y-6 relative overflow-hidden shadow-2xl group/ai transition-all duration-700 hover:border-[#00ff87]/30">
+          <div className="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-[#00ff87] via-[#00d4ff] to-[#7b61ff] opacity-40" />
+          <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-[#00ff87]/5 rounded-full blur-[100px] group-hover/ai:bg-[#00ff87]/10 transition-colors duration-1000" />
 
-          <div className="flex flex-wrap items-center justify-between gap-3 relative z-10">
-            <h4 className="text-[9px] font-mono font-black text-[#00ff87] tracking-[4px] uppercase flex items-center gap-2">
-              <span className="relative flex h-2 w-2">
+          <div className="flex flex-wrap items-center justify-between gap-4 relative z-10">
+            <h4 className="text-[10px] font-mono font-black text-[#00ff87] tracking-[5px] uppercase flex items-center gap-3">
+              <span className="relative flex h-2.5 w-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00ff87] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00ff87]"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#00ff87] shadow-[0_0_10px_#00ff87]"></span>
               </span>
-              AI Match Analysis
+              Intelligence Report
             </h4>
             {job.score && (
-              <div className="text-[10px] font-mono font-black bg-[#00ff87]/5 text-[#00ff87] px-2.5 py-1 rounded-lg border border-[#00ff87]/20 shadow-[0_0_15px_rgba(0,255,135,0.1)]">
-                {job.score}% FIT
+              <div className="text-[11px] font-mono font-black bg-[#00ff87]/10 text-[#00ff87] px-4 py-1.5 rounded-full border border-[#00ff87]/30 shadow-[0_0_20px_rgba(0,255,135,0.1)] uppercase tracking-widest">
+                {job.score}% Alignment
               </div>
             )}
           </div>
 
-          <p className="text-[16px] md:text-[18px] text-white leading-relaxed font-syne font-bold italic relative z-10 tracking-tight drop-shadow-sm">
+          <p className="text-[18px] md:text-[22px] text-white leading-[1.4] font-syne font-extrabold italic relative z-10 tracking-tight drop-shadow-2xl">
             &quot;{job.score_reason}&quot;
           </p>
+
+          <div className="pt-4 flex items-center gap-3 relative z-10">
+              <div className="h-px w-8 bg-[#00ff87]/30" />
+              <span className="text-[8px] font-mono font-black text-[#555] uppercase tracking-[3px]">Verified Match</span>
+          </div>
         </div>
       )}
 
