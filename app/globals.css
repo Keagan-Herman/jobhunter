@@ -118,3 +118,7 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+.custom-cursor-green {
+  caret-color: #00ff87;
+}

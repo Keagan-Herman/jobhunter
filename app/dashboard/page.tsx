@@ -265,14 +265,19 @@ export default function DashboardPage() {
                         </div>
 
                         {activeProcess && (
-                            <div className="flex items-center gap-2 bg-[#00ff87]/5 border border-[#00ff87]/20 rounded-full px-4 py-1.5 animate-in fade-in zoom-in duration-300 backdrop-blur-md">
-                                <span className="relative flex h-2 w-2">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00ff87] opacity-50 duration-1000"></span>
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00ff87]"></span>
-                                </span>
-                                <span className="text-[10px] text-[#00ff87] font-mono font-bold tracking-widest uppercase flex items-center gap-2">
-                                    Live Command: <span className="text-white brightness-125">{activeProcess === 'scanning' ? 'Scanning Jobs' : activeProcess === 'rescoring' ? 'Rescoring' : 'Generating'}</span>
-                                </span>
+                            <div className="flex items-center gap-3 bg-[#00ff87]/5 border border-[#00ff87]/20 rounded-full pl-3 pr-5 py-2 animate-in fade-in zoom-in duration-500 backdrop-blur-xl shadow-[0_0_20px_rgba(0,255,135,0.1)] group/command">
+                                <div className="relative flex h-2.5 w-2.5">
+                                    <div className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00ff87] opacity-40 duration-1000"></div>
+                                    <div className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#00ff87] shadow-[0_0_10px_#00ff87]"></div>
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[8px] text-[#00ff87] font-mono font-black tracking-[2px] uppercase leading-none mb-0.5 opacity-70">
+                                        Live Command
+                                    </span>
+                                    <span className="text-[11px] text-white font-syne font-extrabold tracking-tight leading-none brightness-125">
+                                        {activeProcess === 'scanning' ? 'Scanning Jobs' : activeProcess === 'rescoring' ? 'Rescoring' : 'Generating Content'}
+                                    </span>
+                                </div>
                             </div>
                         )}
                     </div>

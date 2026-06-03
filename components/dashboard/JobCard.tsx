@@ -21,10 +21,13 @@ function JobCardComponent({
     <div
       className={`p-6 border-b border-white/5 cursor-pointer transition-all duration-500 ease-out hover:bg-white/[0.04] group relative overflow-hidden
         ${isSelected ? 'bg-white/[0.06] before:absolute before:left-0 before:top-4 before:bottom-4 before:w-1.5 before:bg-[#00ff87] before:rounded-r-full before:shadow-[0_0_20px_#00ff87]' : ''}
-        hover:border-white/10 animate-in fade-in slide-in-from-bottom-4 fill-mode-forwards`}
+        hover:border-white/10 animate-in fade-in slide-in-from-bottom-4 fill-mode-forwards group/card`}
       style={{ animationDelay, opacity: 0 }}
       onClick={onClick}
     >
+      {/* Loading Shimmer Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.02] to-transparent -translate-x-full group-hover/card:animate-shimmer pointer-events-none" />
+
       {/* Hover Light Effect */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#00ff87]/[0.05] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
@@ -73,8 +76,14 @@ function JobCardComponent({
           </div>
         )}
         {job.stack_overlap !== null && job.stack_overlap !== undefined && job.stack_overlap > 0 && (
-          <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-2xl bg-[#ffd60a]/[0.03] border border-[#ffd60a]/10 transition-all duration-300 group-hover:border-[#ffd60a]/30 group-hover:bg-[#ffd60a]/[0.06]">
-            <span className="text-[10px] text-[#ffd60a] font-mono font-black uppercase tracking-[2px]">
+          <div className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-2xl transition-all duration-300 border
+            ${job.stack_overlap >= 85 ? 'bg-[#00ff87]/[0.03] border-[#00ff87]/10 group-hover:border-[#00ff87]/30 group-hover:bg-[#00ff87]/[0.06]' :
+              job.stack_overlap >= 70 ? 'bg-[#ffd60a]/[0.03] border-[#ffd60a]/10 group-hover:border-[#ffd60a]/30 group-hover:bg-[#ffd60a]/[0.06]' :
+              'bg-[#ff6b6b]/[0.03] border-[#ff6b6b]/10 group-hover:border-[#ff6b6b]/30 group-hover:bg-[#ff6b6b]/[0.06]'}`}>
+            <span className={`text-[10px] font-mono font-black uppercase tracking-[2px]
+              ${job.stack_overlap >= 85 ? 'text-[#00ff87]' :
+                job.stack_overlap >= 70 ? 'text-[#ffd60a]' :
+                'text-[#ff6b6b]'}`}>
               {job.stack_overlap}% Match
             </span>
           </div>
