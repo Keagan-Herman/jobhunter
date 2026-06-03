@@ -248,129 +248,113 @@ export default function DashboardPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#080812] text-[#e0e0f0] font-sans selection:bg-[#00ff8720] selection:text-[#00ff87]">
-            <div className="fixed inset-0 z-0 pointer-events-none opacity-[0.15]"
-                 style={{ backgroundImage: 'linear-gradient(#00ff8710 1px, transparent 1px), linear-gradient(90deg, #00ff8710 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-            <div className="fixed -top-[20rem] -right-[20rem] w-[60rem] h-[60rem] rounded-full bg-radial-gradient from-[#00ff8708] to-transparent z-0 pointer-events-none blur-[100px]" />
-            <div className="fixed -bottom-[30rem] -left-[20rem] w-[70rem] h-[70rem] rounded-full bg-radial-gradient from-[#7b61ff05] to-transparent z-0 pointer-events-none blur-[120px]" />
+        <div className="min-h-screen bg-[#f8f8f4] text-[#1a1a1a] font-sans selection:bg-[#c5a05920] selection:text-[#1a1a1a]">
+            {/* Background Grid & Organic Accents */}
+            <div className="fixed inset-0 z-0 pointer-events-none grid-overlay opacity-30" />
+            <div className="fixed top-[-10rem] right-[-10rem] w-[40rem] h-[40rem] rounded-full bg-[#c5a059]/5 blur-[120px] animate-organic z-0 pointer-events-none" />
+            <div className="fixed bottom-[-10rem] left-[-10rem] w-[45rem] h-[45rem] rounded-full bg-[#2b6777]/5 blur-[150px] animate-organic z-0 pointer-events-none" style={{ animationDelay: '5s' }} />
 
             <div className="relative z-10 max-w-7xl mx-auto px-6 py-12 md:px-8 space-y-12">
-                <header className="flex flex-col xl:flex-row xl:items-center justify-between gap-8">
-                    <div className="flex flex-wrap items-center gap-4 md:gap-6">
-                        <h1 className="font-syne text-3xl md:text-4xl font-extrabold tracking-tight text-white flex items-center gap-1">
-                            Job<span className="text-[#00ff87] text-glow-green">Hunter</span>
+                <header className="flex flex-col xl:flex-row xl:items-center justify-between gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                    <div className="flex flex-wrap items-center gap-6">
+                        <h1 className="font-syne text-4xl font-bold tracking-tight text-[#1a1a1a] flex items-center gap-1">
+                            Job<span className="text-[#c5a059] italic">Hunter</span>
                         </h1>
-                        <div className="flex items-center gap-2 bg-[#0d0d20] border border-[#1e1e38] rounded-full px-3 py-1">
-                            <span className="text-[10px] text-[#00ff87] font-mono font-bold tracking-widest uppercase">Local</span>
-                        </div>
+
+                        <div className="h-8 w-px bg-[#e2e2d9] hidden md:block" />
 
                         {activeProcess && (
-                            <div className="flex items-center gap-3 bg-[#00ff87]/5 border border-[#00ff87]/20 rounded-full pl-3 pr-5 py-2 animate-in fade-in zoom-in duration-500 backdrop-blur-xl shadow-[0_0_20px_rgba(0,255,135,0.1)] group/command">
-                                <div className="relative flex h-2.5 w-2.5">
-                                    <div className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00ff87] opacity-40 duration-1000"></div>
-                                    <div className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#00ff87] shadow-[0_0_10px_#00ff87]"></div>
-                                </div>
-                                <div className="flex flex-col">
-                                    <span className="text-[8px] text-[#00ff87] font-mono font-black tracking-[2px] uppercase leading-none mb-0.5 opacity-70">
-                                        Live Command
-                                    </span>
-                                    <span className="text-[11px] text-white font-syne font-extrabold tracking-tight leading-none brightness-125">
-                                        {activeProcess === 'scanning' ? 'Scanning Jobs' : activeProcess === 'rescoring' ? 'Rescoring' : 'Generating Content'}
-                                    </span>
-                                </div>
+                            <div className="flex items-center gap-3 matte-surface border-[#d1d1ca] px-4 py-2 rounded-sm shadow-sm animate-in fade-in duration-500">
+                                <div className="w-2.5 h-2.5 bg-[#c5a059] animate-pulse" />
+                                <span className="text-[10px] text-[#4a4a4a] font-mono font-bold tracking-[2px] uppercase">
+                                    {activeProcess === 'scanning' ? 'Scanning Sources' : activeProcess === 'rescoring' ? 'Recalibrating' : 'Processing Content'}
+                                </span>
                             </div>
                         )}
                     </div>
 
-                    <div className="flex items-center gap-3 md:gap-4 flex-wrap">
+                    <div className="flex items-center gap-4 flex-wrap">
                         <button onClick={handleScan} disabled={scanning}
-                                className={"group relative flex items-center gap-2 px-6 py-3 rounded-2xl font-mono text-[11px] font-bold tracking-[2px] uppercase transition-all duration-300 shadow-[0_0_30px_-5px_#00ff8730] overflow-hidden " + (scanning ? 'bg-white/[0.03] border border-white/5 text-[#00ff87] cursor-not-allowed' : 'bg-[#00ff87] text-[#0a0a1a] hover:brightness-110 active:scale-95')}>
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer" />
-                            {scanning ? (
-                                <><span className="w-3 h-3 border-2 border-[#00ff87] border-t-transparent rounded-full animate-spin" /> Scanning...</>
-                            ) : 'Scan Jobs'}
+                                className={"group relative px-8 py-3 rounded-sm font-mono text-[11px] font-bold tracking-[2px] uppercase transition-all duration-300 shadow-sm " + (scanning ? 'bg-[#f0f0eb] text-[#888] cursor-not-allowed' : 'bg-[#1a1a1a] text-[#f8f8f4] hover:bg-[#c5a059] active:scale-95')}>
+                            {scanning ? 'Processing...' : 'Scan Sources'}
                         </button>
 
                         <button onClick={handleRescore} disabled={rescoring}
-                                className="flex items-center gap-2 px-5 py-3 rounded-2xl border border-white/5 bg-white/[0.02] text-[#666] font-mono text-[11px] font-bold tracking-[2px] uppercase hover:bg-white/[0.05] hover:text-white transition-all disabled:opacity-50 hover:border-white/10 active:scale-95">
-                            {rescoring ? (
-                                <><span className="w-3 h-3 border-2 border-[#00ff87] border-t-transparent rounded-full animate-spin" /> Rescoring...</>
-                            ) : 'Rescore'}
+                                className="px-6 py-3 rounded-sm border border-[#e2e2d9] bg-white text-[#4a4a4a] font-mono text-[11px] font-bold tracking-[2px] uppercase hover:bg-[#f8f8f4] transition-all disabled:opacity-50 active:scale-95 tactile-pop">
+                            {rescoring ? 'Calibrating...' : 'Recalibrate'}
                         </button>
 
-                        <div className="h-8 w-[1px] bg-white/5 mx-2" />
+                        <div className="h-8 w-px bg-[#e2e2d9] mx-2" />
 
-                        <button onClick={() => router.push('/profile')} className="px-5 py-3 rounded-2xl border border-white/5 bg-white/[0.02] text-[#555] font-mono text-[11px] font-bold tracking-[1px] hover:bg-white/[0.05] hover:text-white transition-all active:scale-95">Profile</button>
+                        <button onClick={() => router.push('/profile')} className="px-6 py-3 rounded-sm bg-[#f0f0eb] border border-[#d1d1ca] text-[#4a4a4a] font-mono text-[11px] font-bold tracking-[1px] hover:bg-[#e2e2d9] transition-all active:scale-95">Settings</button>
                     </div>
                 </header>
 
                 <div className="space-y-4">
                     {error && (
-                        <div className="bg-[#ff6b6b10] border border-[#ff6b6b30] rounded-xl p-4 flex justify-between items-center animate-in slide-in-from-top-2">
-                            <span className="text-[#ff6b6b] text-sm font-mono">{error}</span>
-                            <button onClick={() => { setError(''); fetchJobs() }} className="text-[#ff6b6b] text-sm font-mono hover:underline">Retry</button>
+                        <div className="bg-[#bc243c]/5 border border-[#bc243c]/20 rounded-sm p-4 flex justify-between items-center animate-in slide-in-from-top-2">
+                            <span className="text-[#bc243c] text-xs font-mono font-bold uppercase tracking-wider">{error}</span>
+                            <button onClick={() => { setError(''); fetchJobs() }} className="text-[#bc243c] text-[10px] font-mono uppercase font-bold hover:underline">Retry</button>
                         </div>
                     )}
                     {scanResult && (
-                        <div className={"rounded-xl p-4 text-sm font-mono animate-in slide-in-from-top-2 " + (!scanResult.includes('failed') ? 'bg-[#00ff8710] border border-[#00ff8730] text-[#00ff87]' : 'bg-[#ff6b6b10] border border-[#ff6b6b30] text-[#ff6b6b]')}>
+                        <div className="bg-[#2b6777]/5 border border-[#2b6777]/20 rounded-sm p-4 text-[10px] font-mono font-bold uppercase tracking-wider text-[#2b6777] animate-in slide-in-from-top-2">
                             {scanResult}
                         </div>
                     )}
                     {rescoreResult && (
-                        <div className={"rounded-xl p-4 text-sm font-mono animate-in slide-in-from-top-2 " + (!rescoreResult.includes('failed') ? 'bg-[#00ff8710] border border-[#00ff8730] text-[#00ff87]' : 'bg-[#ff6b6b10] border border-[#ff6b6b30] text-[#ff6b6b]')}>
+                        <div className="bg-[#2b6777]/5 border border-[#2b6777]/20 rounded-sm p-4 text-[10px] font-mono font-bold uppercase tracking-wider text-[#2b6777] animate-in slide-in-from-top-2">
                             {rescoreResult}
                         </div>
                     )}
                 </div>
 
                 {firstTime && (
-                    <div className="bg-[#00ff8710] border border-[#00ff8730] rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6 shadow-[0_0_30px_-10px_#00ff8720]">
+                    <div className="matte-surface border-[#c5a059]/30 rounded-sm p-8 flex flex-col md:flex-row items-center justify-between gap-8 shadow-md">
                         <div>
-                            <div className="font-syne font-bold text-lg text-[#00ff87] mb-1">You&apos;re all set!</div>
-                            <div className="text-sm text-[#888]">Run your first scan to find jobs matching your profile</div>
+                            <div className="font-syne font-bold text-lg text-[#1a1a1a] mb-2 uppercase tracking-tight">Configuration Complete</div>
+                            <div className="text-xs text-[#666] font-sans">Initialize your first automated job search to begin.</div>
                         </div>
                         <button onClick={() => { setFirstTime(false); handleScan() }}
-                                className="bg-[#00ff87] text-[#0a0a1a] px-6 py-3 rounded-xl font-mono text-xs font-bold tracking-widest uppercase hover:brightness-110 transition-all shadow-lg shadow-[#00ff8730]">Run First Scan</button>
+                                className="bg-[#1a1a1a] text-[#f8f8f4] px-8 py-4 rounded-sm font-mono text-xs font-bold tracking-[2px] uppercase hover:bg-[#c5a059] transition-all shadow-lg">Begin Analysis</button>
                     </div>
                 )}
 
                 <StatsGrid stats={stats} />
 
                 <div className="space-y-8">
-                    <div className="flex flex-wrap gap-1 md:gap-2 border-b border-white/5 pb-px overflow-x-auto scrollbar-hide">
+                    <div className="flex flex-wrap gap-8 border-b border-[#e2e2d9] pb-px overflow-x-auto scrollbar-hide">
                         {(['pending', 'applied', 'interviewing', 'skipped'] as const).map(tab => (
                             <button key={tab}
                                     onClick={() => { setActiveTab(tab) }}
-                                    className={"px-4 md:px-8 py-4 md:py-5 font-mono text-[9px] md:text-[10px] font-bold tracking-[2px] md:tracking-[3px] uppercase transition-all relative shrink-0 " + (activeTab === tab ? 'text-[#00ff87]' : 'text-[#444] hover:text-[#777]')}>
-                                {tab} <span className={"ml-1 md:ml-2 px-1.5 md:px-2 py-0.5 rounded-md text-[8px] md:text-[9px] " + (activeTab === tab ? 'bg-[#00ff87]/10 text-[#00ff87]' : 'bg-white/5 text-[#555]')}>{jobs.filter(j => j.status === tab).length}</span>
-                                {activeTab === tab && <div className="absolute bottom-0 left-2 md:left-4 right-2 md:right-4 h-[2px] bg-[#00ff87] shadow-[0_0_15px_#00ff87]" />}
+                                    className={"pb-5 font-mono text-[10px] font-bold tracking-[3px] uppercase transition-all relative shrink-0 " + (activeTab === tab ? 'text-[#1a1a1a]' : 'text-[#888] hover:text-[#444]')}>
+                                {tab} <span className={"ml-2 px-1.5 py-0.5 rounded-sm text-[9px] " + (activeTab === tab ? 'bg-[#1a1a1a] text-[#f8f8f4]' : 'bg-[#e2e2d9] text-[#888]')}>{jobs.filter(j => j.status === tab).length}</span>
+                                {activeTab === tab && <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#c5a059]" />}
                             </button>
                         ))}
                     </div>
 
-                    <div className="bg-glass border-premium rounded-[2.5rem] overflow-hidden h-[calc(100vh-380px)] shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col relative">
+                    <div className="bg-white border border-[#e2e2d9] rounded-sm overflow-hidden h-[calc(100vh-380px)] shadow-sm flex flex-col relative tactile-pop">
                         {loading ? (
                             <div className="overflow-hidden flex-1">
                                 {Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)}
                             </div>
                         ) : filteredJobs.length === 0 ? (
                             <div className="py-24 text-center flex-1 flex flex-col items-center justify-center px-12 animate-in fade-in duration-700">
-                                <div className="relative mb-10 group/empty">
-                                    <div className="w-24 h-24 rounded-[2rem] bg-white/[0.02] border border-white/5 flex items-center justify-center text-4xl grayscale opacity-20 group-hover/empty:grayscale-0 group-hover/empty:opacity-100 transition-all duration-700 group-hover/empty:scale-110 group-hover/empty:rotate-6 group-hover/empty:border-[#00ff8740] shadow-2xl">
+                                <div className="relative mb-8">
+                                    <div className="w-20 h-20 bg-[#f0f0eb] border border-[#d1d1ca] flex items-center justify-center text-3xl grayscale opacity-40">
                                         {activeTab === 'pending' ? '🔍' : activeTab === 'applied' ? '✉️' : activeTab === 'interviewing' ? '🤝' : '⏭️'}
                                     </div>
-                                    <div className="absolute -inset-8 bg-[#00ff87]/5 rounded-full blur-3xl opacity-0 group-hover/empty:opacity-100 transition-opacity duration-700" />
                                 </div>
-                                <h3 className="font-syne font-extrabold text-2xl text-white/90 mb-3 tracking-tight">No {activeTab} opportunities</h3>
-                                <p className="text-[10px] text-[#555] font-mono uppercase tracking-[4px] mb-12 max-w-xs leading-relaxed font-bold">
+                                <h3 className="font-syne font-bold text-xl text-[#1a1a1a] mb-4 tracking-tight uppercase">No {activeTab} Records</h3>
+                                <p className="text-[10px] text-[#888] font-mono uppercase tracking-[3px] mb-12 max-w-xs leading-relaxed font-bold">
                                     {activeTab === 'pending'
-                                        ? 'Initiate a fresh scan to discover high-match roles tailored to your profile.'
-                                        : "You haven't moved any jobs to " + activeTab + " yet."}
+                                        ? 'Initiate a job search scan to identify matching opportunities.'
+                                        : "No items found in " + activeTab + "."}
                                 </p>
                                 {activeTab === 'pending' && (
-                                    <button onClick={handleScan} className="group relative bg-[#00ff8710] border border-[#00ff8720] text-[#00ff87] px-10 py-4 rounded-2xl font-mono text-[11px] font-black uppercase tracking-[3px] hover:bg-[#00ff87] hover:text-[#0a0a1a] transition-all duration-500 overflow-hidden shadow-lg shadow-[#00ff8710] hover:shadow-[#00ff8730]">
-                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:animate-shimmer" />
-                                        Discover Jobs
+                                    <button onClick={handleScan} className="bg-[#1a1a1a] text-[#f8f8f4] px-10 py-4 rounded-sm font-mono text-[11px] font-bold uppercase tracking-[3px] hover:bg-[#c5a059] transition-all shadow-md">
+                                        Scan Now
                                     </button>
                                 )}
                             </div>

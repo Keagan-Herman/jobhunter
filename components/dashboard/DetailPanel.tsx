@@ -73,7 +73,7 @@ export function DetailPanel({
 
   const handleGenerate = async () => {
     setCoverLetter('')
-    onGenerateCoverLetter('') // Signal start to parent if needed
+    onGenerateCoverLetter('')
 
     try {
       const response = await fetch('/api/cover-letter', {
@@ -96,7 +96,7 @@ export function DetailPanel({
           accumulated += chunk
           setCoverLetter(accumulated)
         }
-        onGenerateCoverLetter(accumulated) // Update parent with final content
+        onGenerateCoverLetter(accumulated)
       }
     } catch (err) {
       console.error('Streaming error:', err)
@@ -148,71 +148,65 @@ export function DetailPanel({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-300">
-      <div className="absolute inset-0 bg-[#080812]/80 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-[#1a1a1a]/40 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="bg-glass border-premium flex flex-col w-full max-w-5xl h-full max-h-[90vh] relative z-10 shadow-[0_0_100px_rgba(0,0,0,1)] overflow-hidden rounded-[2.5rem] md:rounded-[3.5rem] animate-in zoom-in duration-500">
+      <div className="bg-[#f8f8f4] border border-[#e2e2d9] flex flex-col w-full max-w-6xl h-full max-h-[90vh] relative z-10 shadow-2xl overflow-hidden rounded-sm animate-in slide-in-from-bottom-4 duration-500 tactile-pop">
         {/* Header */}
-        <div className="p-6 md:p-10 pb-6 md:pb-8 shrink-0 relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-[#00ff87] via-[#00ff87]/30 to-transparent opacity-40" />
-          <div className="absolute -right-32 -top-32 w-96 h-96 bg-[#00ff87]/10 rounded-full blur-[120px]" />
+        <div className="p-10 pb-8 shrink-0 relative overflow-hidden bg-white">
+          <div className="absolute top-0 left-0 w-full h-1 bg-klimt-gold opacity-30" />
 
-          <div className="flex justify-between items-start mb-6 md:mb-8 relative z-10">
-            <div className="flex-1 pr-4 md:pr-12">
-              <h3 className="font-syne font-black text-[24px] md:text-[32px] text-white mb-2 md:mb-3 leading-[1.1] tracking-tighter drop-shadow-2xl selection:bg-[#00ff8720]">{job.title}</h3>
-              <div className="text-[9px] md:text-[10px] font-mono font-black text-[#555] tracking-[2px] md:tracking-[3px] uppercase flex flex-wrap items-center gap-2 md:gap-3">
-                  <span className="text-[#aaa] hover:text-white transition-colors duration-300">{job.company}</span>
-                  <span className="w-2 h-2 rounded-full bg-white/10 shrink-0" />
-                  <span className="text-[#888]">{job.location || 'Remote'}</span>
+          <div className="flex justify-between items-start mb-8 relative z-10">
+            <div className="flex-1 pr-12">
+              <h3 className="font-syne font-bold text-[28px] md:text-[36px] text-[#1a1a1a] mb-3 leading-[1.1] tracking-tight uppercase">{job.title}</h3>
+              <div className="text-[10px] font-mono font-bold text-[#888] tracking-[3px] uppercase flex flex-wrap items-center gap-3">
+                  <span className="text-[#4a4a4a]">{job.company}</span>
+                  <span className="w-1.5 h-1.5 bg-[#e2e2d9]" />
+                  <span>{job.location || 'Remote'}</span>
               </div>
             </div>
-            <div className="flex items-center gap-2 md:gap-3">
+            <div className="flex items-center gap-3">
               {job.url && (
                 <button
                   onClick={handleCopyLink}
-                  className={`flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-xl font-mono text-[9px] font-black uppercase transition-all duration-500 border shadow-xl active:scale-95 ${
-                    linkCopied ? 'bg-[#00ff87]/10 border-[#00ff87]/40 text-[#00ff87]' : 'bg-[#12122a] border-premium text-[#666] hover:text-white hover:border-white/20 hover:scale-105'
+                  className={`px-4 py-2 rounded-sm font-mono text-[10px] font-bold uppercase transition-all duration-300 border tactile-pop ${
+                    linkCopied ? 'bg-[#2b6777]/5 border-[#2b6777] text-[#2b6777]' : 'bg-white border-[#e2e2d9] text-[#4a4a4a] hover:bg-[#f8f8f4]'
                   }`}
                 >
-                  <span>{linkCopied ? 'Copied!' : 'Copy Link'}</span>
+                  <span>{linkCopied ? 'Copied' : 'Copy Link'}</span>
                 </button>
               )}
-              <button onClick={onClose} className="text-[#444] hover:text-white transition-all duration-500 text-xl md:text-2xl font-mono hover:rotate-90 hover:scale-110 p-2 md:p-2.5 leading-none bg-white/[0.02] rounded-xl border border-transparent hover:border-white/10 active:scale-90">✕</button>
+              <button onClick={onClose} className="text-[#888] hover:text-[#1a1a1a] transition-all duration-300 text-2xl font-mono p-2 bg-[#f0f0eb] rounded-sm border border-[#d1d1ca] hover:border-[#1a1a1a]">✕</button>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 md:gap-4 flex-wrap relative z-10">
+          <div className="flex items-center gap-4 flex-wrap relative z-10">
               {(job.salary_min || job.salary_max) && (
-                <div className="text-[12px] md:text-[13px] font-black text-[#00ff87] font-mono bg-[#00ff87]/5 border border-[#00ff87]/10 px-5 md:px-6 py-2 md:py-2.5 rounded-xl shadow-xl tracking-tighter hover:bg-[#00ff87]/10 transition-colors duration-500">
+                <div className="text-[14px] font-bold text-[#2b6777] font-mono bg-[#2b6777]/5 border border-[#2b6777]/20 px-6 py-2.5 rounded-sm tracking-tight">
                   {currency}{job.salary_min?.toLocaleString()} – {currency}{job.salary_max?.toLocaleString()}
                 </div>
               )}
-              <div className="flex gap-2 flex-wrap">
-                {(job.stack || []).slice(0, 5).map(s => (
-                  <span key={s} className="text-[8px] md:text-[9px] px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-[#12122a] text-[#7b61ff] font-mono font-black border border-[#7b61ff]/10 uppercase tracking-wider shadow-lg transition-all duration-500 hover:border-[#7b61ff]/40">{s}</span>
-                ))}
-              </div>
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="flex px-6 md:px-10 border-b border-premium bg-white/[0.02] backdrop-blur-3xl z-20 relative overflow-x-auto scrollbar-hide">
+        <div className="flex px-10 border-b border-[#e2e2d9] bg-[#f0f0eb] z-20 relative overflow-x-auto scrollbar-hide">
           {(['overview', 'letter', 'tracking'] as const).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-5 md:px-8 py-4 md:py-5 font-mono text-[9px] md:text-[10px] font-black tracking-[2px] md:tracking-[3px] uppercase transition-all duration-500 relative shrink-0
-                ${activeTab === tab ? 'text-[#00ff87]' : 'text-[#444] hover:text-[#888]'}`}
+              className={`px-8 py-5 font-mono text-[10px] font-bold tracking-[3px] uppercase transition-all duration-300 relative shrink-0
+                ${activeTab === tab ? 'text-[#1a1a1a]' : 'text-[#888] hover:text-[#444]'}`}
             >
               {tab}
               {activeTab === tab && (
-                <div className="absolute bottom-0 left-3 md:left-4 right-3 md:right-4 h-[3px] bg-[#00ff87] shadow-[0_-5px_20px_rgba(0,255,135,0.6)] rounded-t-full animate-in slide-in-from-bottom-2" />
+                <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#c5a059]" />
               )}
             </button>
           ))}
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 md:p-10 bg-[#080812]/40 scrollbar-hide">
+        <div className="flex-1 overflow-y-auto p-10 bg-[#f8f8f4] scrollbar-hide">
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
           {activeTab === 'overview' && <OverviewTab job={job} userSkills={userSkills} />}
           {activeTab === 'letter' && (
@@ -255,39 +249,37 @@ export function DetailPanel({
         </div>
 
         {/* Actions Footer */}
-        <div className="p-6 md:p-8 border-t border-premium flex flex-col sm:flex-row justify-center gap-4 md:gap-6 shrink-0 bg-[#0d0d20]/90 backdrop-blur-2xl z-20">
+        <div className="p-8 border-t border-[#e2e2d9] flex flex-col sm:flex-row justify-center gap-6 shrink-0 bg-white z-20">
           {job.status === 'pending' && (
             <>
               <button onClick={() => onStatusUpdate(job.id, 'applied')}
-                className="w-full sm:w-auto px-10 md:px-14 py-3 md:py-4 relative bg-[#00ff87] text-[#0a0a1a] rounded-xl md:rounded-2xl font-black font-mono text-[10px] md:text-[11px] tracking-[2px] uppercase hover:brightness-110 shadow-[0_15px_30px_rgba(0,255,135,0.2)] transition-all duration-500 hover:-translate-y-1 active:translate-y-0 group overflow-hidden"
+                className="w-full sm:w-auto px-14 py-4 relative bg-[#1a1a1a] text-[#f8f8f4] rounded-sm font-bold font-mono text-[11px] tracking-[2px] uppercase hover:bg-[#c5a059] shadow-lg transition-all duration-300"
               >
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer" />
                   Mark Applied
               </button>
               <button onClick={() => onStatusUpdate(job.id, 'skipped')}
-                className="w-full sm:w-auto px-10 md:px-14 py-3 md:py-4 bg-white/[0.02] border border-premium text-[#555] rounded-xl md:rounded-2xl font-mono text-[10px] md:text-[11px] font-black uppercase hover:border-white/10 hover:text-[#999] transition-all duration-500 active:scale-[0.98]"
-              >Skip Job</button>
+                className="w-full sm:w-auto px-14 py-4 bg-[#f0f0eb] border border-[#d1d1ca] text-[#4a4a4a] rounded-sm font-mono text-[11px] font-bold uppercase hover:bg-[#e2e2d9] transition-all duration-300"
+              >Skip Analysis</button>
             </>
           )}
 
           {job.status === 'applied' && (
             <button onClick={() => onStatusUpdate(job.id, 'interviewing')}
-              className="w-full sm:w-auto px-10 md:px-14 py-3 md:py-4 bg-[#00d4ff] text-[#0a0a1a] rounded-xl md:rounded-2xl font-black font-mono text-[10px] md:text-[11px] tracking-[2px] uppercase hover:brightness-110 shadow-[0_15px_30px_rgba(0,212,255,0.2)] transition-all duration-500 hover:-translate-y-1 group relative overflow-hidden"
+              className="w-full sm:w-auto px-14 py-4 bg-[#2b6777] text-white rounded-sm font-bold font-mono text-[11px] tracking-[2px] uppercase hover:bg-[#c5a059] shadow-lg transition-all duration-300"
             >
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer" />
-                Got Interview!
+                Proceed to Interview
             </button>
           )}
 
           {job.status === 'skipped' && (
             <button onClick={() => onStatusUpdate(job.id, 'pending')}
-              className="w-full sm:w-auto px-10 md:px-14 py-3 md:py-4 bg-[#ffd60a]/[0.02] border border-[#ffd60a]/20 text-[#ffd60a] rounded-xl md:rounded-2xl font-black font-mono text-[10px] md:text-[11px] tracking-[2px] uppercase hover:bg-[#ffd60a]/[0.06] transition-all duration-500 shadow-xl active:scale-[0.98]"
-            >Undo Skip</button>
+              className="w-full sm:w-auto px-14 py-4 bg-[#f0f0eb] border border-[#c5a059]/30 text-[#1a1a1a] rounded-sm font-bold font-mono text-[11px] tracking-[2px] uppercase hover:bg-[#c5a059]/10 transition-all duration-300"
+            >Restore Analysis</button>
           )}
 
           {job.status === 'interviewing' && (
-             <div className="w-full sm:w-auto px-10 md:px-14 py-3 md:py-4 text-center rounded-xl md:rounded-2xl bg-[#00d4ff]/[0.03] border border-[#00d4ff]/20">
-                <span className="text-[10px] font-mono font-black text-[#00d4ff] uppercase tracking-[4px] animate-pulse">In Interview Phase</span>
+             <div className="w-full sm:w-auto px-14 py-4 text-center rounded-sm bg-[#bc243c]/5 border border-[#bc243c]/20">
+                <span className="text-[11px] font-mono font-bold text-[#bc243c] uppercase tracking-[4px]">Interview Phase Active</span>
              </div>
           )}
         </div>
