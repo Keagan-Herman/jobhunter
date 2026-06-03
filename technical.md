@@ -66,8 +66,8 @@ JobHunter uses high-impact personas to ensure quality output:
 The project leverages Tailwind 4's new engine. Key utility classes include:
 - `bg-glass`: Backdrop blur with semi-transparent background.
 - `border-premium`: Subtle border for high-contrast dark UI.
-- `text-glow-green`: Branded neon glow effect.
-- `animate-shimmer`: Custom shimmer animation for loading/button states.
+- `text-glow-gold`: branded gold glow effect.
+- `animate-shimmer-light`: Custom shimmer animation for loading/button states.
 
 ### 4.2 Component Architecture
 - **Modularity**: The `DetailPanel.tsx` is split into sub-tabs (`OverviewTab`, `LetterTab`, `TrackingTab`) located in `components/dashboard/detail/`.
@@ -100,7 +100,8 @@ The project leverages Tailwind 4's new engine. Key utility classes include:
 
 ### 6.2 Testing
 - **Framework**: Jest + React Testing Library.
-- **Mocks**: `lib/auth-mock.ts` provides a `mockUser` to bypass authentication in dev/test environments.
+- **Structure**: Tests are organized into `tests/lib/` for utilities and `tests/components/` for UI.
+- **Mocks**: `lib/auth-mock.ts` provides a `mockUser` to bypass authentication in dev/test environments. Database mocking is handled by mocking the Drizzle `db` instance.
 - **CI**: GitHub Actions workflow (`.github/workflows/ci.yml`) runs tests on push/PR.
 
 ---

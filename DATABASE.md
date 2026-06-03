@@ -11,17 +11,17 @@ The database is stored in a single file: `data/jobhunter.sqlite`.
 
 ### 2. Drizzle ORM
 We use Drizzle to interact with the SQLite database.
-- **Schema:** Defined in `lib/db/schema.ts`. It closely mirrors the original Supabase schema.
+- **Schema:** Defined in `lib/db/schema.ts`.
 - **Client:** The database client is initialized in `lib/db/index.ts`.
 
 ### 3. Auto-Initialization
-The database and all required tables are automatically created the first time the app runs. The `initDb()` function in `lib/db/index.ts` handles the initial SQL schema setup.
+The database and all required tables are automatically created the first time the app runs. The `initDb()` function in `lib/db/index.ts` handles the initial SQL schema setup using `CREATE TABLE IF NOT EXISTS` statements.
 
 ## 👤 User Management
 
 Since this is a personal tool, the authentication system has been simplified:
-- **Local User:** The app defaults to a single user with the ID `local-user`.
-- **Automatic Setup:** On first run, the system ensures this local user profile exists.
+- **Local User:** The app defaults to a single user with the ID `local-user`, defined in `lib/db/user.ts`.
+- **Automatic Setup:** On first run, the system ensures this local user profile exists via `ensureLocalUser()`.
 - **Multiple Users:** While designed for one person, if multiple people use the same code on different machines, they each have their own independent `jobhunter.sqlite` file.
 
 ## 🛠️ Maintenance
