@@ -5,51 +5,80 @@
   --font-mono: var(--font-geist-mono);
   --font-syne: var(--font-syne);
 
-  --color-background: #080812;
-  --color-foreground: #e0e0f0;
+  --color-background: #f8f8f4;
+  --color-foreground: #1a1a1a;
+  --color-accent-gold: #c5a059;
+  --color-accent-red: #bc243c;
+  --color-accent-blue: #2b6777;
+  --color-muted: #e2e2d9;
+  --color-matte-grey: #4a4a4a;
 
-  --radius-xl: 0.75rem;
-  --radius-2xl: 1rem;
-  --radius-3xl: 1.5rem;
+  --radius-xl: 0.5rem;
+  --radius-2xl: 0.75rem;
+  --radius-3xl: 1rem;
 
-  --color-premium: rgba(255, 255, 255, 0.08);
+  --color-premium: rgba(0, 0, 0, 0.05);
 }
 
 @layer utilities {
   .bg-glass {
-    background: rgba(13, 13, 32, 0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: rgba(248, 248, 244, 0.8);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 0, 0, 0.05);
   }
 
   .border-premium {
-    border: 1px solid var(--color-premium);
+    border: 1px solid var(--color-muted);
   }
 
-  .text-glow-green {
-    text-shadow: 0 0 10px rgba(0, 255, 135, 0.4);
+  .text-glow-gold {
+    text-shadow: 0 0 15px rgba(197, 160, 89, 0.3);
   }
 
-  .bg-radial-glow {
-    background: radial-gradient(circle at center, var(--color-00ff8710) 0%, transparent 70%);
+  .bg-klimt-gold {
+    background: linear-gradient(135deg, #c5a059 0%, #e8d0a9 50%, #c5a059 100%);
   }
 
-  @keyframes shimmer {
+  .tactile-inset {
+    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05), inset -2px -2px 5px rgba(255,255,255,0.8);
+  }
+
+  .tactile-pop {
+    box-shadow: 4px 4px 10px rgba(0,0,0,0.03), -4px -4px 10px rgba(255,255,255,0.9);
+  }
+
+  .matte-surface {
+    background: #f0f0eb;
+    border: 1px solid #d1d1ca;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(1deg); }
+  }
+
+  .animate-float {
+    animation: float 10s ease-in-out infinite;
+  }
+
+  @keyframes organic-grow {
+    0% { transform: scale(1) rotate(0deg); border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
+    50% { transform: scale(1.05) rotate(2deg); border-radius: 60% 40% 30% 70% / 50% 60% 40% 60%; }
+    100% { transform: scale(1) rotate(0deg); border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
+  }
+
+  .animate-organic {
+    animation: organic-grow 15s ease-in-out infinite;
+  }
+
+  @keyframes shimmer-light {
     0% { transform: translateX(-100%); }
     100% { transform: translateX(100%); }
   }
 
-  .animate-shimmer {
-    animation: shimmer 2s infinite;
-  }
-
-  @keyframes spin-reverse {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(-360deg); }
-  }
-
-  .animate-spin-reverse {
-    animation: spin-reverse 1s linear infinite;
+  .animate-shimmer-light {
+    animation: shimmer-light 3s infinite;
   }
 
   @keyframes fade-in {
@@ -58,24 +87,14 @@
   }
 
   @keyframes slide-in-from-bottom {
-    from { transform: translateY(1rem); }
-    to { transform: translateY(0); }
-  }
-
-  @keyframes slide-in-from-right {
-    from { transform: translateX(2rem); }
-    to { transform: translateX(0); }
-  }
-
-  @keyframes zoom-in {
-    from { transform: scale(0.95); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
+    from { transform: translateY(1.5rem); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
   }
 
   .animate-in {
-    animation-duration: 500ms;
+    animation-duration: 700ms;
     animation-fill-mode: forwards;
-    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
   }
 
   .fade-in {
@@ -83,31 +102,28 @@
   }
 
   .slide-in-from-bottom-4 {
-    animation-name: fade-in, slide-in-from-bottom;
-  }
-
-  .slide-in-from-right-8 {
-    animation-name: fade-in, slide-in-from-right;
-  }
-
-  .zoom-in {
-    animation-name: zoom-in;
-  }
-
-  .fill-mode-forwards {
-    animation-fill-mode: forwards;
+    animation-name: slide-in-from-bottom;
   }
 }
 
 :root {
-  --background: #080812;
-  --foreground: #e0e0f0;
+  --background: #f8f8f4;
+  --foreground: #1a1a1a;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  letter-spacing: -0.01em;
+}
+
+/* Swiss Grid Influence */
+.grid-overlay {
+  background-image:
+    linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px);
+  background-size: 40px 40px;
 }
 
 .scrollbar-hide::-webkit-scrollbar {
@@ -119,6 +135,11 @@ body {
   scrollbar-width: none;
 }
 
-.custom-cursor-green {
-  caret-color: #00ff87;
+.custom-cursor-gold {
+  caret-color: #c5a059;
+}
+
+::selection {
+  background-color: rgba(197, 160, 89, 0.2);
+  color: #1a1a1a;
 }

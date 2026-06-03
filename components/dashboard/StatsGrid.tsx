@@ -1,9 +1,9 @@
 export function StatsGrid({ stats }: { stats: { pending: number, applied: number, interviewing: number, total: number } }) {
   const items = [
-    { label: 'Total Jobs', value: stats.total, color: 'text-white', glow: 'bg-white/10', accent: 'bg-white/20' },
-    { label: 'Pending Scan', value: stats.pending, color: 'text-[#ffd60a]', glow: 'bg-[#ffd60a]/10', accent: 'bg-[#ffd60a]/20' },
-    { label: 'Applications', value: stats.applied, color: 'text-[#00ff87]', glow: 'bg-[#00ff87]/10', accent: 'bg-[#00ff87]/20' },
-    { label: 'Interviews', value: stats.interviewing, color: 'text-[#00d4ff]', glow: 'bg-[#00d4ff]/10', accent: 'bg-[#00d4ff]/20' },
+    { label: 'Total Listings', value: stats.total, color: 'text-[#1a1a1a]', border: 'border-[#e2e2d9]' },
+    { label: 'Pending Review', value: stats.pending, color: 'text-[#c5a059]', border: 'border-[#c5a059]/20' },
+    { label: 'Applications', value: stats.applied, color: 'text-[#2b6777]', border: 'border-[#2b6777]/20' },
+    { label: 'Interviews', value: stats.interviewing, color: 'text-[#bc243c]', border: 'border-[#bc243c]/20' },
   ]
 
   return (
@@ -11,24 +11,17 @@ export function StatsGrid({ stats }: { stats: { pending: number, applied: number
       {items.map(s => (
         <div
           key={s.label}
-          className="bg-glass border-premium rounded-[2rem] p-7 relative overflow-hidden group hover:border-white/20 transition-all duration-500 hover:-translate-y-2 shadow-2xl"
+          className={`bg-white border-b-4 ${s.border} p-8 relative overflow-hidden group hover:-translate-y-1 transition-all duration-500 shadow-sm tactile-pop`}
         >
-          {/* Background Glow */}
-          <div className={`absolute -right-6 -top-6 w-24 h-24 rounded-full blur-3xl opacity-20 transition-all duration-700 group-hover:opacity-50 group-hover:scale-150 ${s.glow}`} />
-
           <div className="relative z-10">
-            <div className="text-[9px] text-[#555] tracking-[4px] uppercase font-mono font-black mb-3 group-hover:text-[#888] transition-colors group-hover:translate-x-1 duration-500">{s.label}</div>
-            <div className={`text-4xl md:text-5xl font-black ${s.color} font-syne tracking-tighter drop-shadow-sm group-hover:scale-105 transition-transform duration-500 origin-left`}>
+            <div className="text-[10px] text-[#888] tracking-[3px] uppercase font-mono font-bold mb-4 group-hover:text-[#4a4a4a] transition-colors">{s.label}</div>
+            <div className={`text-4xl md:text-5xl font-bold ${s.color} font-syne tracking-tighter`}>
               {s.value.toLocaleString()}
             </div>
           </div>
 
-          {/* Premium accent line */}
-          <div className={`absolute bottom-0 left-0 right-0 h-1 opacity-0 transition-all duration-700 group-hover:opacity-100 ${s.accent} blur-[2px]`} />
-          <div className={`absolute bottom-0 left-1/3 right-1/3 h-[2px] opacity-0 transition-all duration-700 ease-out group-hover:opacity-100 ${s.accent.replace('20', '60')} group-hover:left-0 group-hover:right-0 group-hover:w-full blur-[0.5px]`} />
-
-          {/* Subtle Inner Border */}
-          <div className="absolute inset-0 border border-white/[0.02] rounded-[2rem] pointer-events-none" />
+          {/* Klimt Decorative Dot */}
+          <div className="absolute top-2 right-2 w-1.5 h-1.5 bg-[#e2e2d9] rounded-full" />
         </div>
       ))}
     </div>

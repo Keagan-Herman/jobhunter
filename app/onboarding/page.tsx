@@ -46,7 +46,7 @@ export default function OnboardingPage() {
     if (!file) return
     setImporting(true)
     setImportError('')
-    setImportStep('Reading PDF...')
+    setImportStep('Reading source...')
 
     const formData = new FormData()
     formData.append('cv', file)
@@ -55,13 +55,13 @@ export default function OnboardingPage() {
     const clearTimers = () => timers.forEach(clearTimeout)
 
     try {
-      timers.push(setTimeout(() => setImportStep('Analyzing with AI...'), 2000))
-      timers.push(setTimeout(() => setImportStep('Extracting skills & experience...'), 4500))
+      timers.push(setTimeout(() => setImportStep('Analyzing content...'), 2000))
+      timers.push(setTimeout(() => setImportStep('Extracting data...'), 4500))
 
       const res = await fetch('/api/parse-cv', { method: 'POST', body: formData })
       const data = await res.json()
       if (data.success) {
-        setImportStep('Finalizing profile...')
+        setImportStep('Finalizing configuration...')
         const p = data.profile
         if (p.full_name) setFullName(p.full_name)
         if (p.job_title) setJobTitle(p.job_title)
@@ -75,12 +75,12 @@ export default function OnboardingPage() {
         clearTimers()
         setStep(2)
       } else {
-        setImportError(data.error || 'Failed to parse CV')
+        setImportError(data.error || 'Import failed')
         clearTimers()
         setImporting(false)
       }
     } catch {
-      setImportError('Failed to import CV')
+      setImportError('Import failed')
       clearTimers()
       setImporting(false)
     }
@@ -109,7 +109,7 @@ export default function OnboardingPage() {
             })
         })
 
-        if (!res.ok) throw new Error('Failed to save profile')
+        if (!res.ok) throw new Error('Failed to save configuration')
         router.push('/dashboard?firstTime=true')
     } catch (err) {
         console.error('Save failed', err)
@@ -120,252 +120,229 @@ export default function OnboardingPage() {
 
   const progress = (step / 3) * 100
 
-  const inputClasses = "w-full bg-[#0a0a1a] border border-[#1e1e38] rounded-xl px-4 py-3.5 text-[#e0e0f0] text-[14px] outline-none focus:border-[#00ff87] transition-all font-sans hover:border-[#2a2a4a]"
-  const labelClasses = "block text-[10px] text-[#555] tracking-[2px] uppercase font-mono mb-2 font-bold"
+  const inputClasses = "w-full bg-white border border-[#e2e2d9] rounded-sm px-4 py-3 text-[#1a1a1a] text-[14px] outline-none focus:border-[#c5a059] transition-all font-sans"
+  const labelClasses = "block text-[10px] text-[#888] tracking-[2px] uppercase font-mono mb-2 font-bold"
 
   return (
-    <div className="min-h-screen bg-[#080812] font-sans text-[#e0e0f0] px-6 py-12 flex flex-col items-center relative overflow-hidden">
-      <div className="fixed -top-40 -left-40 w-96 h-96 bg-[#00ff8705] rounded-full blur-[100px] pointer-events-none" />
-      <div className="fixed -bottom-40 -right-40 w-96 h-96 bg-[#7b61ff05] rounded-full blur-[100px] pointer-events-none" />
+    <div className="min-h-screen bg-[#f8f8f4] font-sans text-[#1a1a1a] px-6 py-12 flex flex-col items-center relative overflow-hidden">
+      <div className="absolute inset-0 z-0 grid-overlay opacity-30 pointer-events-none" />
+      <div className="fixed -top-40 -left-40 w-96 h-96 bg-[#c5a05905] rounded-full blur-[100px] pointer-events-none animate-organic" />
 
-      <div className="w-full max-w-[600px] relative z-10">
-        <div className="text-center mb-12">
-          <h1 className="font-syne text-[32px] font-extrabold text-white tracking-tight">
-            Job<span className="text-[#00ff87]">Hunter</span>
+      <div className="w-full max-w-[650px] relative z-10">
+        <div className="text-center mb-16">
+          <h1 className="font-syne text-[32px] font-bold text-[#1a1a1a] tracking-tight uppercase">
+            Job<span className="text-[#c5a059] italic">Hunter</span>
           </h1>
-          <div className="text-[11px] font-mono text-[#444] uppercase tracking-[4px] mt-2 font-bold">AI Career Copilot</div>
+          <div className="text-[10px] font-mono text-[#888] uppercase tracking-[4px] mt-2 font-bold">Professional Configuration</div>
         </div>
 
-        <div className="mb-12">
-          <div className="flex justify-between mb-4">
-            {['Welcome', 'Your Profile', 'Preferences'].map((label, i) => (
-              <div key={label} className="flex flex-col items-center gap-2">
-                <div className={"w-8 h-8 rounded-xl flex items-center justify-center text-[12px] font-bold font-mono transition-all duration-500 " + (step > i + 1 ? 'bg-[#00ff87] text-[#0a0a1a] shadow-[0_0_15px_#00ff8740]' : step === i + 1 ? 'border-2 border-[#00ff87] text-[#00ff87] shadow-[0_0_15px_#00ff8720]' : 'bg-[#0d0d20] border-2 border-[#1e1e38] text-[#333]')}>
-                  {step > i + 1 ? '' : i + 1}
+        <div className="mb-16">
+          <div className="flex justify-between mb-6">
+            {['Welcome', 'Profile', 'Criteria'].map((label, i) => (
+              <div key={label} className="flex flex-col items-center gap-3">
+                <div className={"w-10 h-10 rounded-sm flex items-center justify-center text-[12px] font-bold font-mono transition-all duration-500 " + (step > i + 1 ? 'bg-[#c5a059] text-white' : step === i + 1 ? 'bg-[#1a1a1a] text-white' : 'bg-white border border-[#e2e2d9] text-[#888]')}>
+                  {step > i + 1 ? '✓' : i + 1}
                 </div>
-                <span className={"text-[10px] font-mono font-bold uppercase tracking-wider " + (step === i + 1 ? 'text-[#00ff87]' : 'text-[#333]')}>
+                <span className={"text-[9px] font-mono font-bold uppercase tracking-widest " + (step === i + 1 ? 'text-[#1a1a1a]' : 'text-[#888]')}>
                   {label}
                 </span>
               </div>
             ))}
           </div>
-          <div className="h-1 bg-[#1e1e38] rounded-full mt-2 overflow-hidden">
-            <div className="h-full bg-[#00ff87] rounded-full transition-all duration-700 ease-in-out shadow-[0_0_10px_#00ff8780]" style={{ width: progress + "%" }} />
+          <div className="h-[2px] bg-[#e2e2d9] rounded-full mt-2 overflow-hidden">
+            <div className="h-full bg-[#c5a059] transition-all duration-700 ease-in-out" style={{ width: progress + "%" }} />
           </div>
         </div>
 
         {step === 1 && (
-          <div className="bg-[#0d0d20]/80 backdrop-blur-xl border border-[#1e1e38] rounded-3xl p-10 animate-in fade-in slide-in-from-bottom-4 duration-700 shadow-2xl">
-            <h2 className="font-syne text-[26px] font-extrabold text-white mb-3 leading-tight tracking-tight">
-              Ready to land your next role?
+          <div className="bg-white border border-[#e2e2d9] p-12 animate-in fade-in slide-in-from-bottom-4 duration-700 shadow-sm tactile-pop">
+            <h2 className="font-syne text-[28px] font-bold text-[#1a1a1a] mb-4 tracking-tight uppercase leading-tight">
+              Begin your search
             </h2>
-            <p className="text-[#666] text-[14px] leading-relaxed mb-10">
-              JobHunter uses advanced AI to curate the best opportunities for you, score your fit instantly, and generate high-impact cover letters.
+            <p className="text-[#666] text-[15px] leading-[1.6] mb-12">
+              Our analysis platform optimizes your job discovery process by aligning your professional profile with global market listings.
             </p>
 
-            <div className={"bg-[#0a0a1a] border-2 border-dashed rounded-2xl p-8 text-center mb-6 group transition-all duration-300 " + (importing ? 'border-[#00ff8740] bg-[#00ff8705]' : 'border-[#2a2a4a] hover:border-[#00ff8730] hover:bg-[#00ff8702]')}>
+            <div className={"bg-[#f8f8f4] border border-[#e2e2d9] p-10 text-center mb-8 transition-all duration-300 " + (importing ? 'border-[#c5a059]' : 'hover:border-[#c5a059]/50')}>
               {importing ? (
-                <div className="flex flex-col items-center animate-in fade-in duration-300">
-                  <div className="w-12 h-12 rounded-full border-3 border-[#00ff8710] border-t-[#00ff87] animate-spin mb-4" />
-                  <div className="text-sm font-bold text-[#00ff87] font-mono uppercase tracking-[2px] mb-1 animate-pulse">
+                <div className="flex flex-col items-center py-4">
+                  <div className="w-12 h-12 border-2 border-[#e2e2d9] border-t-[#c5a059] animate-spin mb-6" />
+                  <div className="text-[11px] font-bold text-[#c5a059] font-mono uppercase tracking-[3px] animate-pulse">
                     {importStep}
                   </div>
-                  <div className="text-[11px] text-[#444] font-mono">This usually takes about 10-15 seconds</div>
                 </div>
               ) : (
                 <>
-                  <div className="text-4xl mb-4 grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 scale-100 group-hover:scale-110"></div>
-                  <div className="text-[16px] font-bold text-[#e0e0f0] mb-1 font-syne">
-                    Import your CV
+                  <div className="text-[18px] font-bold text-[#1a1a1a] mb-2 font-syne uppercase tracking-tight">
+                    Import CV Data
                   </div>
-                  <div className="text-[12px] text-[#555] mb-6">
-                    We&apos;ll auto-fill your profile to save you time.
+                  <div className="text-[13px] text-[#888] mb-8">
+                    Automatically populate your professional criteria.
                   </div>
-                  <label className="inline-block bg-[#00ff8710] border border-[#00ff8730] text-[#00ff87] px-8 py-3 rounded-xl font-mono text-[11px] font-bold tracking-[2px] uppercase cursor-pointer transition-all hover:bg-[#00ff8720] hover:shadow-[0_0_20px_#00ff8715]">
-                    Upload PDF
+                  <label className="inline-block bg-[#1a1a1a] text-white px-10 py-4 rounded-sm font-mono text-[11px] font-bold tracking-[2px] uppercase cursor-pointer transition-all hover:bg-[#c5a059] shadow-md">
+                    Upload Document
                     <input type="file" accept=".pdf" onChange={handleImportCV} disabled={importing} className="hidden" />
                   </label>
                 </>
               )}
 
               {importError && (
-                <div className="text-[#ff6b6b] text-[11px] mt-4 font-mono font-bold bg-[#ff6b6b05] py-2 px-4 rounded-lg border border-[#ff6b6b10]">
+                <div className="text-[#bc243c] text-[10px] mt-6 font-mono font-bold uppercase tracking-wider bg-[#bc243c]/5 py-3 px-4 border border-[#bc243c]/10">
                   {importError}
                 </div>
               )}
             </div>
 
-            <div className="text-center text-[#222] text-[10px] mb-6 font-mono font-bold uppercase tracking-[4px]">
-              — or continue manually —
+            <div className="text-center text-[#e2e2d9] text-[10px] mb-8 font-mono font-bold uppercase tracking-[6px]">
+              OR
             </div>
 
             <button
               onClick={() => setStep(2)}
-              className="w-full bg-transparent border border-[#1e1e38] text-[#444] py-4 rounded-xl font-mono text-[11px] font-bold tracking-[2px] uppercase cursor-pointer hover:border-[#333] hover:text-[#777] transition-all"
+              className="w-full bg-white border border-[#e2e2d9] text-[#4a4a4a] py-4 rounded-sm font-mono text-[11px] font-bold tracking-[2px] uppercase hover:bg-[#f8f8f4] transition-all"
             >
-              Start from scratch
+              Manual Configuration
             </button>
           </div>
         )}
 
         {step === 2 && (
-          <div className="bg-[#0d0d20]/80 backdrop-blur-xl border border-[#1e1e38] rounded-3xl p-10 animate-in fade-in slide-in-from-bottom-4 duration-700 shadow-2xl">
-            <h2 className="font-syne text-[26px] font-extrabold text-white mb-2 tracking-tight">
-              Your Professional Profile
+          <div className="bg-white border border-[#e2e2d9] p-12 animate-in fade-in slide-in-from-bottom-4 duration-700 shadow-sm tactile-pop">
+            <h2 className="font-syne text-[28px] font-bold text-[#1a1a1a] mb-2 tracking-tight uppercase leading-tight">
+              Professional Data
             </h2>
-            <p className="text-[#666] text-[14px] mb-8 leading-relaxed">
-              Our AI uses this context to score jobs and write high-conversion cover letters.
+            <p className="text-[#666] text-[15px] mb-10 leading-[1.6]">
+              Detailed criteria used for automated matching and document generation.
             </p>
 
-            <div className="space-y-6 mb-10">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
+            <div className="space-y-6 mb-12">
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-1">
                   <label className={labelClasses}>Full Name</label>
-                  <input className={inputClasses} value={fullName} onChange={e => setFullName(e.target.value)} placeholder="John Smith" />
+                  <input className={inputClasses} value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Jane Doe" />
                 </div>
-                <div>
-                  <label className={labelClasses}>Current Role</label>
-                  <input className={inputClasses} value={jobTitle} onChange={e => setJobTitle(e.target.value)} placeholder="Senior Developer" />
+                <div className="space-y-1">
+                  <label className={labelClasses}>Primary Role</label>
+                  <input className={inputClasses} value={jobTitle} onChange={e => setJobTitle(e.target.value)} placeholder="Software Engineer" />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className={labelClasses}>Company</label>
-                  <input className={inputClasses} value={company} onChange={e => setCompany(e.target.value)} placeholder="Acme Inc" />
-                </div>
-                <div>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-1">
                   <label className={labelClasses}>Education</label>
-                  <input className={inputClasses} value={education} onChange={e => setEducation(e.target.value)} placeholder="BSc Comp Sci" />
+                  <input className={inputClasses} value={education} onChange={e => setEducation(e.target.value)} placeholder="University Degree" />
+                </div>
+                <div className="space-y-1">
+                  <label className={labelClasses}>Current Company</label>
+                  <input className={inputClasses} value={company} onChange={e => setCompany(e.target.value)} placeholder="Organization Name" />
                 </div>
               </div>
-              <div>
-                <label className={labelClasses}>Skills & Technologies</label>
-                <div className="text-[10px] text-[#444] mb-2 italic font-mono uppercase">Separated by commas</div>
-                <input className={inputClasses} value={skills} onChange={e => setSkills(e.target.value)} placeholder="React, TypeScript, Node.js, AWS" />
+              <div className="space-y-1">
+                <label className={labelClasses}>Core Competencies</label>
+                <div className="text-[9px] text-[#aaa] mb-1 font-mono uppercase">Comma separated values</div>
+                <input className={inputClasses} value={skills} onChange={e => setSkills(e.target.value)} placeholder="Language, Framework, Tool" />
               </div>
-              <div>
-                <label className={labelClasses}>Experience Highlights</label>
+              <div className="space-y-1">
+                <label className={labelClasses}>Professional Experience</label>
                 <textarea
-                  className={inputClasses + " resize-none leading-relaxed"}
+                  className={inputClasses + " resize-none leading-[1.6] h-32"}
                   value={experience}
                   onChange={e => setExperience(e.target.value)}
-                  placeholder="Key achievements and responsibilities..."
-                  rows={4}
-                />
-              </div>
-              <div>
-                <label className={labelClasses}>Notable Projects</label>
-                <textarea
-                  className={inputClasses + " resize-none leading-relaxed"}
-                  value={projects}
-                  onChange={e => setProjects(e.target.value)}
-                  placeholder="Personal or open-source projects..."
-                  rows={3}
+                  placeholder="Summary of responsibilities and achievements..."
                 />
               </div>
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex gap-6">
               <button
                 onClick={() => setStep(1)}
-                className="flex-1 bg-transparent border border-[#1e1e38] text-[#444] py-4 rounded-2xl font-mono text-[11px] font-bold uppercase hover:border-[#333] transition-all"
+                className="flex-1 bg-white border border-[#e2e2d9] text-[#4a4a4a] py-4 rounded-sm font-mono text-[11px] font-bold uppercase hover:bg-[#f8f8f4] transition-all"
               >
-                Back
+                Previous
               </button>
               <button
                 onClick={() => setStep(3)}
                 disabled={!fullName || !skills}
-                className={"flex-[2] bg-[#00ff87] text-[#0a0a1a] py-4 rounded-2xl font-mono text-[11px] font-bold tracking-[2px] uppercase transition-all " + (!fullName || !skills ? 'opacity-50 cursor-not-allowed' : 'hover:brightness-110 shadow-lg shadow-[#00ff8720] hover:-translate-y-0.5 active:translate-y-0')}>
-                Next to Preferences
+                className={"flex-[2] bg-[#1a1a1a] text-white py-4 rounded-sm font-mono text-[11px] font-bold tracking-[2px] uppercase transition-all " + (!fullName || !skills ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#c5a059] shadow-md')}>
+                Continue
               </button>
             </div>
           </div>
         )}
 
         {step === 3 && (
-          <div className="bg-[#0d0d20]/80 backdrop-blur-xl border border-[#1e1e38] rounded-3xl p-10 animate-in fade-in slide-in-from-bottom-4 duration-700 shadow-2xl">
-            <h2 className="font-syne text-[26px] font-extrabold text-white mb-2 tracking-tight">
-              Search Preferences
+          <div className="bg-white border border-[#e2e2d9] p-12 animate-in fade-in slide-in-from-bottom-4 duration-700 shadow-sm tactile-pop">
+            <h2 className="font-syne text-[28px] font-bold text-[#1a1a1a] mb-2 tracking-tight uppercase leading-tight">
+              Analysis Criteria
             </h2>
-            <p className="text-[#666] text-[14px] mb-8 leading-relaxed">
-              Help us narrow down the perfect opportunities for you.
+            <p className="text-[#666] text-[15px] mb-10 leading-[1.6]">
+              Parameters used to filter and score market opportunities.
             </p>
 
-            <div className="space-y-6 mb-10">
-              <div>
-                <label className={labelClasses}>Job Search Terms</label>
-                <div className="text-[10px] text-[#444] mb-2 italic font-mono uppercase">
-                  Comma separated keywords
-                </div>
+            <div className="space-y-8 mb-12">
+              <div className="space-y-1">
+                <label className={labelClasses}>Target Search Terms</label>
                 <input
                   className={inputClasses}
                   value={searchTerms}
                   onChange={e => setSearchTerms(e.target.value)}
-                  placeholder="frontend engineer, fullstack developer"
+                  placeholder="Engineer, Developer, Manager"
                 />
               </div>
 
-              <div>
-                <label className={labelClasses}>Target Country</label>
-                <div className="relative">
-                    <select
-                        value={country}
-                        onChange={e => setCountry(e.target.value)}
-                        className={inputClasses + " appearance-none cursor-pointer pr-10"}
-                    >
-                        <option value="za">South Africa</option>
-                        <option value="gb">United Kingdom</option>
-                        <option value="us">United States</option>
-                        <option value="au">Australia</option>
-                        <option value="ca">Canada</option>
-                        <option value="de">Germany</option>
-                        <option value="nl">Netherlands</option>
-                        <option value="sg">Singapore</option>
-                    </select>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-1">
+                  <label className={labelClasses}>Region</label>
+                  <select
+                      value={country}
+                      onChange={e => setCountry(e.target.value)}
+                      className={inputClasses + " cursor-pointer"}
+                  >
+                      <option value="za">South Africa</option>
+                      <option value="gb">United Kingdom</option>
+                      <option value="us">United States</option>
+                      <option value="de">Germany</option>
+                      <option value="nl">Netherlands</option>
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label className={labelClasses}>Min Salary</label>
+                  <input
+                    className={inputClasses}
+                    type="number"
+                    value={salaryMin}
+                    onChange={e => setSalaryMin(e.target.value)}
+                    placeholder="Annual Amount"
+                  />
                 </div>
               </div>
 
-              <div>
-                <label className={labelClasses}>Minimum Annual Salary</label>
-                <div className="text-[10px] text-[#444] mb-2 italic font-mono uppercase">
-                  Local currency &mdash; blank for any
-                </div>
-                <input
-                  className={inputClasses}
-                  type="number"
-                  value={salaryMin}
-                  onChange={e => setSalaryMin(e.target.value)}
-                  placeholder="e.g. 50000"
-                />
-              </div>
-
-              <div className="pt-4 p-5 rounded-2xl bg-[#0a0a1a] border border-[#1e1e38]">
+              <div className="p-6 bg-[#f8f8f4] border border-[#e2e2d9]">
                 <label className="flex items-center justify-between cursor-pointer group">
                   <div className="space-y-1">
-                    <div className="text-[14px] font-bold text-[#e0e0f0] group-hover:text-white transition-colors">Remote Only</div>
-                    <div className="text-[11px] text-[#444] font-mono">Only show fully remote positions</div>
+                    <div className="text-[14px] font-bold text-[#1a1a1a] uppercase tracking-tight">Remote Specific</div>
+                    <div className="text-[11px] text-[#888] font-mono">Prioritize remote-only listings</div>
                   </div>
                   <div
                     onClick={() => setRemoteOnly(!remoteOnly)}
-                    className={"w-12 h-6.5 rounded-full relative transition-all duration-300 ease-in-out " + (remoteOnly ? 'bg-[#00ff87]' : 'bg-[#1e1e38]')}>
-                    <div className={"w-5 h-5 rounded-full bg-white absolute top-0.75 transition-all duration-300 shadow-sm " + (remoteOnly ? 'left-[23px]' : 'left-1')} />
+                    className={"w-12 h-6.5 rounded-sm relative transition-all duration-300 " + (remoteOnly ? 'bg-[#c5a059]' : 'bg-[#e2e2d9]')}>
+                    <div className={"w-5 h-5 bg-white absolute top-0.75 transition-all duration-300 shadow-sm " + (remoteOnly ? 'left-[23px]' : 'left-1')} />
                   </div>
                 </label>
               </div>
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex gap-6">
               <button
                 onClick={() => setStep(2)}
-                className="flex-1 bg-transparent border border-[#1e1e38] text-[#444] py-4 rounded-2xl font-mono text-[11px] font-bold uppercase hover:border-[#333] transition-all"
+                className="flex-1 bg-white border border-[#e2e2d9] text-[#4a4a4a] py-4 rounded-sm font-mono text-[11px] font-bold uppercase hover:bg-[#f8f8f4] transition-all"
               >
-                Back
+                Previous
               </button>
               <button
                 onClick={handleSave}
                 disabled={saving || !searchTerms}
-                className={"flex-[2] bg-[#00ff87] text-[#0a0a1a] py-4 rounded-2xl font-mono text-[11px] font-bold tracking-[2px] uppercase transition-all " + (saving || !searchTerms ? 'opacity-50 cursor-not-allowed' : 'hover:brightness-110 shadow-lg shadow-[#00ff8720] hover:-translate-y-0.5 active:translate-y-0')}>
-                {saving ? 'Preparing Dashboard...' : 'Launch JobHunter'}
+                className={"flex-[2] bg-[#1a1a1a] text-white py-4 rounded-sm font-mono text-[11px] font-bold tracking-[2px] uppercase transition-all " + (saving || !searchTerms ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#c5a059] shadow-md')}>
+                {saving ? 'Finalizing...' : 'Launch Platform'}
               </button>
             </div>
           </div>
