@@ -28,26 +28,53 @@ export function OverviewTab({
           ))}
         </div>
 
-        <h4 className="text-[10px] font-mono font-bold text-[#888] tracking-[4px] uppercase flex items-center gap-4">
-          Technical Skills
-          <div className="h-px flex-1 bg-[#e2e2d9]" />
-        </h4>
-        <div className="flex flex-wrap gap-3 p-8 bg-white border border-[#e2e2d9] shadow-sm">
-          {job.stack?.map((skill, idx) => {
-            const isMatch = userSkills.some(s => s.toLowerCase() === skill.toLowerCase())
-            return (
-              <div key={`${skill}-${idx}`} className={`text-[10px] px-4 py-2 font-mono font-bold uppercase tracking-wider border transition-all duration-500 flex items-center gap-2 ${
-                isMatch
-                  ? 'bg-[#2b6777]/5 border-[#2b6777] text-[#2b6777]'
-                  : 'bg-[#f0f0eb] border-[#d1d1ca] text-[#888]'
-              }`}>
-                {isMatch && <div className="w-1.5 h-1.5 bg-[#2b6777]" />}
-                {skill}
-              </div>
-            )
-          })}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="space-y-6">
+            <h4 className="text-[10px] font-mono font-bold text-[#888] tracking-[4px] uppercase flex items-center gap-4">
+              Matched Competencies
+              <div className="h-px flex-1 bg-[#e2e2d9]" />
+            </h4>
+            <div className="flex flex-wrap gap-2 p-6 bg-white border border-[#e2e2d9] shadow-sm tactile-inset min-h-[100px]">
+              {job.stack?.filter(s => userSkills.some(us => us.toLowerCase() === s.toLowerCase())).map((skill, idx) => (
+                <div key={`${skill}-${idx}`} className="text-[10px] px-3 py-1.5 font-mono font-bold uppercase tracking-wider border bg-[#2b6777]/5 border-[#2b6777] text-[#2b6777] flex items-center gap-2">
+                  <div className="w-1 h-1 bg-[#2b6777]" />
+                  {skill}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <h4 className="text-[10px] font-mono font-bold text-[#888] tracking-[4px] uppercase flex items-center gap-4">
+              Skill Gaps
+              <div className="h-px flex-1 bg-[#e2e2d9]" />
+            </h4>
+            <div className="flex flex-wrap gap-2 p-6 bg-white border border-[#e2e2d9] shadow-sm min-h-[100px]">
+              {job.stack?.filter(s => !userSkills.some(us => us.toLowerCase() === s.toLowerCase())).map((skill, idx) => (
+                <div key={`${skill}-${idx}`} className="text-[10px] px-3 py-1.5 font-mono font-bold uppercase tracking-wider border bg-[#f0f0eb] border-[#d1d1ca] text-[#888]">
+                  {skill}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Cultural Fit */}
+      {job.culture_fit && (
+        <div className="space-y-6">
+          <h4 className="text-[10px] font-mono font-bold text-[#888] tracking-[4px] uppercase flex items-center gap-4">
+            Cultural Resonance
+            <div className="h-px flex-1 bg-[#e2e2d9]" />
+          </h4>
+          <div className="p-10 bg-white border border-[#e2e2d9] shadow-sm relative group overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 opacity-10 font-syne font-black text-6xl select-none text-[#c5a059]">FIT</div>
+            <p className="text-[16px] leading-[1.7] text-[#4a4a4a] font-sans font-medium relative z-10 italic">
+              &quot;{job.culture_fit}&quot;
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Analysis Report */}
       {job.score_reason && (

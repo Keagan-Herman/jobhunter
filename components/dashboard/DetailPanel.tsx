@@ -58,6 +58,37 @@ export function DetailPanel({
   }
   const currency = currencyMap[country] || 'R'
 
+  function SalarySpectrum({ min, max }: { min: number, max: number }) {
+    // Relative positioning for a simple dynamic bar
+    // Since we don't have a global range, we show the relative spread
+    const mid = (max + min) / 2
+    const spread = max - min
+    const spreadPercent = Math.min(60, Math.max(20, (spread / mid) * 100))
+    const leftOffset = (100 - spreadPercent) / 2
+
+    return (
+      <div className="w-full max-w-md space-y-3">
+        <div className="flex justify-between items-end">
+          <div className="flex flex-col">
+            <span className="text-[9px] font-mono font-bold text-[#888] uppercase tracking-widest">Entry Spectrum</span>
+            <span className="text-[16px] font-bold text-[#1a1a1a]">{currency}{min.toLocaleString()}</span>
+          </div>
+          <div className="flex flex-col items-end">
+            <span className="text-[9px] font-mono font-bold text-[#888] uppercase tracking-widest">Cap Projection</span>
+            <span className="text-[16px] font-bold text-[#1a1a1a]">{currency}{max.toLocaleString()}</span>
+          </div>
+        </div>
+        <div className="h-2 bg-[#f0f0eb] rounded-full overflow-hidden relative border border-[#e2e2d9]">
+          <div className="absolute inset-y-0 left-0 bg-[#c5a059]/10 w-full" />
+          <div
+            className="absolute inset-y-0 bg-[#c5a059] shadow-[0_0_10px_rgba(197,160,89,0.5)] transition-all duration-1000"
+            style={{ left: `${leftOffset}%`, width: `${spreadPercent}%` }}
+          />
+        </div>
+      </div>
+    )
+  }
+
   const handleCopy = async () => {
     await navigator.clipboard.writeText(coverLetter)
     setCopied(true)
@@ -155,36 +186,54 @@ export function DetailPanel({
         <div className="p-10 pb-8 shrink-0 relative overflow-hidden bg-white">
           <div className="absolute top-0 left-0 w-full h-1 bg-klimt-gold opacity-30" />
 
-          <div className="flex justify-between items-start mb-8 relative z-10">
+          <div className="flex justify-between items-start mb-10 relative z-10">
             <div className="flex-1 pr-12">
-              <h3 className="font-syne font-bold text-[28px] md:text-[36px] text-[#1a1a1a] mb-3 leading-[1.1] tracking-tight uppercase">{job.title}</h3>
-              <div className="text-[10px] font-mono font-bold text-[#888] tracking-[3px] uppercase flex flex-wrap items-center gap-3">
-                  <span className="text-[#4a4a4a]">{job.company}</span>
-                  <span className="w-1.5 h-1.5 bg-[#e2e2d9]" />
-                  <span>{job.location || 'Remote'}</span>
+              <div className="flex items-center gap-4 mb-4">
+                <div className="px-3 py-1 bg-[#1a1a1a] text-[#f8f8f4] text-[9px] font-mono font-bold uppercase tracking-[3px]">Listing Verified</div>
+                {job.source && <div className="text-[9px] font-mono font-bold text-[#888] uppercase tracking-[3px]">Source: {job.source}</div>}
+              </div>
+              <h3 className="font-syne font-bold text-[32px] md:text-[42px] text-[#1a1a1a] mb-4 leading-[1.05] tracking-tight uppercase">{job.title}</h3>
+              <div className="text-[11px] font-mono font-bold text-[#4a4a4a] tracking-[4px] uppercase flex flex-wrap items-center gap-4">
+                  <span className="hover:text-[#c5a059] transition-colors cursor-default">{job.company}</span>
+                  <div className="w-1.5 h-1.5 bg-[#c5a059] rotate-45" />
+                  <span className="text-[#888]">{job.location || 'Remote'}</span>
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               {job.url && (
                 <button
                   onClick={handleCopyLink}
-                  className={`px-4 py-2 rounded-sm font-mono text-[10px] font-bold uppercase transition-all duration-300 border tactile-pop ${
-                    linkCopied ? 'bg-[#2b6777]/5 border-[#2b6777] text-[#2b6777]' : 'bg-white border-[#e2e2d9] text-[#4a4a4a] hover:bg-[#f8f8f4]'
-                  }`}
+                  className={`group relative px-6 py-3 rounded-sm font-mono text-[10px] font-bold uppercase transition-all duration-500 border ${
+                    linkCopied ? 'bg-[#2b6777] border-[#2b6777] text-white' : 'bg-white border-[#e2e2d9] text-[#4a4a4a] hover:border-[#1a1a1a] hover:bg-[#f8f8f4]'
+                  } shadow-sm active:scale-95`}
                 >
-                  <span>{linkCopied ? 'Copied' : 'Copy Link'}</span>
+                  <span className="relative z-10">{linkCopied ? 'URL Copied' : 'Copy Application Link'}</span>
                 </button>
               )}
-              <button onClick={onClose} className="text-[#888] hover:text-[#1a1a1a] transition-all duration-300 text-2xl font-mono p-2 bg-[#f0f0eb] rounded-sm border border-[#d1d1ca] hover:border-[#1a1a1a]">✕</button>
+              <button onClick={onClose} className="group text-[#888] hover:text-[#1a1a1a] transition-all duration-300 text-xl font-mono p-3 bg-[#f8f8f4] hover:bg-white rounded-sm border border-[#e2e2d9] hover:border-[#1a1a1a] active:scale-90">✕</button>
             </div>
           </div>
 
-          <div className="flex items-center gap-4 flex-wrap relative z-10">
-              {(job.salary_min || job.salary_max) && (
-                <div className="text-[14px] font-bold text-[#2b6777] font-mono bg-[#2b6777]/5 border border-[#2b6777]/20 px-6 py-2.5 rounded-sm tracking-tight">
-                  {currency}{job.salary_min?.toLocaleString()} – {currency}{job.salary_max?.toLocaleString()}
+          <div className="flex items-center justify-between gap-8 flex-wrap relative z-10">
+              {job.salary_min && job.salary_max ? (
+                <SalarySpectrum min={job.salary_min} max={job.salary_max} />
+              ) : (job.salary_min || job.salary_max) && (
+                <div className="text-[14px] font-bold text-[#2b6777] font-mono bg-[#2b6777]/5 border border-[#2b6777]/20 px-8 py-3 rounded-sm tracking-tight flex items-center gap-4">
+                  <div className="w-2 h-2 bg-[#2b6777] animate-pulse" />
+                  {currency}{(job.salary_min || job.salary_max || 0).toLocaleString()} <span className="text-[10px] text-[#888] uppercase tracking-widest ml-2">Base Est.</span>
                 </div>
               )}
+
+              <div className="flex gap-4">
+                 <div className="px-6 py-3 bg-[#f0f0eb] border border-[#d1d1ca] text-[10px] font-mono font-bold uppercase tracking-widest text-[#4a4a4a] flex items-center gap-3">
+                    <div className="w-1.5 h-1.5 bg-[#c5a059]" />
+                    {job.seniority || 'Professional'}
+                 </div>
+                 <div className="px-6 py-3 bg-[#f0f0eb] border border-[#d1d1ca] text-[10px] font-mono font-bold uppercase tracking-widest text-[#4a4a4a] flex items-center gap-3">
+                    <div className="w-1.5 h-1.5 bg-[#2b6777]" />
+                    {job.work_style || 'Remote'}
+                 </div>
+              </div>
           </div>
         </div>
 
