@@ -14,6 +14,7 @@ import { Job, Profile } from '@/types'
 export default function DashboardPage() {
     const [jobs, setJobs] = useState<Job[]>([])
     const [selected, setSelected] = useState<Job | null>(null)
+    const [searchQuery, setSearchQuery] = useState('')
     const [loading, setLoading] = useState(true)
     const [scanning, setScanning] = useState(false)
     const [generating, setGenerating] = useState(false)
@@ -238,7 +239,19 @@ export default function DashboardPage() {
         setSelected(null)
     }
 
-    const filteredJobs: Job[] = jobs.filter(j => j.status === activeTab)
+    const filteredJobs: Job[] = jobs.filter(j => {
+        const matchesTab = j.status === activeTab
+        if (!matchesTab) return false
+
+        if (!searchQuery) return true
+
+        const q = searchQuery.toLowerCase()
+        return (
+            j.title.toLowerCase().includes(q) ||
+            j.company.toLowerCase().includes(q) ||
+            (j.stack || []).some(s => s.toLowerCase().includes(q))
+        )
+    })
 
     const stats: { pending: number; applied: number; interviewing: number; total: number } = {
         pending: jobs.filter(j => j.status === 'pending').length,
@@ -323,7 +336,8 @@ export default function DashboardPage() {
                 <StatsGrid stats={stats} />
 
                 <div className="space-y-8">
-                    <div className="flex flex-wrap gap-8 border-b border-[#e2e2d9] pb-px overflow-x-auto scrollbar-hide">
+                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[#e2e2d9] pb-px">
+                        <div className="flex flex-wrap gap-8 overflow-x-auto scrollbar-hide">
                         {(['pending', 'applied', 'interviewing', 'skipped'] as const).map(tab => (
                             <button key={tab}
                                     onClick={() => { setActiveTab(tab) }}
@@ -332,6 +346,28 @@ export default function DashboardPage() {
                                 {activeTab === tab && <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#c5a059]" />}
                             </button>
                         ))}
+                        </div>
+
+                        <div className="pb-4 w-full md:w-64">
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    placeholder="SEARCH ARCHIVE..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full bg-transparent border-none outline-none font-mono text-[10px] font-bold tracking-[2px] text-[#1a1a1a] placeholder:text-[#ccc] uppercase"
+                                />
+                                <div className="absolute -bottom-1 left-0 right-0 h-px bg-[#e2e2d9]" />
+                                {searchQuery && (
+                                    <button
+                                        onClick={() => setSearchQuery('')}
+                                        className="absolute right-0 top-0 text-[#ccc] hover:text-[#1a1a1a] transition-colors"
+                                    >
+                                        ×
+                                    </button>
+                                )}
+                            </div>
+                        </div>
                     </div>
 
                     <div className="bg-white border border-[#e2e2d9] rounded-sm overflow-hidden h-[calc(100vh-380px)] shadow-sm flex flex-col relative tactile-pop">
