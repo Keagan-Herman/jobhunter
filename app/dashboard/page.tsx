@@ -8,8 +8,10 @@ import { SkeletonRow } from '@/components/dashboard/Skeleton'
 import { List } from 'react-window'
 import { DetailPanel } from '@/components/dashboard/DetailPanel'
 import { SkipModal } from '@/components/dashboard/SkipModal'
+import { Notification, NotificationType } from '@/components/dashboard/Notification'
 
 import { Job, Profile } from '@/types'
+import { AllJobsResponse, ScanResponse, RescoreResponse, ProfileResponse } from '@/types/api'
 
 export default function DashboardPage() {
     const [jobs, setJobs] = useState<Job[]>([])
@@ -21,14 +23,17 @@ export default function DashboardPage() {
     const [rescoring, setRescoring] = useState(false)
     const [activeProcess, setActiveProcess] = useState<'scanning' | 'rescoring' | 'generating' | null>(null)
     const [activeTab, setActiveTab] = useState<'pending' | 'applied' | 'interviewing' | 'skipped'>('pending')
-    const [scanResult, setScanResult] = useState('')
     const [profile, setProfile] = useState<Profile | null>(null)
-    const [error, setError] = useState('')
     const [firstTime, setFirstTime] = useState(false)
+
+    const [notification, setNotification] = useState<{ message: string; type: NotificationType } | null>(null)
+
+    const handleCloseNotification = useCallback(() => {
+        setNotification(null)
+    }, [])
 
     const [showSkipModal, setShowSkipModal] = useState(false)
     const [skipJobId, setSkipJobId] = useState<string | null>(null)
-    const [rescoreResult, setRescoreResult] = useState('')
 
     const [listHeight, setListHeight] = useState(600)
 
@@ -37,10 +42,10 @@ export default function DashboardPage() {
     const fetchJobs = useCallback(async () => {
         try {
             const res = await fetch('/api/jobs/all')
-            const data = await res.json()
-            if (data.jobs) setJobs(data.jobs as Job[])
+            const data = await res.json() as AllJobsResponse
+            if (data.jobs) setJobs(data.jobs)
         } catch {
-            setError('Failed to load jobs. Please refresh.')
+            setNotification({ message: 'Failed to load jobs. Please refresh.', type: 'error' })
         } finally {
             setLoading(false)
         }
@@ -49,8 +54,8 @@ export default function DashboardPage() {
     const fetchProfile = useCallback(async () => {
         try {
             const res = await fetch('/api/profile')
-            const data = await res.json()
-            if (data.profile) setProfile(data.profile as Profile)
+            const data = await res.json() as ProfileResponse
+            if (data.profile) setProfile(data.profile)
         } catch {
             console.error('Failed to load profile')
         }
@@ -76,36 +81,24 @@ export default function DashboardPage() {
         fetchJobs()
     }, [fetchProfile, fetchJobs])
 
-    useEffect(() => {
-        if (scanResult) {
-            const timer = setTimeout(() => setScanResult(''), 5000)
-            return () => clearTimeout(timer)
-        }
-    }, [scanResult])
-
-    useEffect(() => {
-        if (rescoreResult) {
-            const timer = setTimeout(() => setRescoreResult(''), 5000)
-            return () => clearTimeout(timer)
-        }
-    }, [rescoreResult])
-
     const handleScan = async () => {
         setScanning(true)
         setActiveProcess('scanning')
-        setScanResult('')
-        setError('')
+        setNotification(null)
         try {
             const res = await fetch('/api/jobs')
-            const data = await res.json()
+            const data = await res.json() as ScanResponse
             if (res.ok && data.success) {
-                setScanResult("Found " + data.found + " jobs, saved " + data.saved + " new")
+                setNotification({
+                    message: `Found ${data.found} jobs, saved ${data.saved} new`,
+                    type: 'success'
+                })
                 await fetchJobs()
             } else {
-                setError(data.error || 'Scan failed')
+                setNotification({ message: data.error || 'Scan failed', type: 'error' })
             }
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Scan failed')
+            setNotification({ message: err instanceof Error ? err.message : 'Scan failed', type: 'error' })
         } finally {
             setScanning(false)
             setActiveProcess(null)
@@ -115,19 +108,21 @@ export default function DashboardPage() {
     const handleRescore = async () => {
         setRescoring(true)
         setActiveProcess('rescoring')
-        setRescoreResult('')
-        setError('')
+        setNotification(null)
         try {
             const res = await fetch('/api/rescore', { method: 'POST' })
-            const data = await res.json()
+            const data = await res.json() as RescoreResponse
             if (data.success) {
-                setRescoreResult("Rescored " + data.rescored + " jobs")
+                setNotification({
+                    message: `Rescored ${data.rescored} jobs`,
+                    type: 'success'
+                })
                 await fetchJobs()
             } else {
-                setError(data.message || data.error || 'Rescore failed')
+                setNotification({ message: data.message || data.error || 'Rescore failed', type: 'error' })
             }
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Rescore failed')
+            setNotification({ message: err instanceof Error ? err.message : 'Rescore failed', type: 'error' })
         } finally {
             setRescoring(false)
             setActiveProcess(null)
@@ -151,7 +146,10 @@ export default function DashboardPage() {
             setJobs(prev => prev.map(j => j.id === selected.id ? updatedJob : j))
             setSelected(updatedJob)
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to update cover letter.')
+            setNotification({
+                message: err instanceof Error ? err.message : 'Failed to update cover letter.',
+                type: 'error'
+            })
         } finally {
             if (content) {
                 setGenerating(false)
@@ -172,7 +170,10 @@ export default function DashboardPage() {
             })
             if (!res.ok) throw new Error('Failed to update status')
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to update status')
+            setNotification({
+                message: err instanceof Error ? err.message : 'Failed to update status',
+                type: 'error'
+            })
             await fetchJobs()
         }
     }
@@ -303,24 +304,13 @@ export default function DashboardPage() {
                     </div>
                 </header>
 
-                <div className="space-y-4">
-                    {error && (
-                        <div className="bg-[#bc243c]/5 border border-[#bc243c]/20 rounded-sm p-4 flex justify-between items-center animate-in slide-in-from-top-2">
-                            <span className="text-[#bc243c] text-xs font-mono font-bold uppercase tracking-wider">{error}</span>
-                            <button onClick={() => { setError(''); fetchJobs() }} className="text-[#bc243c] text-[10px] font-mono uppercase font-bold hover:underline">Retry</button>
-                        </div>
-                    )}
-                    {scanResult && (
-                        <div className="bg-[#2b6777]/5 border border-[#2b6777]/20 rounded-sm p-4 text-[10px] font-mono font-bold uppercase tracking-wider text-[#2b6777] animate-in slide-in-from-top-2">
-                            {scanResult}
-                        </div>
-                    )}
-                    {rescoreResult && (
-                        <div className="bg-[#2b6777]/5 border border-[#2b6777]/20 rounded-sm p-4 text-[10px] font-mono font-bold uppercase tracking-wider text-[#2b6777] animate-in slide-in-from-top-2">
-                            {rescoreResult}
-                        </div>
-                    )}
-                </div>
+                {notification && (
+                    <Notification
+                        message={notification.message}
+                        type={notification.type}
+                        onClose={handleCloseNotification}
+                    />
+                )}
 
                 {firstTime && (
                     <div className="matte-surface border-[#c5a059]/30 rounded-sm p-8 flex flex-col md:flex-row items-center justify-between gap-8 shadow-md">
@@ -399,7 +389,7 @@ export default function DashboardPage() {
                                 <List
                                     key={`${activeTab}-${filteredJobs.length}`}
                                     rowCount={filteredJobs.length}
-                                    rowHeight={220}
+                                    rowHeight={240}
                                     className="scrollbar-hide"
                                     style={{ height: listHeight, width: '100%' }}
                                     rowProps={{}}
