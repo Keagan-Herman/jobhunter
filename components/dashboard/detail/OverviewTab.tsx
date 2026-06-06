@@ -16,14 +16,16 @@ export function OverviewTab({
         </h4>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {[
-            { label: 'Level', value: job.seniority || 'Professional', color: 'text-[#1a1a1a]', icon: 'S' },
-            { label: 'Environment', value: job.work_style || 'Remote', color: 'text-[#2b6777]', icon: 'W' },
-            { label: 'Compatibility', value: `${job.stack_overlap || 0}%`, color: 'text-[#c5a059]', icon: 'C' }
+            { label: 'Level', value: job.seniority || 'Professional', color: 'text-[#1a1a1a]', icon: 'S', description: 'Experience Calibration' },
+            { label: 'Environment', value: job.work_style || 'Remote', color: 'text-[#2b6777]', icon: 'W', description: 'Spatial Alignment' },
+            { label: 'Compatibility', value: `${job.stack_overlap || 0}%`, color: 'text-[#c5a059]', icon: 'C', description: 'Technical Overlap' }
           ].map(item => (
-            <div key={item.label} className="p-8 bg-white border border-[#e2e2d9] transition-all duration-500 hover:border-[#c5a059] tactile-pop relative group">
+            <div key={item.label} className="p-8 bg-white border border-[#e2e2d9] transition-all duration-500 hover:border-[#c5a059] tactile-pop relative group overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-0.5 bg-[#e2e2d9] group-hover:bg-[#c5a059] transition-colors" />
               <div className="absolute top-4 right-4 text-[10px] font-mono text-[#e2e2d9] group-hover:text-[#c5a059] transition-colors">{item.icon}</div>
               <div className="text-[10px] font-mono text-[#888] uppercase tracking-[3px] mb-4 font-bold">{item.label}</div>
-              <div className={"text-[24px] font-syne font-bold uppercase tracking-tight " + item.color}>{item.value}</div>
+              <div className={"text-[26px] font-syne font-bold uppercase tracking-tight mb-2 " + item.color}>{item.value}</div>
+              <div className="text-[9px] font-mono text-[#aaa] uppercase tracking-widest">{item.description}</div>
             </div>
           ))}
         </div>
@@ -34,10 +36,10 @@ export function OverviewTab({
               Matched Competencies
               <div className="h-px flex-1 bg-[#e2e2d9]" />
             </h4>
-            <div className="flex flex-wrap gap-2 p-6 bg-white border border-[#e2e2d9] shadow-sm tactile-inset min-h-[100px]">
+            <div className="flex flex-wrap gap-2.5 p-8 bg-white border border-[#e2e2d9] shadow-sm tactile-inset min-h-[120px]">
               {job.stack?.filter(s => userSkills.some(us => us.toLowerCase() === s.toLowerCase())).map((skill, idx) => (
-                <div key={`${skill}-${idx}`} className="text-[10px] px-3 py-1.5 font-mono font-bold uppercase tracking-wider border bg-[#2b6777]/5 border-[#2b6777] text-[#2b6777] flex items-center gap-2">
-                  <div className="w-1 h-1 bg-[#2b6777]" />
+                <div key={`${skill}-${idx}`} className="text-[10px] px-4 py-2 font-mono font-bold uppercase tracking-wider border bg-[#2b6777]/5 border-[#2b6777] text-[#2b6777] flex items-center gap-3 transition-all hover:bg-white">
+                  <div className="w-1.5 h-1.5 bg-[#2b6777] rotate-45" />
                   {skill}
                 </div>
               ))}
@@ -49,9 +51,9 @@ export function OverviewTab({
               Skill Gaps
               <div className="h-px flex-1 bg-[#e2e2d9]" />
             </h4>
-            <div className="flex flex-wrap gap-2 p-6 bg-white border border-[#e2e2d9] shadow-sm min-h-[100px]">
+            <div className="flex flex-wrap gap-2.5 p-8 bg-white border border-[#e2e2d9] shadow-sm min-h-[120px]">
               {job.stack?.filter(s => !userSkills.some(us => us.toLowerCase() === s.toLowerCase())).map((skill, idx) => (
-                <div key={`${skill}-${idx}`} className="text-[10px] px-3 py-1.5 font-mono font-bold uppercase tracking-wider border bg-[#f0f0eb] border-[#d1d1ca] text-[#888]">
+                <div key={`${skill}-${idx}`} className="text-[10px] px-4 py-2 font-mono font-bold uppercase tracking-wider border bg-[#f0f0eb] border-[#d1d1ca] text-[#888] transition-all hover:bg-[#f8f8f4]">
                   {skill}
                 </div>
               ))}
