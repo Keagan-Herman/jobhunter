@@ -18,7 +18,7 @@ function JobCardComponent({
 
   return (
     <div
-      className={`p-8 border-b border-[#e2e2d9] cursor-pointer transition-all duration-500 ease-out hover:bg-[#f8f8f4] group relative overflow-hidden
+      className={`p-10 border-b border-[#e2e2d9] cursor-pointer transition-all duration-500 ease-out hover:bg-[#f8f8f4] group relative overflow-hidden
         ${isSelected ? 'bg-[#f0f0eb] border-l-4 border-l-[#c5a059]' : 'border-l-4 border-l-transparent'}
         animate-in fade-in slide-in-from-bottom-4 fill-mode-forwards`}
       style={{ animationDelay, opacity: 0 }}
@@ -26,7 +26,7 @@ function JobCardComponent({
     >
       <div className="flex justify-between items-start mb-6 relative z-10">
         <div className="flex-1 mr-6">
-          <div className="font-syne font-bold text-[20px] text-[#1a1a1a] mb-2 group-hover:text-[#c5a059] transition-all duration-500 leading-tight tracking-tight line-clamp-2 uppercase">
+          <div className="font-syne font-bold text-[22px] text-[#1a1a1a] mb-2 group-hover:text-[#c5a059] transition-all duration-500 leading-tight tracking-tight line-clamp-2 uppercase">
             {job.title}
           </div>
           <div className="text-[10px] text-[#888] font-mono tracking-[2px] flex flex-wrap items-center gap-2 uppercase font-bold">

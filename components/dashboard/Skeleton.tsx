@@ -1,9 +1,9 @@
 export function SkeletonRow() {
   return (
-    <div className="p-8 border-b border-[#e2e2d9] animate-pulse h-[220px] flex flex-col relative overflow-hidden bg-white">
+    <div className="p-10 border-b border-[#e2e2d9] animate-pulse h-[240px] flex flex-col relative overflow-hidden bg-white">
       <div className="flex justify-between items-start mb-6">
         <div className="flex-1 mr-6">
-          <div className="h-7 bg-[#f0f0eb] rounded-sm w-3/4 mb-3"></div>
+          <div className="h-8 bg-[#f0f0eb] rounded-sm w-3/4 mb-3"></div>
           <div className="h-3 bg-[#f0f0eb] rounded-sm w-1/2"></div>
         </div>
         <div className="h-[60px] w-[60px] rounded-full bg-[#f0f0eb] shrink-0"></div>

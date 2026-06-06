@@ -8,6 +8,7 @@ import { SkeletonRow } from '@/components/dashboard/Skeleton'
 import { List } from 'react-window'
 import { DetailPanel } from '@/components/dashboard/DetailPanel'
 import { SkipModal } from '@/components/dashboard/SkipModal'
+import { Notification } from '@/components/dashboard/Notification'
 
 import { Job, Profile } from '@/types'
 
@@ -305,20 +306,25 @@ export default function DashboardPage() {
 
                 <div className="space-y-4">
                     {error && (
-                        <div className="bg-[#bc243c]/5 border border-[#bc243c]/20 rounded-sm p-4 flex justify-between items-center animate-in slide-in-from-top-2">
-                            <span className="text-[#bc243c] text-xs font-mono font-bold uppercase tracking-wider">{error}</span>
-                            <button onClick={() => { setError(''); fetchJobs() }} className="text-[#bc243c] text-[10px] font-mono uppercase font-bold hover:underline">Retry</button>
-                        </div>
+                        <Notification
+                            type="error"
+                            message={error}
+                            onClose={() => { setError(''); fetchJobs() }}
+                        />
                     )}
                     {scanResult && (
-                        <div className="bg-[#2b6777]/5 border border-[#2b6777]/20 rounded-sm p-4 text-[10px] font-mono font-bold uppercase tracking-wider text-[#2b6777] animate-in slide-in-from-top-2">
-                            {scanResult}
-                        </div>
+                        <Notification
+                            type="success"
+                            message={scanResult}
+                            onClose={() => setScanResult('')}
+                        />
                     )}
                     {rescoreResult && (
-                        <div className="bg-[#2b6777]/5 border border-[#2b6777]/20 rounded-sm p-4 text-[10px] font-mono font-bold uppercase tracking-wider text-[#2b6777] animate-in slide-in-from-top-2">
-                            {rescoreResult}
-                        </div>
+                        <Notification
+                            type="success"
+                            message={rescoreResult}
+                            onClose={() => setRescoreResult('')}
+                        />
                     )}
                 </div>
 
@@ -399,7 +405,7 @@ export default function DashboardPage() {
                                 <List
                                     key={`${activeTab}-${filteredJobs.length}`}
                                     rowCount={filteredJobs.length}
-                                    rowHeight={220}
+                                    rowHeight={240}
                                     className="scrollbar-hide"
                                     style={{ height: listHeight, width: '100%' }}
                                     rowProps={{}}

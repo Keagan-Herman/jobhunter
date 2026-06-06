@@ -78,25 +78,38 @@ export function OverviewTab({
 
       {/* Analysis Report */}
       {job.score_reason && (
-        <div className="p-12 bg-[#f0f0eb] border-l-8 border-[#c5a059] space-y-8 relative overflow-hidden tactile-pop">
+        <div className="p-12 bg-[#f0f0eb] border border-[#e2e2d9] border-l-[12px] border-l-[#c5a059] space-y-8 relative overflow-hidden tactile-pop group">
+          {/* Decorative background element */}
+          <div className="absolute top-0 right-0 p-8 opacity-[0.03] font-syne font-black text-9xl select-none pointer-events-none text-[#1a1a1a] group-hover:scale-110 transition-transform duration-1000">
+            {job.score}%
+          </div>
+
           <div className="flex flex-wrap items-center justify-between gap-6 relative z-10">
-            <h4 className="text-[11px] font-mono font-bold text-[#1a1a1a] tracking-[5px] uppercase">
+            <h4 className="text-[11px] font-mono font-bold text-[#1a1a1a] tracking-[5px] uppercase flex items-center gap-3">
+              <div className="w-2 h-2 bg-[#c5a059] shadow-[0_0_10px_rgba(197,160,89,0.5)]" />
               Evaluation Summary
             </h4>
             {job.score && (
-              <div className="text-[11px] font-mono font-bold bg-[#1a1a1a] text-[#f8f8f4] px-5 py-2 uppercase tracking-widest">
-                {job.score}% Rank
+              <div className="text-[12px] font-mono font-bold bg-[#1a1a1a] text-[#f8f8f4] px-6 py-3 uppercase tracking-[3px] shadow-lg">
+                Match Index: {job.score}%
               </div>
             )}
           </div>
 
-          <p className="text-[22px] text-[#1a1a1a] leading-tight font-syne font-bold italic relative z-10 tracking-tight">
-            &quot;{job.score_reason}&quot;
-          </p>
+          <div className="relative z-10">
+             <div className="absolute -left-6 top-0 text-4xl text-[#c5a059] opacity-20 font-serif leading-none">"</div>
+             <p className="text-[26px] md:text-[32px] text-[#1a1a1a] leading-[1.1] font-syne font-bold italic tracking-tight">
+               {job.score_reason}
+             </p>
+          </div>
 
-          <div className="pt-6 flex items-center gap-4 relative z-10">
-              <div className="h-px w-10 bg-[#c5a059]" />
-              <span className="text-[9px] font-mono font-bold text-[#888] uppercase tracking-[4px]">System Verified</span>
+          <div className="pt-8 flex items-center gap-6 relative z-10">
+              <div className="h-px w-16 bg-[#c5a059]/40" />
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] font-mono font-bold text-[#888] uppercase tracking-[4px]">Verified AI Analysis</span>
+                <div className="w-1.5 h-1.5 bg-[#e2e2d9] rounded-full" />
+                <span className="text-[9px] font-mono text-[#ccc] uppercase tracking-[2px]">Engine v4.2</span>
+              </div>
           </div>
         </div>
       )}
