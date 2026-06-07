@@ -9,7 +9,7 @@ export function RadialScore({ score, size = 54 }: { score: number, size?: number
   const color = score >= 85 ? '#2b6777' : score >= 70 ? '#c5a059' : '#bc243c'
 
   return (
-    <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
+    <div className="relative flex items-center justify-center transition-transform duration-500 hover:scale-110" style={{ width: size, height: size }}>
       <svg className="transform -rotate-90" width={size} height={size}>
         {/* Background Track */}
         <circle
@@ -32,6 +32,7 @@ export function RadialScore({ score, size = 54 }: { score: number, size?: number
           strokeDashoffset={offset}
           strokeLinecap="square"
           className="transition-all duration-1000 ease-out"
+          style={{ filter: `drop-shadow(0 0 8px ${color}40)` }}
         />
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">

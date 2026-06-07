@@ -1,6 +1,6 @@
 export function SkeletonRow() {
   return (
-    <div className="p-10 border-b border-[#e2e2d9] animate-pulse h-[240px] flex flex-col relative overflow-hidden bg-white">
+    <div className="p-10 border-b border-[#e2e2d9] animate-pulse h-[240px] flex flex-col relative overflow-hidden bg-white transition-transform duration-500 hover:scale-[0.995]">
       <div className="flex justify-between items-start mb-8">
         <div className="flex-1 mr-8">
           <div className="h-8 bg-[#f0f0eb] rounded-sm w-3/4 mb-4"></div>
@@ -20,7 +20,7 @@ export function SkeletonRow() {
         <div className="h-8 bg-[#f0f0eb] rounded-sm w-24"></div>
       </div>
 
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#f8f8f4] to-transparent -translate-x-full animate-shimmer-light" />
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#c5a05905] to-transparent -translate-x-full animate-shimmer-light" />
     </div>
   )
 }
