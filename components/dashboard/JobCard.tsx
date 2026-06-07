@@ -15,6 +15,9 @@ function JobCardComponent({
   index: number
 }) {
   const animationDelay = index < 10 ? `${index * 50}ms` : '0ms'
+  const isNew = job.created_at ? (new Date().getTime() - new Date(job.created_at).getTime()) < 24 * 60 * 60 * 1000 : false
+  const matchStrength = job.score ? (job.score >= 85 ? 'EXCEPTIONAL' : job.score >= 70 ? 'STRONG' : job.score >= 50 ? 'COMPATIBLE' : 'POTENTIAL') : 'PENDING'
+  const matchColor = job.score ? (job.score >= 85 ? 'text-[#2b6777]' : job.score >= 70 ? 'text-[#c5a059]' : job.score >= 50 ? 'text-[#4a4a4a]' : 'text-[#bc243c]') : 'text-[#888]'
 
   return (
     <div
@@ -28,6 +31,12 @@ function JobCardComponent({
         {job.company.substring(0, 2).toUpperCase()}
       </div>
 
+      {isNew && (
+        <div className="absolute top-0 left-0 px-4 py-1.5 bg-[#c5a059] text-white font-mono text-[9px] font-bold tracking-[2px] z-20">
+          NEW LISTING
+        </div>
+      )}
+
       <div className="flex justify-between items-start mb-8 relative z-10">
         <div className="flex-1 mr-8">
           <div className="font-syne font-bold text-[22px] text-[#1a1a1a] mb-3 group-hover:text-[#c5a059] transition-all duration-700 leading-[1.1] tracking-tight line-clamp-2 uppercase">
@@ -39,8 +48,11 @@ function JobCardComponent({
             <span className="line-clamp-1">{job.location || 'Remote'}</span>
           </div>
         </div>
-        <div className="shrink-0 transition-all duration-700 group-hover:scale-110 group-hover:rotate-3">
+        <div className="shrink-0 flex flex-col items-center gap-2 transition-all duration-700 group-hover:scale-110 group-hover:rotate-3">
           <RadialScore score={job.score || 0} size={64} />
+          <span className={`text-[9px] font-mono font-bold tracking-[2px] ${matchColor}`}>
+            {matchStrength}
+          </span>
         </div>
       </div>
 

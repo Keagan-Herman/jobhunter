@@ -20,7 +20,7 @@ export function OverviewTab({
             { label: 'Environment', value: job.work_style || 'Remote', color: 'text-[#2b6777]', icon: 'W', description: 'Spatial Alignment' },
             { label: 'Compatibility', value: `${job.stack_overlap || 0}%`, color: 'text-[#c5a059]', icon: 'C', description: 'Technical Overlap' }
           ].map(item => (
-            <div key={item.label} className="p-8 bg-white border border-[#e2e2d9] transition-all duration-500 hover:border-[#c5a059] tactile-pop relative group overflow-hidden">
+            <div key={item.label} className="p-8 bg-white border border-[#e2e2d9] transition-all duration-500 hover:border-[#c5a059] tactile-pop relative group overflow-hidden hover:-translate-y-1">
               <div className="absolute top-0 left-0 w-full h-0.5 bg-[#e2e2d9] group-hover:bg-[#c5a059] transition-colors" />
               <div className="absolute top-4 right-4 text-[10px] font-mono text-[#e2e2d9] group-hover:text-[#c5a059] transition-colors">{item.icon}</div>
               <div className="text-[10px] font-mono text-[#888] uppercase tracking-[3px] mb-4 font-bold">{item.label}</div>
@@ -92,7 +92,7 @@ export function OverviewTab({
             )}
           </div>
 
-          <p className="text-[22px] text-[#1a1a1a] leading-tight font-syne font-bold italic relative z-10 tracking-tight">
+          <p className="text-[24px] text-[#1a1a1a] leading-relaxed font-syne font-bold italic relative z-10 tracking-tight">
             &quot;{job.score_reason}&quot;
           </p>
 

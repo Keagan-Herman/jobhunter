@@ -43,6 +43,8 @@ export type Job = {
     contact_email: string | null
     offer_amount: number | null
     follow_up_date: string | null
+    created_at: string
+    updated_at: string
     cover_letter?: string
     cover_letter_id?: string
     culture_fit?: string

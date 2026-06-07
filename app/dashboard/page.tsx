@@ -270,35 +270,39 @@ export default function DashboardPage() {
 
             <div className="relative z-10 max-w-7xl mx-auto px-6 py-12 md:px-8 space-y-12">
                 <header className="flex flex-col xl:flex-row xl:items-center justify-between gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                    <div className="flex flex-wrap items-center gap-6">
+                    <div className="flex flex-wrap items-center gap-6 min-h-[48px]">
                         <h1 className="font-syne text-4xl font-bold tracking-tight text-[#1a1a1a] flex items-center gap-1">
                             Job<span className="text-[#c5a059] italic">Hunter</span>
                         </h1>
 
                         <div className="h-8 w-px bg-[#e2e2d9] hidden md:block" />
 
-                        {activeProcess && (
-                            <div className="flex items-center gap-3 matte-surface border-[#d1d1ca] px-4 py-2 rounded-sm shadow-sm animate-in fade-in duration-500">
-                                <div className="w-2.5 h-2.5 bg-[#c5a059] animate-pulse" />
-                                <span className="text-[10px] text-[#4a4a4a] font-mono font-bold tracking-[2px] uppercase">
-                                    {activeProcess === 'scanning' ? 'Scanning Sources' : activeProcess === 'rescoring' ? 'Recalibrating' : 'Processing Content'}
-                                </span>
-                            </div>
-                        )}
+                        <div className="flex items-center gap-3">
+                            {activeProcess && (
+                                <div className="flex items-center gap-3 matte-surface border-[#d1d1ca] px-4 py-2 rounded-sm shadow-sm animate-in fade-in duration-500">
+                                    <div className="w-2.5 h-2.5 bg-[#c5a059] animate-pulse" />
+                                    <span className="text-[10px] text-[#4a4a4a] font-mono font-bold tracking-[2px] uppercase">
+                                        {activeProcess === 'scanning' ? 'Scanning Sources' : activeProcess === 'rescoring' ? 'Recalibrating' : 'Processing Content'}
+                                    </span>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
-                    <div className="flex items-center gap-4 flex-wrap">
-                        <button onClick={handleScan} disabled={scanning}
-                                className={"group relative px-8 py-3 rounded-sm font-mono text-[11px] font-bold tracking-[2px] uppercase transition-all duration-300 shadow-sm " + (scanning ? 'bg-[#f0f0eb] text-[#888] cursor-not-allowed' : 'bg-[#1a1a1a] text-[#f8f8f4] hover:bg-[#c5a059] active:scale-95')}>
-                            {scanning ? 'Processing...' : 'Scan Sources'}
-                        </button>
+                    <div className="flex items-center gap-6 flex-wrap">
+                        <div className="flex items-center gap-4">
+                            <button onClick={handleScan} disabled={scanning}
+                                    className={"group relative px-8 py-3 rounded-sm font-mono text-[11px] font-bold tracking-[2px] uppercase transition-all duration-300 shadow-sm " + (scanning ? 'bg-[#f0f0eb] text-[#888] cursor-not-allowed' : 'bg-[#1a1a1a] text-[#f8f8f4] hover:bg-[#c5a059] active:scale-95')}>
+                                {scanning ? 'Processing...' : 'Scan Sources'}
+                            </button>
 
-                        <button onClick={handleRescore} disabled={rescoring}
-                                className="px-6 py-3 rounded-sm border border-[#e2e2d9] bg-white text-[#4a4a4a] font-mono text-[11px] font-bold tracking-[2px] uppercase hover:bg-[#f8f8f4] transition-all disabled:opacity-50 active:scale-95 tactile-pop">
-                            {rescoring ? 'Calibrating...' : 'Recalibrate'}
-                        </button>
+                            <button onClick={handleRescore} disabled={rescoring}
+                                    className="px-6 py-3 rounded-sm border border-[#e2e2d9] bg-white text-[#4a4a4a] font-mono text-[11px] font-bold tracking-[2px] uppercase hover:bg-[#f8f8f4] transition-all disabled:opacity-50 active:scale-95 tactile-pop">
+                                {rescoring ? 'Calibrating...' : 'Recalibrate'}
+                            </button>
+                        </div>
 
-                        <div className="h-8 w-px bg-[#e2e2d9] mx-2" />
+                        <div className="h-8 w-px bg-[#e2e2d9] hidden sm:block" />
 
                         <button onClick={() => router.push('/profile')} className="px-6 py-3 rounded-sm bg-[#f0f0eb] border border-[#d1d1ca] text-[#4a4a4a] font-mono text-[11px] font-bold tracking-[1px] hover:bg-[#e2e2d9] transition-all active:scale-95">Settings</button>
                     </div>

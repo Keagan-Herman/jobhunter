@@ -234,7 +234,7 @@ export async function GET() {
       const diffMs = now.getTime() - lastScan.getTime()
       const diffMins = Math.floor(diffMs / 60000)
       if (diffMins < 30) {
-        return NextResponse.json({ error: `Please wait ${30 - diffMins} minutes before scanning again.` }, { status: 429 })
+        return NextResponse.json({ success: false, error: `Please wait ${30 - diffMins} minutes before scanning again.` }, { status: 429 })
       }
     }
 
@@ -267,7 +267,7 @@ export async function GET() {
     })
 
     if (!uniqueResults.length) {
-      return NextResponse.json({ error: 'No results from any source' }, { status: 500 })
+      return NextResponse.json({ success: false, error: 'No results from any source' }, { status: 500 })
     }
 
     // Batch check existence

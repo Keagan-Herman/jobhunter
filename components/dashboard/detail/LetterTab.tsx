@@ -70,11 +70,11 @@ export function LetterTab({
           </div>
 
           <div className="relative group/editor">
-            <div className="p-16 bg-white border border-[#e2e2d9] shadow-sm relative group selection:bg-[#c5a05920] selection:text-[#1a1a1a]">
+            <div className="p-12 bg-white border border-[#e2e2d9] shadow-sm relative group selection:bg-[#c5a05920] selection:text-[#1a1a1a] tactile-inset">
               <textarea
                 value={coverLetter}
                 onChange={(e) => onUpdateContent(e.target.value)}
-                className="w-full bg-transparent border-none outline-none text-[17px] leading-[1.8] text-[#1a1a1a] font-serif tracking-normal resize-none h-[550px] relative z-10 scrollbar-hide custom-cursor-gold"
+                className="w-full bg-transparent border-none outline-none text-[17px] leading-loose text-[#1a1a1a] font-sans tracking-normal resize-none h-[550px] relative z-10 scrollbar-hide custom-cursor-gold"
                 spellCheck="false"
                 placeholder="Professional summary content..."
               />
