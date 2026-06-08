@@ -280,9 +280,9 @@ export default function DashboardPage() {
                         <div className="flex items-center gap-3">
                             {activeProcess && (
                                 <div className="flex items-center gap-3 matte-surface border-[#d1d1ca] px-4 py-2 rounded-sm shadow-sm animate-in fade-in duration-500">
-                                    <div className="w-2.5 h-2.5 bg-[#c5a059] animate-pulse" />
+                                    <div className="w-3 h-3 border-2 border-[#c5a059] border-t-transparent animate-spin" />
                                     <span className="text-[10px] text-[#4a4a4a] font-mono font-bold tracking-[2px] uppercase">
-                                        {activeProcess === 'scanning' ? 'Scanning Sources' : activeProcess === 'rescoring' ? 'Recalibrating' : 'Processing Content'}
+                                        {activeProcess === 'scanning' ? 'Scanning Global Sources' : activeProcess === 'rescoring' ? 'Recalibrating Match Engine' : 'Synthesizing Document'}
                                     </span>
                                 </div>
                             )}
