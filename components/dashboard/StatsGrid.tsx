@@ -11,8 +11,9 @@ export function StatsGrid({ stats }: { stats: { pending: number, applied: number
       {items.map(s => (
         <div
           key={s.label}
-          className={`bg-white border-b-4 ${s.border} p-8 relative overflow-hidden group hover:-translate-y-1 transition-all duration-500 shadow-sm tactile-pop`}
+          className={`bg-white border-b-4 ${s.border} p-8 relative overflow-hidden group hover:-translate-y-2 hover:shadow-lg transition-all duration-500 shadow-sm tactile-pop`}
         >
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#c5a05905] to-transparent -translate-x-full group-hover:animate-shimmer-light pointer-events-none" />
           <div className="relative z-10">
             <div className="text-[10px] text-[#888] tracking-[3px] uppercase font-mono font-bold mb-4 group-hover:text-[#4a4a4a] transition-colors">{s.label}</div>
             <div className={`text-4xl md:text-5xl font-bold ${s.color} font-syne tracking-tighter`}>

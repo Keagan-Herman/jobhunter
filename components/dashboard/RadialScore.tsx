@@ -17,7 +17,7 @@ export function RadialScore({ score, size = 54 }: { score: number, size?: number
           cy={size / 2}
           r={radius}
           stroke="#e2e2d9"
-          strokeWidth="4"
+          strokeWidth="6"
           fill="transparent"
         />
         {/* Progress Circle */}
@@ -26,13 +26,13 @@ export function RadialScore({ score, size = 54 }: { score: number, size?: number
           cy={size / 2}
           r={radius}
           stroke={color}
-          strokeWidth="4"
+          strokeWidth="6"
           fill="transparent"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
           strokeLinecap="square"
           className="transition-all duration-1000 ease-out"
-          style={{ filter: `drop-shadow(0 0 8px ${color}40)` }}
+          style={{ filter: `drop-shadow(0 0 6px ${color}60)` }}
         />
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">

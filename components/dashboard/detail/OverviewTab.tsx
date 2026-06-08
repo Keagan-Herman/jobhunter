@@ -81,6 +81,10 @@ export function OverviewTab({
       {/* Analysis Report */}
       {job.score_reason && (
         <div className="p-12 bg-[#f0f0eb] border-l-8 border-[#c5a059] space-y-8 relative overflow-hidden tactile-pop">
+          <div className="absolute top-0 right-0 p-8 opacity-[0.03] font-syne font-black text-9xl select-none text-[#1a1a1a] transition-opacity duration-700">
+            {job.score}%
+          </div>
+
           <div className="flex flex-wrap items-center justify-between gap-6 relative z-10">
             <h4 className="text-[11px] font-mono font-bold text-[#1a1a1a] tracking-[5px] uppercase">
               Evaluation Summary
