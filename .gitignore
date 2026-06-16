@@ -42,3 +42,4 @@ next-env.d.ts
 
 # SQLite database
 data/jobhunter.sqlite
+CLAUDE.local.md
