@@ -42,7 +42,7 @@ export function TrackingTab({
   return (
     <div className="space-y-12 animate-in fade-in slide-in-from-bottom-2 duration-500 fill-mode-forwards pb-8">
       <div className="space-y-6">
-        <h4 className="text-[10px] font-mono font-bold text-[#888] tracking-[4px] uppercase flex items-center gap-4">
+        <h4 className="text-[11px] font-mono font-semibold text-[#666] tracking-[1px] flex items-center gap-4">
           Point of Contact
           <div className="h-px flex-1 bg-[#e2e2d9]" />
         </h4>
@@ -61,7 +61,7 @@ export function TrackingTab({
       </div>
 
       <div className="space-y-6">
-        <h4 className="text-[10px] font-mono font-bold text-[#888] tracking-[4px] uppercase flex items-center gap-4">
+        <h4 className="text-[11px] font-mono font-semibold text-[#666] tracking-[1px] flex items-center gap-4">
           Timeline
           <div className="h-px flex-1 bg-[#e2e2d9]" />
         </h4>
@@ -81,7 +81,7 @@ export function TrackingTab({
 
       {job.status === 'interviewing' && (
         <div className="space-y-6">
-          <h4 className="text-[10px] font-mono font-bold text-[#888] tracking-[4px] uppercase flex items-center gap-4">
+          <h4 className="text-[11px] font-mono font-semibold text-[#666] tracking-[1px] flex items-center gap-4">
             Final Outcome
             <div className="h-px flex-1 bg-[#e2e2d9]" />
           </h4>
@@ -95,10 +95,10 @@ export function TrackingTab({
               {[
                 { value: 'offer', label: 'Offer Received', color: 'text-[#2b6777]', bg: 'bg-[#2b6777]/5', border: 'border-[#2b6777]/20' },
                 { value: 'rejected_after_interview', label: 'Rejected', color: 'text-[#bc243c]', bg: 'bg-[#bc243c]/5', border: 'border-[#bc243c]/20' },
-                { value: 'withdrew', label: 'Withdrawn', color: 'text-[#888]', bg: 'bg-[#f0f0eb]', border: 'border-[#d1d1ca]' },
+                { value: 'withdrew', label: 'Withdrawn', color: 'text-[#666]', bg: 'bg-[#f0f0eb]', border: 'border-[#d1d1ca]' },
               ].map(opt => (
                 <button key={opt.value} onClick={() => onInterviewOutcome(opt.value)}
-                  className={`p-5 rounded-sm cursor-pointer text-[11px] font-bold ${opt.bg} border ${opt.border} ${opt.color} font-syne tracking-tight transition-all duration-300 hover:scale-[1.02] active:scale-[0.99] flex flex-col items-center gap-1 uppercase`}
+                  className={`p-5 rounded-sm cursor-pointer text-[11px] font-bold ${opt.bg} border ${opt.border} ${opt.color} font-mono tracking-tight transition-all duration-300 hover:scale-[1.02] active:scale-[0.99] flex flex-col items-center gap-1 uppercase`}
                 >
                     {opt.label}
                 </button>
@@ -109,7 +109,7 @@ export function TrackingTab({
       )}
 
       <div className="space-y-6">
-        <h4 className="text-[10px] font-mono font-bold text-[#888] tracking-[4px] uppercase flex items-center gap-4">
+        <h4 className="text-[11px] font-mono font-semibold text-[#666] tracking-[1px] flex items-center gap-4">
           Strategic Notes
           <div className="h-px flex-1 bg-[#e2e2d9]" />
         </h4>

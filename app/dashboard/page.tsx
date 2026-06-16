@@ -36,6 +36,7 @@ export default function DashboardPage() {
     const [skipJobId, setSkipJobId] = useState<string | null>(null)
 
     const [listHeight, setListHeight] = useState(600)
+    const [rowHeight, setRowHeight] = useState(240)
 
     const router = useRouter()
 
@@ -69,6 +70,7 @@ export default function DashboardPage() {
             const handleResize = () => {
                 const offset = window.innerWidth >= 1024 ? 420 : 500
                 setListHeight(Math.max(300, window.innerHeight - offset))
+                setRowHeight(window.innerWidth < 640 ? 290 : 240)
             }
             handleResize()
             window.addEventListener('resize', handleResize)
@@ -265,8 +267,7 @@ export default function DashboardPage() {
         <div className="min-h-screen bg-[#f8f8f4] text-[#1a1a1a] font-sans selection:bg-[#c5a05920] selection:text-[#1a1a1a]">
             {/* Background Grid & Organic Accents */}
             <div className="fixed inset-0 z-0 pointer-events-none grid-overlay opacity-30" />
-            <div className="fixed top-[-10rem] right-[-10rem] w-[40rem] h-[40rem] rounded-full bg-[#c5a059]/5 blur-[120px] animate-organic z-0 pointer-events-none" />
-            <div className="fixed bottom-[-10rem] left-[-10rem] w-[45rem] h-[45rem] rounded-full bg-[#2b6777]/5 blur-[150px] animate-organic z-0 pointer-events-none" style={{ animationDelay: '5s' }} />
+            <div className="fixed inset-0 z-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 60% 50% at 100% 0%, rgba(197,160,89,0.06) 0%, transparent 70%), radial-gradient(ellipse 60% 50% at 0% 100%, rgba(43,103,119,0.06) 0%, transparent 70%)' }} />
 
             <div className="relative z-10 max-w-7xl mx-auto px-6 py-12 md:px-8 space-y-12">
                 <header className="flex flex-col xl:flex-row xl:items-center justify-between gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -292,7 +293,7 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-6 flex-wrap">
                         <div className="flex items-center gap-4">
                             <button onClick={handleScan} disabled={scanning}
-                                    className={"group relative px-8 py-3 rounded-sm font-mono text-[11px] font-bold tracking-[2px] uppercase transition-all duration-300 shadow-sm " + (scanning ? 'bg-[#f0f0eb] text-[#888] cursor-not-allowed' : 'bg-[#1a1a1a] text-[#f8f8f4] hover:bg-[#c5a059] active:scale-95')}>
+                                    className={"group relative px-8 py-3 rounded-sm font-mono text-[11px] font-bold tracking-[2px] uppercase transition-all duration-300 shadow-sm " + (scanning ? 'bg-[#f0f0eb] text-[#666] cursor-not-allowed' : 'bg-[#1a1a1a] text-[#f8f8f4] hover:bg-[#c5a059] active:scale-95')}>
                                 {scanning ? 'Processing...' : 'Scan Sources'}
                             </button>
 
@@ -331,12 +332,14 @@ export default function DashboardPage() {
 
                 <div className="space-y-8">
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[#e2e2d9] pb-px">
-                        <div className="flex flex-wrap gap-8 overflow-x-auto scrollbar-hide">
+                        <div role="tablist" className="flex flex-wrap gap-8 overflow-x-auto scrollbar-hide">
                         {(['pending', 'applied', 'interviewing', 'skipped'] as const).map(tab => (
                             <button key={tab}
+                                    role="tab"
+                                    aria-selected={activeTab === tab}
                                     onClick={() => { setActiveTab(tab) }}
-                                    className={"pb-5 font-mono text-[10px] font-bold tracking-[3px] uppercase transition-all relative shrink-0 " + (activeTab === tab ? 'text-[#1a1a1a]' : 'text-[#888] hover:text-[#444]')}>
-                                {tab} <span className={"ml-2 px-1.5 py-0.5 rounded-sm text-[9px] " + (activeTab === tab ? 'bg-[#1a1a1a] text-[#f8f8f4]' : 'bg-[#e2e2d9] text-[#888]')}>{jobs.filter(j => j.status === tab).length}</span>
+                                    className={"pb-5 min-h-[44px] font-mono text-[10px] font-bold tracking-[3px] uppercase transition-all relative shrink-0 " + (activeTab === tab ? 'text-[#1a1a1a]' : 'text-[#666] hover:text-[#444]')}>
+                                {tab} <span className={"ml-2 px-1.5 py-0.5 rounded-sm text-[9px] " + (activeTab === tab ? 'bg-[#1a1a1a] text-[#f8f8f4]' : 'bg-[#e2e2d9] text-[#666]')}>{jobs.filter(j => j.status === tab).length}</span>
                                 {activeTab === tab && <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#c5a059]" />}
                             </button>
                         ))}
@@ -346,10 +349,11 @@ export default function DashboardPage() {
                             <div className="relative">
                                 <input
                                     type="text"
+                                    aria-label="Search jobs"
                                     placeholder="SEARCH ARCHIVE..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full bg-transparent border-none outline-none font-mono text-[10px] font-bold tracking-[2px] text-[#1a1a1a] placeholder:text-[#ccc] uppercase"
+                                    className="w-full bg-transparent border-none outline-none font-mono text-[10px] font-bold tracking-[2px] text-[#1a1a1a] placeholder:text-[#888] uppercase"
                                 />
                                 <div className="absolute -bottom-1 left-0 right-0 h-px bg-[#e2e2d9]" />
                                 {searchQuery && (
@@ -364,20 +368,20 @@ export default function DashboardPage() {
                         </div>
                     </div>
 
-                    <div className="bg-white border border-[#e2e2d9] rounded-sm overflow-hidden h-[calc(100vh-380px)] shadow-sm flex flex-col relative tactile-pop">
+                    <div className="bg-white rounded-sm overflow-hidden h-[calc(100vh-380px)] flex flex-col relative tactile-pop">
                         {loading ? (
                             <div className="overflow-hidden flex-1">
                                 {Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)}
                             </div>
                         ) : filteredJobs.length === 0 ? (
                             <div className="py-24 text-center flex-1 flex flex-col items-center justify-center px-12 animate-in fade-in duration-700">
-                                <div className="relative mb-8">
+                                <div className="relative mb-8" aria-hidden="true">
                                     <div className="w-20 h-20 bg-[#f0f0eb] border border-[#d1d1ca] flex items-center justify-center text-3xl grayscale opacity-40">
                                         {activeTab === 'pending' ? '🔍' : activeTab === 'applied' ? '✉️' : activeTab === 'interviewing' ? '🤝' : '⏭️'}
                                     </div>
                                 </div>
                                 <h3 className="font-syne font-bold text-xl text-[#1a1a1a] mb-4 tracking-tight uppercase">No {activeTab} Records</h3>
-                                <p className="text-[10px] text-[#888] font-mono uppercase tracking-[3px] mb-12 max-w-xs leading-relaxed font-bold">
+                                <p className="text-[10px] text-[#666] font-mono uppercase tracking-[3px] mb-12 max-w-xs leading-relaxed font-bold">
                                     {activeTab === 'pending'
                                         ? 'Initiate a job search scan to identify matching opportunities.'
                                         : "No items found in " + activeTab + "."}
@@ -393,7 +397,7 @@ export default function DashboardPage() {
                                 <List
                                     key={`${activeTab}-${filteredJobs.length}`}
                                     rowCount={filteredJobs.length}
-                                    rowHeight={240}
+                                    rowHeight={rowHeight}
                                     className="scrollbar-hide"
                                     style={{ height: listHeight, width: '100%' }}
                                     rowProps={{}}

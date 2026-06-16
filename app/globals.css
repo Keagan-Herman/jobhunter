@@ -109,6 +109,40 @@
 :root {
   --background: #f8f8f4;
   --foreground: #1a1a1a;
+
+  /* Semantic color tokens */
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #4a4a4a;  /* 9.7:1 on #f8f8f4 */
+  --color-text-muted: #666666;      /* 6.3:1 on #f8f8f4 */
+  --color-text-placeholder: #888888; /* 4.0:1 — use sparingly, only on white */
+
+  --color-surface-1: #ffffff;
+  --color-surface-2: #f8f8f4;
+  --color-surface-3: #f0f0eb;
+  --color-border: #e2e2d9;
+  --color-border-strong: #d1d1ca;
+
+  --color-accent: #c5a059;
+  --color-accent-hover: #b8903e;
+  --color-success: #2b6777;
+  --color-danger: #bc243c;
+
+  /* Z-index scale */
+  --z-sticky: 10;
+  --z-dropdown: 20;
+  --z-modal-backdrop: 30;
+  --z-modal: 40;
+  --z-toast: 50;
+  --z-tooltip: 60;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 body {

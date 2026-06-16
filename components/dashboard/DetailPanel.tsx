@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Job } from '@/types'
 import { OverviewTab } from './detail/OverviewTab'
 import { LetterTab } from './detail/LetterTab'
@@ -70,11 +70,11 @@ export function DetailPanel({
       <div className="w-full max-w-md space-y-3">
         <div className="flex justify-between items-end">
           <div className="flex flex-col">
-            <span className="text-[9px] font-mono font-bold text-[#888] uppercase tracking-widest">Entry Spectrum</span>
+            <span className="text-[9px] font-mono font-bold text-[#666] uppercase tracking-widest">Entry Spectrum</span>
             <span className="text-[16px] font-bold text-[#1a1a1a]">{currency}{min.toLocaleString()}</span>
           </div>
           <div className="flex flex-col items-end">
-            <span className="text-[9px] font-mono font-bold text-[#888] uppercase tracking-widest">Cap Projection</span>
+            <span className="text-[9px] font-mono font-bold text-[#666] uppercase tracking-widest">Cap Projection</span>
             <span className="text-[16px] font-bold text-[#1a1a1a]">{currency}{max.toLocaleString()}</span>
           </div>
         </div>
@@ -149,7 +149,38 @@ export function DetailPanel({
     setTimeout(() => setSaved(false), 3000)
   }
 
+  const panelRef = useRef<HTMLDivElement>(null)
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  useEffect(() => {
+    const firstFocusable = panelRef.current?.querySelector<HTMLElement>(
+      'button:not([disabled]), [href], input, textarea, [tabindex]:not([tabindex="-1"])'
+    )
+    firstFocusable?.focus()
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { onClose(); return }
+      if (e.key !== 'Tab') return
+
+      const focusable = panelRef.current?.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), [href], input:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )
+      if (!focusable?.length) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [onClose])
 
   const handleUpdateCoverLetter = (newContent: string) => {
     setCoverLetter(newContent)
@@ -181,7 +212,13 @@ export function DetailPanel({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-300">
       <div className="absolute inset-0 bg-[#1a1a1a]/40 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="bg-[#f8f8f4] border border-[#e2e2d9] flex flex-col w-full max-w-6xl h-full max-h-[90vh] relative z-10 shadow-2xl overflow-hidden rounded-sm animate-in slide-in-from-bottom-4 duration-500 tactile-pop">
+      <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="detail-panel-title"
+        className="bg-[#f8f8f4] flex flex-col w-full max-w-6xl h-full max-h-[90vh] relative z-10 shadow-2xl overflow-hidden rounded-sm animate-in slide-in-from-bottom-4 duration-500"
+      >
         {/* Header */}
         <div className="p-10 pb-8 shrink-0 relative overflow-hidden bg-white">
           <div className="absolute top-0 left-0 w-full h-1 bg-klimt-gold opacity-30" />
@@ -190,13 +227,13 @@ export function DetailPanel({
             <div className="flex-1 pr-12">
               <div className="flex items-center gap-4 mb-4">
                 <div className="px-3 py-1 bg-[#1a1a1a] text-[#f8f8f4] text-[9px] font-mono font-bold uppercase tracking-[3px]">Listing Verified</div>
-                {job.source && <div className="text-[9px] font-mono font-bold text-[#888] uppercase tracking-[3px]">Source: {job.source}</div>}
+                {job.source && <div className="text-[9px] font-mono font-bold text-[#666] uppercase tracking-[3px]">Source: {job.source}</div>}
               </div>
-              <h3 className="font-syne font-bold text-[32px] md:text-[42px] text-[#1a1a1a] mb-4 leading-[1.05] tracking-tight uppercase">{job.title}</h3>
+              <h3 id="detail-panel-title" className="font-syne font-bold text-[32px] md:text-[42px] text-[#1a1a1a] mb-4 leading-[1.05] tracking-tight uppercase">{job.title}</h3>
               <div className="text-[11px] font-mono font-bold text-[#4a4a4a] tracking-[4px] uppercase flex flex-wrap items-center gap-4">
                   <span className="hover:text-[#c5a059] transition-colors cursor-default">{job.company}</span>
                   <div className="w-1.5 h-1.5 bg-[#c5a059] rotate-45" />
-                  <span className="text-[#888]">{job.location || 'Remote'}</span>
+                  <span className="text-[#666]">{job.location || 'Remote'}</span>
               </div>
             </div>
             <div className="flex items-center gap-4">
@@ -210,7 +247,7 @@ export function DetailPanel({
                   <span className="relative z-10">{linkCopied ? 'URL Copied' : 'Copy Application Link'}</span>
                 </button>
               )}
-              <button onClick={onClose} className="group text-[#888] hover:text-[#1a1a1a] transition-all duration-300 text-xl font-mono p-3 bg-[#f8f8f4] hover:bg-white rounded-sm border border-[#e2e2d9] hover:border-[#1a1a1a] active:scale-90">✕</button>
+              <button onClick={onClose} className="group text-[#666] hover:text-[#1a1a1a] transition-all duration-300 text-xl font-mono p-3 bg-[#f8f8f4] hover:bg-white rounded-sm border border-[#e2e2d9] hover:border-[#1a1a1a] active:scale-90">✕</button>
             </div>
           </div>
 
@@ -220,7 +257,7 @@ export function DetailPanel({
               ) : (job.salary_min || job.salary_max) && (
                 <div className="text-[14px] font-bold text-[#2b6777] font-mono bg-[#2b6777]/5 border border-[#2b6777]/20 px-8 py-3 rounded-sm tracking-tight flex items-center gap-4">
                   <div className="w-2 h-2 bg-[#2b6777] animate-pulse" />
-                  {currency}{(job.salary_min || job.salary_max || 0).toLocaleString()} <span className="text-[10px] text-[#888] uppercase tracking-widest ml-2">Base Est.</span>
+                  {currency}{(job.salary_min || job.salary_max || 0).toLocaleString()} <span className="text-[10px] text-[#666] uppercase tracking-widest ml-2">Base Est.</span>
                 </div>
               )}
 
@@ -238,13 +275,15 @@ export function DetailPanel({
         </div>
 
         {/* Tabs */}
-        <div className="flex px-10 border-b border-[#e2e2d9] bg-[#f0f0eb] z-20 relative overflow-x-auto scrollbar-hide">
+        <div role="tablist" className="flex px-10 border-b border-[#e2e2d9] bg-[#f0f0eb] z-20 relative overflow-x-auto scrollbar-hide">
           {(['overview', 'letter', 'tracking'] as const).map(tab => (
             <button
               key={tab}
+              role="tab"
+              aria-selected={activeTab === tab}
               onClick={() => setActiveTab(tab)}
               className={`px-8 py-5 font-mono text-[10px] font-bold tracking-[3px] uppercase transition-all duration-300 relative shrink-0
-                ${activeTab === tab ? 'text-[#1a1a1a]' : 'text-[#888] hover:text-[#444]'}`}
+                ${activeTab === tab ? 'text-[#1a1a1a]' : 'text-[#666] hover:text-[#444]'}`}
             >
               {tab}
               {activeTab === tab && (
