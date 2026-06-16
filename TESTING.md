@@ -17,21 +17,36 @@ npm run test:watch
 ## Testing Strategy
 
 - **Unit Tests:** Located in `tests/lib/`, these test utility functions and logic in isolation.
-- **API Tests:** Located in `tests/api/`, these test Next.js API routes by mocking Supabase and external services (Groq, Adzuna, JSearch).
 - **Component Tests:** Located in `tests/components/`, these test React components using JSDOM and React Testing Library.
-- **Page Tests:** Located in `tests/dashboard/` and `tests/onboarding/`, these test the high-level page logic and user flows.
+- **Integration Tests:** The project also uses playwright for visual verification and end-to-end flows.
 
 ## Mocking
 
-### Supabase
-We mock the Supabase client to avoid making real database calls. Since Supabase uses a chainable API, we mock the chain:
+### Database (SQLite/Drizzle)
+We mock the Drizzle database client to avoid making real database calls. Since Drizzle uses a functional or query builder API, we mock the specific parts of the `db` object:
+
 ```typescript
-mockSupabase = {
-  from: jest.fn().mockReturnThis(),
-  select: jest.fn().mockReturnThis(),
-  // ... other chainable methods
-  single: jest.fn().mockResolvedValue({ data: { ... }, error: null })
-}
+import { db } from '@/lib/db'
+
+jest.mock('@/lib/db', () => ({
+  db: {
+    query: {
+      jobs: {
+        findFirst: jest.fn(),
+      },
+    },
+    insert: jest.fn().mockReturnThis(),
+    values: jest.fn().mockResolvedValue({}),
+  },
+}))
+```
+
+Example usage in a test:
+```typescript
+(db.query.jobs.findFirst as jest.Mock).mockResolvedValue({
+  score: 85,
+  score_reason: 'Good match',
+})
 ```
 
 ### Groq AI

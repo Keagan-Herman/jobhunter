@@ -8,26 +8,32 @@ import { SkeletonRow } from '@/components/dashboard/Skeleton'
 import { List } from 'react-window'
 import { DetailPanel } from '@/components/dashboard/DetailPanel'
 import { SkipModal } from '@/components/dashboard/SkipModal'
+import { Notification, NotificationType } from '@/components/dashboard/Notification'
 
 import { Job, Profile } from '@/types'
+import { AllJobsResponse, ScanResponse, RescoreResponse, ProfileResponse } from '@/types/api'
 
 export default function DashboardPage() {
     const [jobs, setJobs] = useState<Job[]>([])
     const [selected, setSelected] = useState<Job | null>(null)
+    const [searchQuery, setSearchQuery] = useState('')
     const [loading, setLoading] = useState(true)
     const [scanning, setScanning] = useState(false)
     const [generating, setGenerating] = useState(false)
     const [rescoring, setRescoring] = useState(false)
     const [activeProcess, setActiveProcess] = useState<'scanning' | 'rescoring' | 'generating' | null>(null)
     const [activeTab, setActiveTab] = useState<'pending' | 'applied' | 'interviewing' | 'skipped'>('pending')
-    const [scanResult, setScanResult] = useState('')
     const [profile, setProfile] = useState<Profile | null>(null)
-    const [error, setError] = useState('')
     const [firstTime, setFirstTime] = useState(false)
+
+    const [notification, setNotification] = useState<{ message: string; type: NotificationType } | null>(null)
+
+    const handleCloseNotification = useCallback(() => {
+        setNotification(null)
+    }, [])
 
     const [showSkipModal, setShowSkipModal] = useState(false)
     const [skipJobId, setSkipJobId] = useState<string | null>(null)
-    const [rescoreResult, setRescoreResult] = useState('')
 
     const [listHeight, setListHeight] = useState(600)
 
@@ -36,10 +42,10 @@ export default function DashboardPage() {
     const fetchJobs = useCallback(async () => {
         try {
             const res = await fetch('/api/jobs/all')
-            const data = await res.json()
-            if (data.jobs) setJobs(data.jobs as Job[])
+            const data = await res.json() as AllJobsResponse
+            if (data.jobs) setJobs(data.jobs)
         } catch {
-            setError('Failed to load jobs. Please refresh.')
+            setNotification({ message: 'Failed to load jobs. Please refresh.', type: 'error' })
         } finally {
             setLoading(false)
         }
@@ -48,8 +54,8 @@ export default function DashboardPage() {
     const fetchProfile = useCallback(async () => {
         try {
             const res = await fetch('/api/profile')
-            const data = await res.json()
-            if (data.profile) setProfile(data.profile as Profile)
+            const data = await res.json() as ProfileResponse
+            if (data.profile) setProfile(data.profile)
         } catch {
             console.error('Failed to load profile')
         }
@@ -75,36 +81,24 @@ export default function DashboardPage() {
         fetchJobs()
     }, [fetchProfile, fetchJobs])
 
-    useEffect(() => {
-        if (scanResult) {
-            const timer = setTimeout(() => setScanResult(''), 5000)
-            return () => clearTimeout(timer)
-        }
-    }, [scanResult])
-
-    useEffect(() => {
-        if (rescoreResult) {
-            const timer = setTimeout(() => setRescoreResult(''), 5000)
-            return () => clearTimeout(timer)
-        }
-    }, [rescoreResult])
-
     const handleScan = async () => {
         setScanning(true)
         setActiveProcess('scanning')
-        setScanResult('')
-        setError('')
+        setNotification(null)
         try {
             const res = await fetch('/api/jobs')
-            const data = await res.json()
+            const data = await res.json() as ScanResponse
             if (res.ok && data.success) {
-                setScanResult("Found " + data.found + " jobs, saved " + data.saved + " new")
+                setNotification({
+                    message: `Found ${data.found} jobs, saved ${data.saved} new`,
+                    type: 'success'
+                })
                 await fetchJobs()
             } else {
-                setError(data.error || 'Scan failed')
+                setNotification({ message: data.error || 'Scan failed', type: 'error' })
             }
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Scan failed')
+            setNotification({ message: err instanceof Error ? err.message : 'Scan failed', type: 'error' })
         } finally {
             setScanning(false)
             setActiveProcess(null)
@@ -114,19 +108,21 @@ export default function DashboardPage() {
     const handleRescore = async () => {
         setRescoring(true)
         setActiveProcess('rescoring')
-        setRescoreResult('')
-        setError('')
+        setNotification(null)
         try {
             const res = await fetch('/api/rescore', { method: 'POST' })
-            const data = await res.json()
+            const data = await res.json() as RescoreResponse
             if (data.success) {
-                setRescoreResult("Rescored " + data.rescored + " jobs")
+                setNotification({
+                    message: `Rescored ${data.rescored} jobs`,
+                    type: 'success'
+                })
                 await fetchJobs()
             } else {
-                setError(data.message || data.error || 'Rescore failed')
+                setNotification({ message: data.message || data.error || 'Rescore failed', type: 'error' })
             }
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Rescore failed')
+            setNotification({ message: err instanceof Error ? err.message : 'Rescore failed', type: 'error' })
         } finally {
             setRescoring(false)
             setActiveProcess(null)
@@ -150,7 +146,10 @@ export default function DashboardPage() {
             setJobs(prev => prev.map(j => j.id === selected.id ? updatedJob : j))
             setSelected(updatedJob)
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to update cover letter.')
+            setNotification({
+                message: err instanceof Error ? err.message : 'Failed to update cover letter.',
+                type: 'error'
+            })
         } finally {
             if (content) {
                 setGenerating(false)
@@ -171,7 +170,10 @@ export default function DashboardPage() {
             })
             if (!res.ok) throw new Error('Failed to update status')
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to update status')
+            setNotification({
+                message: err instanceof Error ? err.message : 'Failed to update status',
+                type: 'error'
+            })
             await fetchJobs()
         }
     }
@@ -238,7 +240,19 @@ export default function DashboardPage() {
         setSelected(null)
     }
 
-    const filteredJobs: Job[] = jobs.filter(j => j.status === activeTab)
+    const filteredJobs: Job[] = jobs.filter(j => {
+        const matchesTab = j.status === activeTab
+        if (!matchesTab) return false
+
+        if (!searchQuery) return true
+
+        const q = searchQuery.toLowerCase()
+        return (
+            j.title.toLowerCase().includes(q) ||
+            j.company.toLowerCase().includes(q) ||
+            (j.stack || []).some(s => s.toLowerCase().includes(q))
+        )
+    })
 
     const stats: { pending: number; applied: number; interviewing: number; total: number } = {
         pending: jobs.filter(j => j.status === 'pending').length,
@@ -248,124 +262,129 @@ export default function DashboardPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#080812] text-[#e0e0f0] font-sans selection:bg-[#00ff8720] selection:text-[#00ff87]">
-            <div className="fixed inset-0 z-0 pointer-events-none opacity-[0.15]"
-                 style={{ backgroundImage: 'linear-gradient(#00ff8710 1px, transparent 1px), linear-gradient(90deg, #00ff8710 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-            <div className="fixed -top-[20rem] -right-[20rem] w-[60rem] h-[60rem] rounded-full bg-radial-gradient from-[#00ff8708] to-transparent z-0 pointer-events-none blur-[100px]" />
-            <div className="fixed -bottom-[30rem] -left-[20rem] w-[70rem] h-[70rem] rounded-full bg-radial-gradient from-[#7b61ff05] to-transparent z-0 pointer-events-none blur-[120px]" />
+        <div className="min-h-screen bg-[#f8f8f4] text-[#1a1a1a] font-sans selection:bg-[#c5a05920] selection:text-[#1a1a1a]">
+            {/* Background Grid & Organic Accents */}
+            <div className="fixed inset-0 z-0 pointer-events-none grid-overlay opacity-30" />
+            <div className="fixed top-[-10rem] right-[-10rem] w-[40rem] h-[40rem] rounded-full bg-[#c5a059]/5 blur-[120px] animate-organic z-0 pointer-events-none" />
+            <div className="fixed bottom-[-10rem] left-[-10rem] w-[45rem] h-[45rem] rounded-full bg-[#2b6777]/5 blur-[150px] animate-organic z-0 pointer-events-none" style={{ animationDelay: '5s' }} />
 
             <div className="relative z-10 max-w-7xl mx-auto px-6 py-12 md:px-8 space-y-12">
-                <header className="flex flex-col xl:flex-row xl:items-center justify-between gap-8">
-                    <div className="flex flex-wrap items-center gap-4 md:gap-6">
-                        <h1 className="font-syne text-3xl md:text-4xl font-extrabold tracking-tight text-white flex items-center gap-1">
-                            Job<span className="text-[#00ff87] text-glow-green">Hunter</span>
+                <header className="flex flex-col xl:flex-row xl:items-center justify-between gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                    <div className="flex flex-wrap items-center gap-6 min-h-[48px]">
+                        <h1 className="font-syne text-4xl font-bold tracking-tight text-[#1a1a1a] flex items-center gap-1">
+                            Job<span className="text-[#c5a059] italic">Hunter</span>
                         </h1>
-                        <div className="flex items-center gap-2 bg-[#0d0d20] border border-[#1e1e38] rounded-full px-3 py-1">
-                            <span className="text-[10px] text-[#00ff87] font-mono font-bold tracking-widest uppercase">Local</span>
-                        </div>
 
-                        {activeProcess && (
-                            <div className="flex items-center gap-2 bg-[#00ff87]/5 border border-[#00ff87]/20 rounded-full px-4 py-1.5 animate-in fade-in zoom-in duration-300 backdrop-blur-md">
-                                <span className="relative flex h-2 w-2">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00ff87] opacity-50 duration-1000"></span>
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00ff87]"></span>
-                                </span>
-                                <span className="text-[10px] text-[#00ff87] font-mono font-bold tracking-widest uppercase flex items-center gap-2">
-                                    Live Command: <span className="text-white brightness-125">{activeProcess === 'scanning' ? 'Scanning Jobs' : activeProcess === 'rescoring' ? 'Rescoring' : 'Generating'}</span>
-                                </span>
-                            </div>
-                        )}
+                        <div className="h-8 w-px bg-[#e2e2d9] hidden md:block" />
+
+                        <div className="flex items-center gap-3">
+                            {activeProcess && (
+                                <div className="flex items-center gap-3 matte-surface border-[#d1d1ca] px-4 py-2 rounded-sm shadow-sm animate-in fade-in duration-500">
+                                    <div className="w-2.5 h-2.5 bg-[#c5a059] animate-pulse" />
+                                    <span className="text-[10px] text-[#4a4a4a] font-mono font-bold tracking-[2px] uppercase">
+                                        {activeProcess === 'scanning' ? 'Scanning Sources' : activeProcess === 'rescoring' ? 'Recalibrating' : 'Processing Content'}
+                                    </span>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
-                    <div className="flex items-center gap-3 md:gap-4 flex-wrap">
-                        <button onClick={handleScan} disabled={scanning}
-                                className={"group relative flex items-center gap-2 px-6 py-3 rounded-2xl font-mono text-[11px] font-bold tracking-[2px] uppercase transition-all duration-300 shadow-[0_0_30px_-5px_#00ff8730] overflow-hidden " + (scanning ? 'bg-white/[0.03] border border-white/5 text-[#00ff87] cursor-not-allowed' : 'bg-[#00ff87] text-[#0a0a1a] hover:brightness-110 active:scale-95')}>
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer" />
-                            {scanning ? (
-                                <><span className="w-3 h-3 border-2 border-[#00ff87] border-t-transparent rounded-full animate-spin" /> Scanning...</>
-                            ) : 'Scan Jobs'}
-                        </button>
+                    <div className="flex items-center gap-6 flex-wrap">
+                        <div className="flex items-center gap-4">
+                            <button onClick={handleScan} disabled={scanning}
+                                    className={"group relative px-8 py-3 rounded-sm font-mono text-[11px] font-bold tracking-[2px] uppercase transition-all duration-300 shadow-sm " + (scanning ? 'bg-[#f0f0eb] text-[#888] cursor-not-allowed' : 'bg-[#1a1a1a] text-[#f8f8f4] hover:bg-[#c5a059] active:scale-95')}>
+                                {scanning ? 'Processing...' : 'Scan Sources'}
+                            </button>
 
-                        <button onClick={handleRescore} disabled={rescoring}
-                                className="flex items-center gap-2 px-5 py-3 rounded-2xl border border-white/5 bg-white/[0.02] text-[#666] font-mono text-[11px] font-bold tracking-[2px] uppercase hover:bg-white/[0.05] hover:text-white transition-all disabled:opacity-50 hover:border-white/10 active:scale-95">
-                            {rescoring ? (
-                                <><span className="w-3 h-3 border-2 border-[#00ff87] border-t-transparent rounded-full animate-spin" /> Rescoring...</>
-                            ) : 'Rescore'}
-                        </button>
+                            <button onClick={handleRescore} disabled={rescoring}
+                                    className="px-6 py-3 rounded-sm border border-[#e2e2d9] bg-white text-[#4a4a4a] font-mono text-[11px] font-bold tracking-[2px] uppercase hover:bg-[#f8f8f4] transition-all disabled:opacity-50 active:scale-95 tactile-pop">
+                                {rescoring ? 'Calibrating...' : 'Recalibrate'}
+                            </button>
+                        </div>
 
-                        <div className="h-8 w-[1px] bg-white/5 mx-2" />
+                        <div className="h-8 w-px bg-[#e2e2d9] hidden sm:block" />
 
-                        <button onClick={() => router.push('/profile')} className="px-5 py-3 rounded-2xl border border-white/5 bg-white/[0.02] text-[#555] font-mono text-[11px] font-bold tracking-[1px] hover:bg-white/[0.05] hover:text-white transition-all active:scale-95">Profile</button>
+                        <button onClick={() => router.push('/profile')} className="px-6 py-3 rounded-sm bg-[#f0f0eb] border border-[#d1d1ca] text-[#4a4a4a] font-mono text-[11px] font-bold tracking-[1px] hover:bg-[#e2e2d9] transition-all active:scale-95">Settings</button>
                     </div>
                 </header>
 
-                <div className="space-y-4">
-                    {error && (
-                        <div className="bg-[#ff6b6b10] border border-[#ff6b6b30] rounded-xl p-4 flex justify-between items-center animate-in slide-in-from-top-2">
-                            <span className="text-[#ff6b6b] text-sm font-mono">{error}</span>
-                            <button onClick={() => { setError(''); fetchJobs() }} className="text-[#ff6b6b] text-sm font-mono hover:underline">Retry</button>
-                        </div>
-                    )}
-                    {scanResult && (
-                        <div className={"rounded-xl p-4 text-sm font-mono animate-in slide-in-from-top-2 " + (!scanResult.includes('failed') ? 'bg-[#00ff8710] border border-[#00ff8730] text-[#00ff87]' : 'bg-[#ff6b6b10] border border-[#ff6b6b30] text-[#ff6b6b]')}>
-                            {scanResult}
-                        </div>
-                    )}
-                    {rescoreResult && (
-                        <div className={"rounded-xl p-4 text-sm font-mono animate-in slide-in-from-top-2 " + (!rescoreResult.includes('failed') ? 'bg-[#00ff8710] border border-[#00ff8730] text-[#00ff87]' : 'bg-[#ff6b6b10] border border-[#ff6b6b30] text-[#ff6b6b]')}>
-                            {rescoreResult}
-                        </div>
-                    )}
-                </div>
+                {notification && (
+                    <Notification
+                        message={notification.message}
+                        type={notification.type}
+                        onClose={handleCloseNotification}
+                    />
+                )}
 
                 {firstTime && (
-                    <div className="bg-[#00ff8710] border border-[#00ff8730] rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6 shadow-[0_0_30px_-10px_#00ff8720]">
+                    <div className="matte-surface border-[#c5a059]/30 rounded-sm p-8 flex flex-col md:flex-row items-center justify-between gap-8 shadow-md">
                         <div>
-                            <div className="font-syne font-bold text-lg text-[#00ff87] mb-1">You&apos;re all set!</div>
-                            <div className="text-sm text-[#888]">Run your first scan to find jobs matching your profile</div>
+                            <div className="font-syne font-bold text-lg text-[#1a1a1a] mb-2 uppercase tracking-tight">Configuration Complete</div>
+                            <div className="text-xs text-[#666] font-sans">Initialize your first automated job search to begin.</div>
                         </div>
                         <button onClick={() => { setFirstTime(false); handleScan() }}
-                                className="bg-[#00ff87] text-[#0a0a1a] px-6 py-3 rounded-xl font-mono text-xs font-bold tracking-widest uppercase hover:brightness-110 transition-all shadow-lg shadow-[#00ff8730]">Run First Scan</button>
+                                className="bg-[#1a1a1a] text-[#f8f8f4] px-8 py-4 rounded-sm font-mono text-xs font-bold tracking-[2px] uppercase hover:bg-[#c5a059] transition-all shadow-lg">Begin Analysis</button>
                     </div>
                 )}
 
                 <StatsGrid stats={stats} />
 
                 <div className="space-y-8">
-                    <div className="flex flex-wrap gap-1 md:gap-2 border-b border-white/5 pb-px overflow-x-auto scrollbar-hide">
+                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[#e2e2d9] pb-px">
+                        <div className="flex flex-wrap gap-8 overflow-x-auto scrollbar-hide">
                         {(['pending', 'applied', 'interviewing', 'skipped'] as const).map(tab => (
                             <button key={tab}
                                     onClick={() => { setActiveTab(tab) }}
-                                    className={"px-4 md:px-8 py-4 md:py-5 font-mono text-[9px] md:text-[10px] font-bold tracking-[2px] md:tracking-[3px] uppercase transition-all relative shrink-0 " + (activeTab === tab ? 'text-[#00ff87]' : 'text-[#444] hover:text-[#777]')}>
-                                {tab} <span className={"ml-1 md:ml-2 px-1.5 md:px-2 py-0.5 rounded-md text-[8px] md:text-[9px] " + (activeTab === tab ? 'bg-[#00ff87]/10 text-[#00ff87]' : 'bg-white/5 text-[#555]')}>{jobs.filter(j => j.status === tab).length}</span>
-                                {activeTab === tab && <div className="absolute bottom-0 left-2 md:left-4 right-2 md:right-4 h-[2px] bg-[#00ff87] shadow-[0_0_15px_#00ff87]" />}
+                                    className={"pb-5 font-mono text-[10px] font-bold tracking-[3px] uppercase transition-all relative shrink-0 " + (activeTab === tab ? 'text-[#1a1a1a]' : 'text-[#888] hover:text-[#444]')}>
+                                {tab} <span className={"ml-2 px-1.5 py-0.5 rounded-sm text-[9px] " + (activeTab === tab ? 'bg-[#1a1a1a] text-[#f8f8f4]' : 'bg-[#e2e2d9] text-[#888]')}>{jobs.filter(j => j.status === tab).length}</span>
+                                {activeTab === tab && <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#c5a059]" />}
                             </button>
                         ))}
+                        </div>
+
+                        <div className="pb-4 w-full md:w-64">
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    placeholder="SEARCH ARCHIVE..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full bg-transparent border-none outline-none font-mono text-[10px] font-bold tracking-[2px] text-[#1a1a1a] placeholder:text-[#ccc] uppercase"
+                                />
+                                <div className="absolute -bottom-1 left-0 right-0 h-px bg-[#e2e2d9]" />
+                                {searchQuery && (
+                                    <button
+                                        onClick={() => setSearchQuery('')}
+                                        className="absolute right-0 top-0 text-[#ccc] hover:text-[#1a1a1a] transition-colors"
+                                    >
+                                        ×
+                                    </button>
+                                )}
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="bg-glass border-premium rounded-[2.5rem] overflow-hidden h-[calc(100vh-380px)] shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col relative">
+                    <div className="bg-white border border-[#e2e2d9] rounded-sm overflow-hidden h-[calc(100vh-380px)] shadow-sm flex flex-col relative tactile-pop">
                         {loading ? (
                             <div className="overflow-hidden flex-1">
                                 {Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)}
                             </div>
                         ) : filteredJobs.length === 0 ? (
                             <div className="py-24 text-center flex-1 flex flex-col items-center justify-center px-12 animate-in fade-in duration-700">
-                                <div className="relative mb-10 group/empty">
-                                    <div className="w-24 h-24 rounded-[2rem] bg-white/[0.02] border border-white/5 flex items-center justify-center text-4xl grayscale opacity-20 group-hover/empty:grayscale-0 group-hover/empty:opacity-100 transition-all duration-700 group-hover/empty:scale-110 group-hover/empty:rotate-6 group-hover/empty:border-[#00ff8740] shadow-2xl">
+                                <div className="relative mb-8">
+                                    <div className="w-20 h-20 bg-[#f0f0eb] border border-[#d1d1ca] flex items-center justify-center text-3xl grayscale opacity-40">
                                         {activeTab === 'pending' ? '🔍' : activeTab === 'applied' ? '✉️' : activeTab === 'interviewing' ? '🤝' : '⏭️'}
                                     </div>
-                                    <div className="absolute -inset-8 bg-[#00ff87]/5 rounded-full blur-3xl opacity-0 group-hover/empty:opacity-100 transition-opacity duration-700" />
                                 </div>
-                                <h3 className="font-syne font-extrabold text-2xl text-white/90 mb-3 tracking-tight">No {activeTab} opportunities</h3>
-                                <p className="text-[10px] text-[#555] font-mono uppercase tracking-[4px] mb-12 max-w-xs leading-relaxed font-bold">
+                                <h3 className="font-syne font-bold text-xl text-[#1a1a1a] mb-4 tracking-tight uppercase">No {activeTab} Records</h3>
+                                <p className="text-[10px] text-[#888] font-mono uppercase tracking-[3px] mb-12 max-w-xs leading-relaxed font-bold">
                                     {activeTab === 'pending'
-                                        ? 'Initiate a fresh scan to discover high-match roles tailored to your profile.'
-                                        : "You haven't moved any jobs to " + activeTab + " yet."}
+                                        ? 'Initiate a job search scan to identify matching opportunities.'
+                                        : "No items found in " + activeTab + "."}
                                 </p>
                                 {activeTab === 'pending' && (
-                                    <button onClick={handleScan} className="group relative bg-[#00ff8710] border border-[#00ff8720] text-[#00ff87] px-10 py-4 rounded-2xl font-mono text-[11px] font-black uppercase tracking-[3px] hover:bg-[#00ff87] hover:text-[#0a0a1a] transition-all duration-500 overflow-hidden shadow-lg shadow-[#00ff8710] hover:shadow-[#00ff8730]">
-                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:animate-shimmer" />
-                                        Discover Jobs
+                                    <button onClick={handleScan} className="bg-[#1a1a1a] text-[#f8f8f4] px-10 py-4 rounded-sm font-mono text-[11px] font-bold uppercase tracking-[3px] hover:bg-[#c5a059] transition-all shadow-md">
+                                        Scan Now
                                     </button>
                                 )}
                             </div>
@@ -374,7 +393,7 @@ export default function DashboardPage() {
                                 <List
                                     key={`${activeTab}-${filteredJobs.length}`}
                                     rowCount={filteredJobs.length}
-                                    rowHeight={220}
+                                    rowHeight={240}
                                     className="scrollbar-hide"
                                     style={{ height: listHeight, width: '100%' }}
                                     rowProps={{}}

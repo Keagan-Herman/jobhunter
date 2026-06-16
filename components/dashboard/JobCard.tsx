@@ -14,80 +14,70 @@ function JobCardComponent({
   onClick: () => void,
   index: number
 }) {
-  // Only animate the first few items to avoid excessive delay in virtualized list
   const animationDelay = index < 10 ? `${index * 50}ms` : '0ms'
+  const isNew = job.created_at ? (new Date().getTime() - new Date(job.created_at).getTime()) < 24 * 60 * 60 * 1000 : false
+  const matchStrength = job.score ? (job.score >= 85 ? 'EXCEPTIONAL' : job.score >= 70 ? 'STRONG' : job.score >= 50 ? 'COMPATIBLE' : 'POTENTIAL') : 'PENDING'
+  const matchColor = job.score ? (job.score >= 85 ? 'text-[#2b6777]' : job.score >= 70 ? 'text-[#c5a059]' : job.score >= 50 ? 'text-[#4a4a4a]' : 'text-[#bc243c]') : 'text-[#888]'
 
   return (
     <div
-      className={`p-6 border-b border-white/5 cursor-pointer transition-all duration-500 ease-out hover:bg-white/[0.04] group relative overflow-hidden
-        ${isSelected ? 'bg-white/[0.06] before:absolute before:left-0 before:top-4 before:bottom-4 before:w-1.5 before:bg-[#00ff87] before:rounded-r-full before:shadow-[0_0_20px_#00ff87]' : ''}
-        hover:border-white/10 animate-in fade-in slide-in-from-bottom-4 fill-mode-forwards`}
+      className={`p-10 border-b border-[#e2e2d9] cursor-pointer transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-white group relative overflow-hidden
+        ${isSelected ? 'bg-[#f0f0eb] border-l-4 border-l-[#c5a059]' : 'bg-[#fbfbfa] border-l-4 border-l-transparent'}
+        animate-in fade-in slide-in-from-bottom-4 fill-mode-forwards shadow-[inset_0_0_0_1px_transparent] hover:shadow-xl hover:z-10`}
       style={{ animationDelay, opacity: 0 }}
       onClick={onClick}
     >
-      {/* Hover Light Effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#00ff87]/[0.05] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+      <div className="absolute top-0 right-0 p-4 opacity-[0.03] font-syne font-black text-6xl select-none group-hover:opacity-[0.07] transition-opacity duration-700">
+        {job.company.substring(0, 2).toUpperCase()}
+      </div>
 
-      <div className="flex justify-between items-start mb-6 relative z-10">
-        <div className="flex-1 mr-4">
-          <div className="font-syne font-extrabold text-[18px] md:text-[20px] text-white/95 mb-1.5 group-hover:text-white transition-all duration-500 leading-tight tracking-tight group-hover:translate-x-1 line-clamp-2">
+      {isNew && (
+        <div className="absolute top-0 left-0 px-4 py-1.5 bg-[#c5a059] text-white font-mono text-[9px] font-bold tracking-[2px] z-20">
+          NEW LISTING
+        </div>
+      )}
+
+      <div className="flex justify-between items-start mb-8 relative z-10">
+        <div className="flex-1 mr-8">
+          <div className="font-syne font-bold text-[22px] text-[#1a1a1a] mb-3 group-hover:text-[#c5a059] transition-all duration-700 leading-[1.1] tracking-tight line-clamp-2 uppercase">
             {job.title}
           </div>
-          <div className="text-[10px] text-[#666] font-mono tracking-[1.5px] md:tracking-[2.5px] flex flex-wrap items-center gap-2 uppercase font-black">
-            <span className="text-[#999] group-hover:text-[#aaa] transition-colors line-clamp-1">{job.company}</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-white/10 shrink-0" />
-            <span className="line-clamp-1 text-[#777]">{job.location || 'Remote'}</span>
+          <div className="text-[11px] text-[#888] font-mono tracking-[3px] flex flex-wrap items-center gap-3 uppercase font-bold">
+            <span className="text-[#4a4a4a] group-hover:text-[#1a1a1a] transition-colors line-clamp-1">{job.company}</span>
+            <div className="w-1 h-1 bg-[#c5a059] rotate-45 shrink-0" />
+            <span className="line-clamp-1">{job.location || 'Remote'}</span>
           </div>
         </div>
-        <div className="shrink-0 transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 group-hover:drop-shadow-[0_0_15px_rgba(0,255,135,0.2)]">
-          <RadialScore score={job.score || 0} size={54} />
+        <div className="shrink-0 flex flex-col items-center gap-2 transition-all duration-700 group-hover:scale-110 group-hover:rotate-3">
+          <RadialScore score={job.score || 0} size={64} />
+          <span className={`text-[9px] font-mono font-bold tracking-[2px] ${matchColor}`}>
+            {matchStrength}
+          </span>
         </div>
       </div>
 
-      <div className="flex gap-2.5 flex-wrap mb-6 relative z-10">
-        {(job.stack || []).slice(0, 4).map(s => (
-          <span key={s} className="text-[9px] px-3 py-1.5 rounded-xl bg-[#7b61ff]/5 text-[#7b61ff] font-mono font-black tracking-tight uppercase border border-[#7b61ff]/10 transition-all duration-500 hover:scale-110 hover:bg-[#7b61ff]/15 hover:border-[#7b61ff]/40 hover:shadow-[0_0_15px_rgba(123,97,255,0.2)] cursor-default">
+      <div className="flex gap-2.5 flex-wrap mb-8 relative z-10">
+        {(job.stack || []).slice(0, 5).map(s => (
+          <span key={s} className="text-[10px] px-4 py-2 bg-white text-[#4a4a4a] font-mono font-bold tracking-tight uppercase border border-[#e2e2d9] transition-all duration-500 group-hover:border-[#c5a059] group-hover:bg-[#f8f8f4] cursor-default tactile-pop">
             {s}
           </span>
         ))}
-        {(job.stack || []).length > 4 && (
-          <span className="text-[9px] px-3 py-1.5 text-[#444] font-mono font-black bg-white/5 rounded-xl border border-white/5 hover:text-[#777] transition-colors cursor-default">
-            +{(job.stack || []).length - 4}
-          </span>
-        )}
       </div>
 
-      <div className="flex gap-3 flex-wrap items-center relative z-10">
-        {job.seniority && (
-          <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-2xl bg-[#00ff87]/[0.03] border border-[#00ff87]/10 transition-all duration-300 group-hover:border-[#00ff87]/30 group-hover:bg-[#00ff87]/[0.06]">
-             <span className="text-[9px] text-[#00ff87] font-mono font-black uppercase tracking-[2px]">
-               {job.seniority}
-             </span>
-          </div>
-        )}
-        {job.work_style && job.work_style !== 'unspecified' && (
-          <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-2xl bg-[#00d4ff]/[0.03] border border-[#00d4ff]/10 transition-all duration-300 group-hover:border-[#00d4ff]/30 group-hover:bg-[#00d4ff]/[0.06]">
-            <span className="text-[9px] text-[#00d4ff] font-mono font-black uppercase tracking-[2px]">
-              {job.work_style}
-            </span>
-          </div>
-        )}
-        {job.stack_overlap !== null && job.stack_overlap !== undefined && job.stack_overlap > 0 && (
-          <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-2xl bg-[#ffd60a]/[0.03] border border-[#ffd60a]/10 transition-all duration-300 group-hover:border-[#ffd60a]/30 group-hover:bg-[#ffd60a]/[0.06]">
-            <span className="text-[10px] text-[#ffd60a] font-mono font-black uppercase tracking-[2px]">
-              {job.stack_overlap}% Match
-            </span>
-          </div>
-        )}
-      </div>
-
-      <div className="flex justify-between items-center mt-auto pt-4 border-t border-white/[0.03] relative z-10">
-        {job.score_reason && (
-          <div className="text-[11px] text-[#444] font-medium italic flex-1 mr-4 line-clamp-2 group-hover:text-[#888] transition-all duration-500 group-hover:translate-x-1">
-            &quot;{job.score_reason}&quot;
-          </div>
-        )}
-        <div className="shrink-0 transform transition-all duration-500 group-hover:scale-110 group-hover:-translate-x-1">
+      <div className="flex justify-between items-center mt-auto pt-6 border-t border-[#e2e2d9]/50 relative z-10">
+        <div className="flex gap-4 items-center">
+            {job.seniority && (
+              <span className="text-[9px] text-[#888] font-mono font-bold uppercase tracking-[2px]">
+                {job.seniority}
+              </span>
+            )}
+            {job.work_style && job.work_style !== 'unspecified' && (
+              <span className="text-[9px] text-[#888] font-mono font-bold uppercase tracking-[2px]">
+                {job.work_style}
+              </span>
+            )}
+        </div>
+        <div className="shrink-0">
           <StatusBadge status={job.status || 'pending'} />
         </div>
       </div>

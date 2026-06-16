@@ -11,7 +11,7 @@ JobHunter doesn't just search for keywords; it understands job descriptions.
 - **Behavioral Calibration:** The system learns from your past actions. If you skip or apply to certain roles, the AI adjusts future scoring to better match your preferences.
 
 ### 2. Automated CV Parsing
-- **PDF Extraction:** Uses `unpdf` for high-performance, text extraction from PDF resumes.
+- **PDF Extraction:** Uses `unpdf` for high-performance text extraction from PDF resumes.
 - **AI Synthesis:** Automatically identifies skills, experience, and projects to build a searchable profile.
 
 ### 3. Tailored Cover Letter Generation
@@ -35,7 +35,7 @@ JobHunter utilizes the **Groq LLaMA 3.3 70B** model for all natural language tas
 
 ## 💻 Tech Stack
 
-- **Framework:** Next.js 16 (App Router)
+- **Framework:** Next.js 16.1.7 (App Router)
 - **Database:** SQLite with Drizzle ORM
 - **AI Inference:** Groq SDK (LLaMA 3.3 70B)
 - **Styling:** Tailwind CSS 4
