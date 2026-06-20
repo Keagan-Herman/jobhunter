@@ -9,6 +9,7 @@ export default function OnboardingPage() {
   const [saving, setSaving] = useState(false)
   const [importError, setImportError] = useState('')
   const [importStep, setImportStep] = useState('')
+  const [saveError, setSaveError] = useState('')
 
   const [fullName, setFullName] = useState('')
   const [jobTitle, setJobTitle] = useState('')
@@ -30,9 +31,8 @@ export default function OnboardingPage() {
       try {
         const res = await fetch('/api/profile')
         const data = await res.json()
-
         if (data.profile && data.profile.full_name && data.profile.full_name !== 'Local User') {
-            router.push('/dashboard')
+          router.push('/dashboard')
         }
       } catch {
         console.error('Check failed')
@@ -60,6 +60,7 @@ export default function OnboardingPage() {
 
       const res = await fetch('/api/parse-cv', { method: 'POST', body: formData })
       const data = await res.json()
+
       if (data.success) {
         setImportStep('Finalizing configuration...')
         const p = data.profile
@@ -71,16 +72,17 @@ export default function OnboardingPage() {
         if (p.experience) setExperience(p.experience)
         if (p.projects) setProjects(p.projects)
         if (p.search_terms?.length) setSearchTerms(p.search_terms.join(', '))
-
         clearTimers()
+        setImporting(false)
         setStep(2)
       } else {
-        setImportError(data.error || 'Import failed')
+        setImportError(data.error || 'Import failed — please try again or enter details manually.')
         clearTimers()
         setImporting(false)
       }
-    } catch {
-      setImportError('Import failed')
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Network error — please check your connection and try again.'
+      setImportError(msg)
       clearTimers()
       setImporting(false)
     }
@@ -89,32 +91,38 @@ export default function OnboardingPage() {
 
   const handleSave = async () => {
     setSaving(true)
+    setSaveError('')
 
     try {
-        const res = await fetch('/api/profile', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                full_name: fullName,
-                job_title: jobTitle,
-                company,
-                education,
-                skills: skills.split(',').map(s => s.trim()).filter(Boolean),
-                experience,
-                projects,
-                search_terms: searchTerms.split(',').map(s => s.trim()).filter(Boolean),
-                country,
-                salary_min: salaryMin ? parseInt(salaryMin) : null,
-                remote_only: remoteOnly,
-            })
+      const res = await fetch('/api/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          full_name: fullName,
+          job_title: jobTitle,
+          company,
+          education,
+          skills: skills.split(',').map(s => s.trim()).filter(Boolean),
+          experience,
+          projects,
+          search_terms: searchTerms.split(',').map(s => s.trim()).filter(Boolean),
+          country,
+          salary_min: salaryMin ? parseInt(salaryMin) : null,
+          remote_only: remoteOnly,
         })
+      })
 
-        if (!res.ok) throw new Error('Failed to save configuration')
-        router.push('/dashboard?firstTime=true')
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error((body as { error?: string }).error || 'Failed to save — please try again.')
+      }
+      router.push('/dashboard?firstTime=true')
     } catch (err) {
-        console.error('Save failed', err)
+      const msg = err instanceof Error ? err.message : 'Failed to save — please try again.'
+      setSaveError(msg)
+      console.error('Save failed', err)
     } finally {
-        setSaving(false)
+      setSaving(false)
     }
   }
 
@@ -124,26 +132,26 @@ export default function OnboardingPage() {
   const labelClasses = "block text-[10px] text-[#888] tracking-[2px] uppercase font-mono mb-2 font-bold"
 
   return (
-    <div className="min-h-screen bg-[#f8f8f4] font-sans text-[#1a1a1a] px-6 py-12 flex flex-col items-center relative overflow-hidden">
+    <div className="min-h-screen bg-[#f8f8f4] font-sans text-[#1a1a1a] px-4 sm:px-6 py-8 sm:py-12 flex flex-col items-center relative overflow-hidden">
       <div className="absolute inset-0 z-0 grid-overlay opacity-30 pointer-events-none" />
-      <div className="fixed -top-40 -left-40 w-96 h-96 bg-[#c5a05905] rounded-full blur-[100px] pointer-events-none animate-organic" />
 
       <div className="w-full max-w-[650px] relative z-10">
-        <div className="text-center mb-16">
-          <h1 className="font-syne text-[32px] font-bold text-[#1a1a1a] tracking-tight uppercase">
+        <div className="text-center mb-10 sm:mb-16">
+          <h1 className="font-syne text-[28px] sm:text-[32px] font-bold text-[#1a1a1a] tracking-tight uppercase">
             Job<span className="text-[#c5a059] italic">Hunter</span>
           </h1>
           <div className="text-[10px] font-mono text-[#888] uppercase tracking-[4px] mt-2 font-bold">Professional Configuration</div>
         </div>
 
-        <div className="mb-16">
-          <div className="flex justify-between mb-6">
+        {/* Step progress */}
+        <div className="mb-10 sm:mb-16">
+          <div className="flex justify-between mb-5 sm:mb-6">
             {['Welcome', 'Profile', 'Criteria'].map((label, i) => (
-              <div key={label} className="flex flex-col items-center gap-3">
-                <div className={"w-10 h-10 rounded-sm flex items-center justify-center text-[12px] font-bold font-mono transition-all duration-500 " + (step > i + 1 ? 'bg-[#c5a059] text-white' : step === i + 1 ? 'bg-[#1a1a1a] text-white' : 'bg-white border border-[#e2e2d9] text-[#888]')}>
+              <div key={label} className="flex flex-col items-center gap-2 sm:gap-3">
+                <div className={"w-9 h-9 sm:w-10 sm:h-10 rounded-sm flex items-center justify-center text-[11px] sm:text-[12px] font-bold font-mono transition-all duration-500 " + (step > i + 1 ? 'bg-[#c5a059] text-white' : step === i + 1 ? 'bg-[#1a1a1a] text-white' : 'bg-white border border-[#e2e2d9] text-[#888]')}>
                   {step > i + 1 ? '✓' : i + 1}
                 </div>
-                <span className={"text-[9px] font-mono font-bold uppercase tracking-widest " + (step === i + 1 ? 'text-[#1a1a1a]' : 'text-[#888]')}>
+                <span className={"text-[8px] sm:text-[9px] font-mono font-bold uppercase tracking-widest " + (step === i + 1 ? 'text-[#1a1a1a]' : 'text-[#888]')}>
                   {label}
                 </span>
               </div>
@@ -154,46 +162,47 @@ export default function OnboardingPage() {
           </div>
         </div>
 
+        {/* Step 1: Welcome */}
         {step === 1 && (
-          <div className="bg-white border border-[#e2e2d9] p-12 animate-in fade-in slide-in-from-bottom-4 duration-700 shadow-sm tactile-pop">
-            <h2 className="font-syne text-[28px] font-bold text-[#1a1a1a] mb-4 tracking-tight uppercase leading-tight">
+          <div className="bg-white border border-[#e2e2d9] p-6 sm:p-12 animate-in fade-in slide-in-from-bottom-4 duration-700 shadow-sm tactile-pop">
+            <h2 className="font-syne text-[22px] sm:text-[28px] font-bold text-[#1a1a1a] mb-4 tracking-tight uppercase leading-tight">
               Begin your search
             </h2>
-            <p className="text-[#666] text-[15px] leading-[1.6] mb-12">
-              Our analysis platform optimizes your job discovery process by aligning your professional profile with global market listings.
+            <p className="text-[#666] text-[14px] sm:text-[15px] leading-[1.6] mb-8 sm:mb-12">
+              Populate your professional profile automatically from your CV, or enter your details manually.
             </p>
 
-            <div className={"bg-[#f8f8f4] border border-[#e2e2d9] p-10 text-center mb-8 transition-all duration-300 " + (importing ? 'border-[#c5a059]' : 'hover:border-[#c5a059]/50')}>
+            <div className={"bg-[#f8f8f4] border border-[#e2e2d9] p-6 sm:p-10 text-center mb-6 sm:mb-8 transition-all duration-300 " + (importing ? 'border-[#c5a059]' : 'hover:border-[#c5a059]/50')}>
               {importing ? (
                 <div className="flex flex-col items-center py-4">
-                  <div className="w-12 h-12 border-2 border-[#e2e2d9] border-t-[#c5a059] animate-spin mb-6" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 border-2 border-[#e2e2d9] border-t-[#c5a059] animate-spin mb-5 sm:mb-6" />
                   <div className="text-[11px] font-bold text-[#c5a059] font-mono uppercase tracking-[3px] animate-pulse">
                     {importStep}
                   </div>
                 </div>
               ) : (
                 <>
-                  <div className="text-[18px] font-bold text-[#1a1a1a] mb-2 font-syne uppercase tracking-tight">
+                  <div className="text-[16px] sm:text-[18px] font-bold text-[#1a1a1a] mb-2 font-syne uppercase tracking-tight">
                     Import CV Data
                   </div>
-                  <div className="text-[13px] text-[#888] mb-8">
-                    Automatically populate your professional criteria.
+                  <div className="text-[13px] text-[#888] mb-6 sm:mb-8">
+                    Automatically populate your professional criteria from a PDF.
                   </div>
-                  <label className="inline-block bg-[#1a1a1a] text-white px-10 py-4 rounded-sm font-mono text-[11px] font-bold tracking-[2px] uppercase cursor-pointer transition-all hover:bg-[#c5a059] shadow-md">
-                    Upload Document
+                  <label className="inline-block bg-[#1a1a1a] text-white px-8 sm:px-10 py-4 rounded-sm font-mono text-[11px] font-bold tracking-[2px] uppercase cursor-pointer transition-all hover:bg-[#c5a059] shadow-md">
+                    Upload CV / Resume
                     <input type="file" accept=".pdf" onChange={handleImportCV} disabled={importing} className="hidden" />
                   </label>
                 </>
               )}
 
               {importError && (
-                <div className="text-[#bc243c] text-[10px] mt-6 font-mono font-bold uppercase tracking-wider bg-[#bc243c]/5 py-3 px-4 border border-[#bc243c]/10">
+                <div className="text-[#bc243c] text-[13px] mt-5 sm:mt-6 font-mono bg-[#bc243c]/10 py-4 px-4 sm:px-5 border border-[#bc243c]/30 text-left leading-[1.5]">
                   {importError}
                 </div>
               )}
             </div>
 
-            <div className="text-center text-[#e2e2d9] text-[10px] mb-8 font-mono font-bold uppercase tracking-[6px]">
+            <div className="text-center text-[#e2e2d9] text-[10px] mb-6 sm:mb-8 font-mono font-bold uppercase tracking-[6px]">
               OR
             </div>
 
@@ -201,63 +210,64 @@ export default function OnboardingPage() {
               onClick={() => setStep(2)}
               className="w-full bg-white border border-[#e2e2d9] text-[#4a4a4a] py-4 rounded-sm font-mono text-[11px] font-bold tracking-[2px] uppercase hover:bg-[#f8f8f4] transition-all"
             >
-              Manual Configuration
+              Enter Manually
             </button>
           </div>
         )}
 
+        {/* Step 2: Profile */}
         {step === 2 && (
-          <div className="bg-white border border-[#e2e2d9] p-12 animate-in fade-in slide-in-from-bottom-4 duration-700 shadow-sm tactile-pop">
-            <h2 className="font-syne text-[28px] font-bold text-[#1a1a1a] mb-2 tracking-tight uppercase leading-tight">
-              Professional Data
+          <div className="bg-white border border-[#e2e2d9] p-6 sm:p-12 animate-in fade-in slide-in-from-bottom-4 duration-700 shadow-sm tactile-pop">
+            <h2 className="font-syne text-[22px] sm:text-[28px] font-bold text-[#1a1a1a] mb-2 tracking-tight uppercase leading-tight">
+              Your Profile
             </h2>
-            <p className="text-[#666] text-[15px] mb-10 leading-[1.6]">
-              Detailed criteria used for automated matching and document generation.
+            <p className="text-[#666] text-[14px] sm:text-[15px] mb-8 sm:mb-10 leading-[1.6]">
+              This information is used for job matching and document generation.
             </p>
 
-            <div className="space-y-6 mb-12">
-              <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-5 sm:space-y-6 mb-8 sm:mb-12">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
                 <div className="space-y-1">
                   <label className={labelClasses}>Full Name</label>
                   <input className={inputClasses} value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Jane Doe" />
                 </div>
                 <div className="space-y-1">
                   <label className={labelClasses}>Primary Role</label>
-                  <input className={inputClasses} value={jobTitle} onChange={e => setJobTitle(e.target.value)} placeholder="Software Engineer" />
+                  <input className={inputClasses} value={jobTitle} onChange={e => setJobTitle(e.target.value)} placeholder="e.g. Accountant, Nurse, Engineer" />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
                 <div className="space-y-1">
                   <label className={labelClasses}>Education</label>
-                  <input className={inputClasses} value={education} onChange={e => setEducation(e.target.value)} placeholder="University Degree" />
+                  <input className={inputClasses} value={education} onChange={e => setEducation(e.target.value)} placeholder="e.g. BCom Accounting, Wits" />
                 </div>
                 <div className="space-y-1">
-                  <label className={labelClasses}>Current Company</label>
+                  <label className={labelClasses}>Current / Last Company</label>
                   <input className={inputClasses} value={company} onChange={e => setCompany(e.target.value)} placeholder="Organization Name" />
                 </div>
               </div>
               <div className="space-y-1">
-                <label className={labelClasses}>Core Competencies</label>
-                <div className="text-[9px] text-[#aaa] mb-1 font-mono uppercase">Comma separated values</div>
-                <input className={inputClasses} value={skills} onChange={e => setSkills(e.target.value)} placeholder="Language, Framework, Tool" />
+                <label className={labelClasses}>Skills & Competencies</label>
+                <div className="text-[9px] text-[#aaa] mb-1 font-mono uppercase">Comma separated</div>
+                <input className={inputClasses} value={skills} onChange={e => setSkills(e.target.value)} placeholder="e.g. Project Management, Python, Nursing, Excel" />
               </div>
               <div className="space-y-1">
                 <label className={labelClasses}>Professional Experience</label>
                 <textarea
-                  className={inputClasses + " resize-none leading-[1.6] h-32"}
+                  className={inputClasses + " resize-none leading-[1.6] h-28 sm:h-32"}
                   value={experience}
                   onChange={e => setExperience(e.target.value)}
-                  placeholder="Summary of responsibilities and achievements..."
+                  placeholder="Brief summary of your work history and achievements..."
                 />
               </div>
             </div>
 
-            <div className="flex gap-6">
+            <div className="flex gap-4 sm:gap-6">
               <button
                 onClick={() => setStep(1)}
                 className="flex-1 bg-white border border-[#e2e2d9] text-[#4a4a4a] py-4 rounded-sm font-mono text-[11px] font-bold uppercase hover:bg-[#f8f8f4] transition-all"
               >
-                Previous
+                Back
               </button>
               <button
                 onClick={() => setStep(3)}
@@ -269,80 +279,87 @@ export default function OnboardingPage() {
           </div>
         )}
 
+        {/* Step 3: Criteria */}
         {step === 3 && (
-          <div className="bg-white border border-[#e2e2d9] p-12 animate-in fade-in slide-in-from-bottom-4 duration-700 shadow-sm tactile-pop">
-            <h2 className="font-syne text-[28px] font-bold text-[#1a1a1a] mb-2 tracking-tight uppercase leading-tight">
-              Analysis Criteria
+          <div className="bg-white border border-[#e2e2d9] p-6 sm:p-12 animate-in fade-in slide-in-from-bottom-4 duration-700 shadow-sm tactile-pop">
+            <h2 className="font-syne text-[22px] sm:text-[28px] font-bold text-[#1a1a1a] mb-2 tracking-tight uppercase leading-tight">
+              Search Criteria
             </h2>
-            <p className="text-[#666] text-[15px] mb-10 leading-[1.6]">
-              Parameters used to filter and score market opportunities.
+            <p className="text-[#666] text-[14px] sm:text-[15px] mb-8 sm:mb-10 leading-[1.6]">
+              Parameters used to filter and score job listings.
             </p>
 
-            <div className="space-y-8 mb-12">
+            <div className="space-y-6 sm:space-y-8 mb-8 sm:mb-12">
               <div className="space-y-1">
-                <label className={labelClasses}>Target Search Terms</label>
+                <label className={labelClasses}>Target Job Titles / Keywords</label>
                 <input
                   className={inputClasses}
                   value={searchTerms}
                   onChange={e => setSearchTerms(e.target.value)}
-                  placeholder="Engineer, Developer, Manager"
+                  placeholder="e.g. Accountant, Sales Manager, Nurse"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
                 <div className="space-y-1">
                   <label className={labelClasses}>Region</label>
                   <select
-                      value={country}
-                      onChange={e => setCountry(e.target.value)}
-                      className={inputClasses + " cursor-pointer"}
+                    value={country}
+                    onChange={e => setCountry(e.target.value)}
+                    className={inputClasses + " cursor-pointer"}
                   >
-                      <option value="za">South Africa</option>
-                      <option value="gb">United Kingdom</option>
-                      <option value="us">United States</option>
-                      <option value="de">Germany</option>
-                      <option value="nl">Netherlands</option>
+                    <option value="za">South Africa</option>
+                    <option value="gb">United Kingdom</option>
+                    <option value="us">United States</option>
+                    <option value="de">Germany</option>
+                    <option value="nl">Netherlands</option>
                   </select>
                 </div>
                 <div className="space-y-1">
-                  <label className={labelClasses}>Min Salary</label>
+                  <label className={labelClasses}>Min Salary (Annual)</label>
                   <input
                     className={inputClasses}
                     type="number"
                     value={salaryMin}
                     onChange={e => setSalaryMin(e.target.value)}
-                    placeholder="Annual Amount"
+                    placeholder="Leave blank to skip"
                   />
                 </div>
               </div>
 
-              <div className="p-6 bg-[#f8f8f4] border border-[#e2e2d9]">
-                <label className="flex items-center justify-between cursor-pointer group">
-                  <div className="space-y-1">
-                    <div className="text-[14px] font-bold text-[#1a1a1a] uppercase tracking-tight">Remote Specific</div>
+              <div className="p-5 sm:p-6 bg-[#f8f8f4] border border-[#e2e2d9]">
+                <label className="flex items-center justify-between cursor-pointer gap-4">
+                  <div className="space-y-1 min-w-0">
+                    <div className="text-[13px] sm:text-[14px] font-bold text-[#1a1a1a] uppercase tracking-tight">Remote Only</div>
                     <div className="text-[11px] text-[#888] font-mono">Prioritize remote-only listings</div>
                   </div>
                   <div
                     onClick={() => setRemoteOnly(!remoteOnly)}
-                    className={"w-12 h-6.5 rounded-sm relative transition-all duration-300 " + (remoteOnly ? 'bg-[#c5a059]' : 'bg-[#e2e2d9]')}>
-                    <div className={"w-5 h-5 bg-white absolute top-0.75 transition-all duration-300 shadow-sm " + (remoteOnly ? 'left-[23px]' : 'left-1')} />
+                    className={"flex-shrink-0 w-12 h-6 rounded-sm relative transition-all duration-300 " + (remoteOnly ? 'bg-[#c5a059]' : 'bg-[#e2e2d9]')}>
+                    <div className={"w-5 h-5 bg-white absolute top-0.5 transition-all duration-300 shadow-sm " + (remoteOnly ? 'left-[26px]' : 'left-0.5')} />
                   </div>
                 </label>
               </div>
             </div>
 
-            <div className="flex gap-6">
+            {saveError && (
+              <div className="text-[#bc243c] text-[13px] mb-5 sm:mb-6 font-mono bg-[#bc243c]/10 py-4 px-4 sm:px-5 border border-[#bc243c]/30 leading-[1.5]">
+                {saveError}
+              </div>
+            )}
+
+            <div className="flex gap-4 sm:gap-6">
               <button
                 onClick={() => setStep(2)}
                 className="flex-1 bg-white border border-[#e2e2d9] text-[#4a4a4a] py-4 rounded-sm font-mono text-[11px] font-bold uppercase hover:bg-[#f8f8f4] transition-all"
               >
-                Previous
+                Back
               </button>
               <button
                 onClick={handleSave}
                 disabled={saving || !searchTerms}
                 className={"flex-[2] bg-[#1a1a1a] text-white py-4 rounded-sm font-mono text-[11px] font-bold tracking-[2px] uppercase transition-all " + (saving || !searchTerms ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#c5a059] shadow-md')}>
-                {saving ? 'Finalizing...' : 'Launch Platform'}
+                {saving ? 'Saving...' : 'Launch Platform'}
               </button>
             </div>
           </div>

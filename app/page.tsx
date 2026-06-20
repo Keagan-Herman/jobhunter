@@ -53,7 +53,7 @@ export default function SplashPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 py-8 md:py-12 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300">
           {[
             { title: 'Job Discovery', desc: 'Aggregate and filter listings from global sources with precision.' },
-            { title: 'Match Analysis', desc: 'Objective scoring of roles based on your technical qualifications.' },
+            { title: 'Match Analysis', desc: 'Objective scoring of roles based on your skills and experience.' },
             { title: 'Application Assistance', desc: 'Generate professionally tailored documents for your job search.' }
           ].map((feature, i) => (
             <div key={i} className="group p-10 text-left tactile-pop bg-white/50 border border-[#e2e2d9] hover:border-[#c5a059]/30 transition-all duration-700">
@@ -92,7 +92,7 @@ export default function SplashPage() {
 
       <footer className="py-12 md:absolute md:bottom-8 left-0 right-0 text-center animate-in fade-in duration-1000 delay-700">
          <p className="text-[10px] font-mono text-[#888] tracking-widest uppercase px-6">
-            Designed for professional software engineers
+            Your career, your terms.
          </p>
       </footer>
     </div>

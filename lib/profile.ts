@@ -9,7 +9,7 @@ export async function getUserProfile(userId: string): Promise<{ profileText: str
   });
 
   if (!data) return {
-    profileText: 'Software developer with full stack experience',
+    profileText: 'Professional with relevant industry experience',
     profileData: null
   }
 
@@ -114,12 +114,30 @@ export function calculateStackOverlap(jobStack: string[], userSkills: string[]):
 
 export function extractStack(description: string): string[] {
   const keywords = [
+    // Software & tech
     'TypeScript', 'JavaScript', 'React', 'Next.js', 'Vue', 'Angular',
     'C#', 'MVC', '.NET', 'Flutter', 'Kotlin', 'Swift', 'Dart',
     'Python', 'Java', 'Go', 'Rust', 'Node.js', 'Express',
     'PostgreSQL', 'MySQL', 'MongoDB', 'Supabase', 'Firebase',
     'Blazor', 'HTML', 'CSS', 'Tailwind', 'Docker', 'AWS', 'Azure',
-    'IoT', 'Power BI', 'GraphQL', 'REST', 'API'
+    'IoT', 'Power BI', 'GraphQL', 'REST', 'API',
+    // Finance & accounting
+    'IFRS', 'GAAP', 'SAP', 'Xero', 'QuickBooks', 'Sage', 'Pastel',
+    'CIMA', 'ACCA', 'CPA', 'Excel', 'Budgeting', 'Forecasting', 'Auditing',
+    // Healthcare
+    'Nursing', 'CCNA', 'EMR', 'EHR', 'HIPAA', 'Phlebotomy', 'Radiology',
+    'Physiotherapy', 'Occupational Therapy', 'Pharmacy',
+    // Marketing & sales
+    'Google Ads', 'Meta Ads', 'SEO', 'SEM', 'HubSpot', 'Salesforce',
+    'CRM', 'Copywriting', 'Content Marketing', 'Email Marketing',
+    // Engineering & construction
+    'AutoCAD', 'SolidWorks', 'Civil 3D', 'Revit', 'MATLAB',
+    'PLC', 'SCADA', 'Six Sigma', 'Lean', 'Agile', 'Scrum',
+    // Management & operations
+    'Project Management', 'PMP', 'Prince2', 'Supply Chain', 'Logistics',
+    'HR', 'Recruitment', 'Payroll', 'HRIS', 'Labour Law',
+    // Legal & compliance
+    'POPIA', 'GDPR', 'Compliance', 'Conveyancing', 'Litigation',
   ]
   return keywords.filter(k => description?.toLowerCase().includes(k.toLowerCase()))
 }

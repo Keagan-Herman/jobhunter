@@ -56,9 +56,14 @@ async function handleParseCV(request: Request) {
         'PDF parsing'
       )
       text = cleanPdfText(extracted).slice(0, 5000)
-    } catch {
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err)
+      console.error('[parse-cv] PDF extraction failed:', msg)
+      const isTimeout = msg.toLowerCase().includes('timed out')
       return NextResponse.json({
-        error: 'Failed to read PDF — make sure the file is not corrupted or password protected'
+        error: isTimeout
+          ? 'PDF took too long to process — try a smaller file'
+          : `Could not read PDF: ${msg.slice(0, 120)}`
       }, { status: 400 })
     }
 
@@ -86,15 +91,22 @@ Return exactly this structure:
   "search_terms": ["search term 1", "search term 2", "search term 3", "search term 4"]
 }
 
-For search_terms, generate exactly 4 relevant job search keywords based on their skills e.g. "typescript developer", "C# developer", "full stack engineer", "mobile developer".
+For search_terms, generate exactly 4 relevant job search keywords based on their experience and skills. Examples: "accountant", "project manager", "registered nurse", "data analyst", "civil engineer", "marketing manager". Match the person's actual field — do not default to software/tech terms unless they are clearly in tech.
 If any field is not found, use an empty string or empty array.
 `
 
     let result: string
     try {
-      result = await withTimeout(generateContent(prompt), 15000, 'AI CV parsing')
-    } catch {
-      return NextResponse.json({ error: 'AI timed out — please try again' }, { status: 500 })
+      // generateContent already has per-call timeout + retry logic internally; no outer timeout needed
+      result = await generateContent(prompt)
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err)
+      const isTimeout = msg.toLowerCase().includes('timeout') || msg.toLowerCase().includes('timed out')
+      return NextResponse.json({
+        error: isTimeout
+          ? 'AI took too long to respond — please try again'
+          : `AI failed to parse CV — ${msg.slice(0, 120)}`
+      }, { status: 500 })
     }
 
     const clean = result.replace(/\`\`\`json|\`\`\`/g, '').trim()

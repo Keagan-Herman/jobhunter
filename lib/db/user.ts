@@ -18,9 +18,9 @@ export async function ensureLocalUser() {
         id: LOCAL_USER_ID,
         email: 'local@user.com',
         full_name: 'Local User',
-        job_title: 'Software Developer',
+        job_title: '',
         skills: [],
-        search_terms: ['software developer']
+        search_terms: []
       });
     }
   } catch (err) {

@@ -240,7 +240,7 @@ export async function GET() {
 
     const searchTerms: string[] = profileData?.search_terms?.length
       ? profileData.search_terms
-      : ['software developer']
+      : [profileData?.job_title || 'professional']
 
     const country: string = profileData?.country || 'za'
     const userSkills: string[] = profileData?.skills || []
