@@ -330,95 +330,130 @@ export default function DashboardPage() {
 
                 <StatsGrid stats={stats} />
 
-                <div className="space-y-8">
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[#e2e2d9] pb-px">
-                        <div role="tablist" className="flex flex-wrap gap-8 overflow-x-auto scrollbar-hide">
-                        {(['pending', 'applied', 'interviewing', 'skipped'] as const).map(tab => (
-                            <button key={tab}
-                                    role="tab"
-                                    aria-selected={activeTab === tab}
-                                    onClick={() => { setActiveTab(tab) }}
-                                    className={"pb-5 min-h-[44px] font-sans text-[12px] font-medium tracking-[0.5px] uppercase transition-all relative shrink-0 " + (activeTab === tab ? 'text-[#1a1a1a]' : 'text-[#666] hover:text-[#444]')}>
-                                {tab} <span className={"ml-2 px-1.5 py-0.5 rounded-sm text-[9px] " + (activeTab === tab ? 'bg-[#1a1a1a] text-[#f8f8f4]' : 'bg-[#e2e2d9] text-[#666]')}>{jobs.filter(j => j.status === tab).length}</span>
-                                {activeTab === tab && <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#c5a059]" />}
-                            </button>
-                        ))}
-                        </div>
+                {/* 2-column on desktop when a job is selected; single column otherwise */}
+                <div className={selected ? 'lg:flex lg:items-start lg:gap-0' : ''}>
 
-                        <div className="pb-4 w-full md:w-64">
-                            <div className="relative">
-                                <input
-                                    type="text"
-                                    aria-label="Search jobs"
-                                    placeholder="Search jobs..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full bg-transparent border-none outline-none font-sans text-[13px] text-[#1a1a1a] placeholder:text-[#555]"
-                                />
-                                <div className="absolute -bottom-1 left-0 right-0 h-px bg-[#e2e2d9]" />
-                                {searchQuery && (
-                                    <button
-                                        onClick={() => setSearchQuery('')}
-                                        className="absolute right-0 top-0 text-[#ccc] hover:text-[#1a1a1a] transition-colors"
-                                    >
-                                        ×
-                                    </button>
-                                )}
+                    {/* Left column: tabs + search + job list */}
+                    <div className={`space-y-8 ${selected ? 'lg:w-[400px] lg:shrink-0' : ''}`}>
+                        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[#e2e2d9] pb-px">
+                            <div role="tablist" className="flex flex-wrap gap-6 md:gap-8 overflow-x-auto scrollbar-hide">
+                            {(['pending', 'applied', 'interviewing', 'skipped'] as const).map(tab => (
+                                <button key={tab}
+                                        role="tab"
+                                        aria-selected={activeTab === tab}
+                                        onClick={() => { setActiveTab(tab) }}
+                                        className={"pb-5 min-h-[44px] font-sans text-[12px] font-medium tracking-[0.5px] uppercase transition-all relative shrink-0 " + (activeTab === tab ? 'text-[#1a1a1a]' : 'text-[#666] hover:text-[#444]')}>
+                                    {tab} <span className={"ml-2 px-1.5 py-0.5 rounded-sm text-[9px] " + (activeTab === tab ? 'bg-[#1a1a1a] text-[#f8f8f4]' : 'bg-[#e2e2d9] text-[#666]')}>{jobs.filter(j => j.status === tab).length}</span>
+                                    {activeTab === tab && <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#c5a059]" />}
+                                </button>
+                            ))}
                             </div>
-                        </div>
-                    </div>
 
-                    <div className="bg-white rounded-sm overflow-hidden h-[calc(100vh-380px)] flex flex-col relative tactile-pop">
-                        {loading ? (
-                            <div className="overflow-hidden flex-1">
-                                {Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)}
-                            </div>
-                        ) : filteredJobs.length === 0 ? (
-                            <div className="py-24 text-center flex-1 flex flex-col items-center justify-center px-12 animate-in fade-in duration-700">
-                                <div className="relative mb-8" aria-hidden="true">
-                                    <div className="w-20 h-20 bg-[#f0f0eb] border border-[#d1d1ca] flex items-center justify-center text-3xl grayscale opacity-40">
-                                        {activeTab === 'pending' ? '🔍' : activeTab === 'applied' ? '✉️' : activeTab === 'interviewing' ? '🤝' : '⏭️'}
-                                    </div>
-                                </div>
-                                <h3 className="font-syne font-bold text-xl text-[#1a1a1a] mb-4 tracking-tight">No {activeTab} records</h3>
-                                <p className="text-sm text-[#666] font-sans mb-12 max-w-xs leading-relaxed">
-                                    {activeTab === 'pending'
-                                        ? 'Initiate a job search scan to identify matching opportunities.'
-                                        : "No items found in " + activeTab + "."}
-                                </p>
-                                {activeTab === 'pending' && (
-                                    <button onClick={handleScan} className="bg-[#1a1a1a] text-[#f8f8f4] px-10 py-4 rounded-sm font-mono text-[11px] font-bold uppercase tracking-[3px] hover:bg-[#c5a059] transition-all shadow-md">
-                                        Scan Now
-                                    </button>
-                                )}
-                            </div>
-                        ) : (
-                            <div className="flex-1">
-                                <List
-                                    key={`${activeTab}-${filteredJobs.length}`}
-                                    rowCount={filteredJobs.length}
-                                    rowHeight={rowHeight}
-                                    className="scrollbar-hide"
-                                    style={{ height: listHeight, width: '100%' }}
-                                    rowProps={{}}
-                                    rowComponent={({ index, style }) => (
-                                        <div style={style}>
-                                            <JobCard
-                                                job={filteredJobs[index]}
-                                                isSelected={selected?.id === filteredJobs[index].id}
-                                                index={index}
-                                                onClick={() => setSelected(filteredJobs[index])}
-                                            />
-                                        </div>
+                            <div className="pb-4 w-full md:w-56">
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        aria-label="Search jobs"
+                                        placeholder="Search jobs..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="w-full bg-transparent border-none outline-none font-sans text-[13px] text-[#1a1a1a] placeholder:text-[#555]"
+                                    />
+                                    <div className="absolute -bottom-1 left-0 right-0 h-px bg-[#e2e2d9]" />
+                                    {searchQuery && (
+                                        <button
+                                            onClick={() => setSearchQuery('')}
+                                            className="absolute right-0 top-0 text-[#ccc] hover:text-[#1a1a1a] transition-colors"
+                                        >
+                                            ×
+                                        </button>
                                     )}
-                                />
+                                </div>
                             </div>
-                        )}
+                        </div>
+
+                        <div className="bg-white rounded-sm overflow-hidden h-[calc(100vh-380px)] flex flex-col relative tactile-pop">
+                            {loading ? (
+                                <div className="overflow-hidden flex-1">
+                                    {Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)}
+                                </div>
+                            ) : filteredJobs.length === 0 ? (
+                                <div className="py-24 text-center flex-1 flex flex-col items-center justify-center px-12 animate-in fade-in duration-700">
+                                    <div className="relative mb-8" aria-hidden="true">
+                                        <div className="w-20 h-20 bg-[#f0f0eb] border border-[#d1d1ca] flex items-center justify-center text-3xl grayscale opacity-40">
+                                            {activeTab === 'pending' ? '🔍' : activeTab === 'applied' ? '✉️' : activeTab === 'interviewing' ? '🤝' : '⏭️'}
+                                        </div>
+                                    </div>
+                                    <h3 className="font-syne font-bold text-xl text-[#1a1a1a] mb-4 tracking-tight">No {activeTab} records</h3>
+                                    <p className="text-sm text-[#666] font-sans mb-12 max-w-xs leading-relaxed">
+                                        {activeTab === 'pending'
+                                            ? 'Initiate a job search scan to identify matching opportunities.'
+                                            : "No items found in " + activeTab + "."}
+                                    </p>
+                                    {activeTab === 'pending' && (
+                                        <button onClick={handleScan} className="bg-[#1a1a1a] text-[#f8f8f4] px-10 py-4 rounded-sm font-mono text-[11px] font-bold uppercase tracking-[3px] hover:bg-[#c5a059] transition-all shadow-md">
+                                            Scan Now
+                                        </button>
+                                    )}
+                                </div>
+                            ) : (
+                                <div className="flex-1">
+                                    <List
+                                        key={`${activeTab}-${filteredJobs.length}`}
+                                        rowCount={filteredJobs.length}
+                                        rowHeight={rowHeight}
+                                        className="scrollbar-hide"
+                                        style={{ height: listHeight, width: '100%' }}
+                                        rowProps={{}}
+                                        rowComponent={({ index, style }) => (
+                                            <div style={style}>
+                                                <JobCard
+                                                    job={filteredJobs[index]}
+                                                    isSelected={selected?.id === filteredJobs[index].id}
+                                                    index={index}
+                                                    onClick={() => setSelected(filteredJobs[index])}
+                                                />
+                                            </div>
+                                        )}
+                                    />
+                                </div>
+                            )}
+                        </div>
                     </div>
 
+                    {/* Right column: detail panel sidebar (desktop only) */}
                     {selected && (
+                        <div className="hidden lg:flex lg:flex-1 lg:flex-col lg:sticky lg:top-4 lg:h-[calc(100vh-2rem)] lg:overflow-hidden lg:border-l lg:border-[#e2e2d9]">
+                            <DetailPanel
+                                job={selected}
+                                mode="sidebar"
+                                country={profile?.country ?? undefined}
+                                userSkills={profile?.skills ?? []}
+                                generating={generating}
+                                onClose={() => setSelected(null)}
+                                onGenerateCoverLetter={handleGenerateCoverLetter}
+                                onStatusUpdate={(id, status) => {
+                                    if (status === 'skipped') {
+                                        setSkipJobId(id)
+                                        setShowSkipModal(true)
+                                    } else {
+                                        handleStatusUpdate(id, status)
+                                    }
+                                }}
+                                onInterviewOutcome={handleInterviewOutcome}
+                                onSaveTracking={handleSaveTracking}
+                                onCoverLetterOutcome={handleCoverLetterOutcome}
+                            />
+                        </div>
+                    )}
+                </div>
+
+                {/* Mobile: bottom sheet (hidden on desktop) */}
+                {selected && (
+                    <div className="lg:hidden">
                         <DetailPanel
                             job={selected}
+                            mode="sheet"
                             country={profile?.country ?? undefined}
                             userSkills={profile?.skills ?? []}
                             generating={generating}
@@ -436,8 +471,8 @@ export default function DashboardPage() {
                             onSaveTracking={handleSaveTracking}
                             onCoverLetterOutcome={handleCoverLetterOutcome}
                         />
-                    )}
-                </div>
+                    </div>
+                )}
             </div>
 
             {showSkipModal && (
