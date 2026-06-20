@@ -320,7 +320,7 @@ export default function DashboardPage() {
                 {firstTime && (
                     <div className="matte-surface border-[#c5a059]/30 rounded-sm p-8 flex flex-col md:flex-row items-center justify-between gap-8 shadow-md">
                         <div>
-                            <div className="font-syne font-bold text-lg text-[#1a1a1a] mb-2 uppercase tracking-tight">Configuration Complete</div>
+                            <div className="font-syne font-bold text-lg text-[#1a1a1a] mb-2 tracking-tight">Configuration Complete</div>
                             <div className="text-xs text-[#666] font-sans">Initialize your first automated job search to begin.</div>
                         </div>
                         <button onClick={() => { setFirstTime(false); handleScan() }}
@@ -338,7 +338,7 @@ export default function DashboardPage() {
                                     role="tab"
                                     aria-selected={activeTab === tab}
                                     onClick={() => { setActiveTab(tab) }}
-                                    className={"pb-5 min-h-[44px] font-mono text-[10px] font-bold tracking-[3px] uppercase transition-all relative shrink-0 " + (activeTab === tab ? 'text-[#1a1a1a]' : 'text-[#666] hover:text-[#444]')}>
+                                    className={"pb-5 min-h-[44px] font-sans text-[12px] font-medium tracking-[0.5px] uppercase transition-all relative shrink-0 " + (activeTab === tab ? 'text-[#1a1a1a]' : 'text-[#666] hover:text-[#444]')}>
                                 {tab} <span className={"ml-2 px-1.5 py-0.5 rounded-sm text-[9px] " + (activeTab === tab ? 'bg-[#1a1a1a] text-[#f8f8f4]' : 'bg-[#e2e2d9] text-[#666]')}>{jobs.filter(j => j.status === tab).length}</span>
                                 {activeTab === tab && <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#c5a059]" />}
                             </button>
@@ -350,10 +350,10 @@ export default function DashboardPage() {
                                 <input
                                     type="text"
                                     aria-label="Search jobs"
-                                    placeholder="SEARCH ARCHIVE..."
+                                    placeholder="Search jobs..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full bg-transparent border-none outline-none font-mono text-[10px] font-bold tracking-[2px] text-[#1a1a1a] placeholder:text-[#888] uppercase"
+                                    className="w-full bg-transparent border-none outline-none font-sans text-[13px] text-[#1a1a1a] placeholder:text-[#555]"
                                 />
                                 <div className="absolute -bottom-1 left-0 right-0 h-px bg-[#e2e2d9]" />
                                 {searchQuery && (
@@ -380,8 +380,8 @@ export default function DashboardPage() {
                                         {activeTab === 'pending' ? '🔍' : activeTab === 'applied' ? '✉️' : activeTab === 'interviewing' ? '🤝' : '⏭️'}
                                     </div>
                                 </div>
-                                <h3 className="font-syne font-bold text-xl text-[#1a1a1a] mb-4 tracking-tight uppercase">No {activeTab} Records</h3>
-                                <p className="text-[10px] text-[#666] font-mono uppercase tracking-[3px] mb-12 max-w-xs leading-relaxed font-bold">
+                                <h3 className="font-syne font-bold text-xl text-[#1a1a1a] mb-4 tracking-tight">No {activeTab} records</h3>
+                                <p className="text-sm text-[#666] font-sans mb-12 max-w-xs leading-relaxed">
                                     {activeTab === 'pending'
                                         ? 'Initiate a job search scan to identify matching opportunities.'
                                         : "No items found in " + activeTab + "."}

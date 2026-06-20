@@ -70,11 +70,11 @@ export function DetailPanel({
       <div className="w-full max-w-md space-y-3">
         <div className="flex justify-between items-end">
           <div className="flex flex-col">
-            <span className="text-[9px] font-mono font-bold text-[#666] uppercase tracking-widest">Entry Spectrum</span>
+            <span className="text-[11px] font-sans font-medium text-[#888]">Entry Spectrum</span>
             <span className="text-[16px] font-bold text-[#1a1a1a]">{currency}{min.toLocaleString()}</span>
           </div>
           <div className="flex flex-col items-end">
-            <span className="text-[9px] font-mono font-bold text-[#666] uppercase tracking-widest">Cap Projection</span>
+            <span className="text-[11px] font-sans font-medium text-[#888]">Cap Projection</span>
             <span className="text-[16px] font-bold text-[#1a1a1a]">{currency}{max.toLocaleString()}</span>
           </div>
         </div>
@@ -229,8 +229,8 @@ export function DetailPanel({
                 <div className="px-3 py-1 bg-[#1a1a1a] text-[#f8f8f4] text-[9px] font-mono font-bold uppercase tracking-[3px]">Listing Verified</div>
                 {job.source && <div className="text-[9px] font-mono font-bold text-[#666] uppercase tracking-[3px]">Source: {job.source}</div>}
               </div>
-              <h3 id="detail-panel-title" className="font-syne font-bold text-[32px] md:text-[42px] text-[#1a1a1a] mb-4 leading-[1.05] tracking-tight uppercase">{job.title}</h3>
-              <div className="text-[11px] font-mono font-bold text-[#4a4a4a] tracking-[4px] uppercase flex flex-wrap items-center gap-4">
+              <h3 id="detail-panel-title" className="font-syne font-bold text-[32px] md:text-[42px] text-[#1a1a1a] mb-4 leading-[1.05] tracking-tight">{job.title}</h3>
+              <div className="text-[14px] font-sans font-medium text-[#4a4a4a] flex flex-wrap items-center gap-4">
                   <span className="hover:text-[#c5a059] transition-colors cursor-default">{job.company}</span>
                   <div className="w-1.5 h-1.5 bg-[#c5a059] rotate-45" />
                   <span className="text-[#666]">{job.location || 'Remote'}</span>
@@ -282,7 +282,7 @@ export function DetailPanel({
               role="tab"
               aria-selected={activeTab === tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-8 py-5 font-mono text-[10px] font-bold tracking-[3px] uppercase transition-all duration-300 relative shrink-0
+              className={`px-8 py-5 font-sans text-[12px] font-medium tracking-[0.5px] uppercase transition-all duration-300 relative shrink-0
                 ${activeTab === tab ? 'text-[#1a1a1a]' : 'text-[#666] hover:text-[#444]'}`}
             >
               {tab}

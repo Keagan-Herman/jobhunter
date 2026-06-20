@@ -41,10 +41,10 @@ function JobCardComponent({
 
       <div className="flex justify-between items-start mb-8 relative z-10">
         <div className="flex-1 mr-8">
-          <div className="font-syne font-bold text-[22px] text-[#1a1a1a] mb-3 group-hover:text-[#c5a059] transition-all duration-700 leading-[1.1] tracking-tight line-clamp-2 uppercase">
+          <div className="font-syne font-bold text-[22px] text-[#1a1a1a] mb-3 group-hover:text-[#c5a059] transition-all duration-700 leading-[1.1] tracking-tight line-clamp-2">
             {job.title}
           </div>
-          <div className="text-[11px] font-mono tracking-[3px] flex flex-wrap items-center gap-3 uppercase font-bold">
+          <div className="text-[13px] font-sans flex flex-wrap items-center gap-3 font-medium">
             <span className="text-[#4a4a4a] group-hover:text-[#1a1a1a] transition-colors line-clamp-1">{job.company}</span>
             <div className="w-1 h-1 bg-[#c5a059] rotate-45 shrink-0" aria-hidden="true" />
             <span className="text-[#666] line-clamp-1">{job.location || 'Remote'}</span>
@@ -60,7 +60,7 @@ function JobCardComponent({
 
       <div className="flex gap-2.5 flex-wrap mb-8 relative z-10" aria-label={`Tech stack: ${(job.stack || []).slice(0, 5).join(', ')}`}>
         {(job.stack || []).slice(0, 5).map(s => (
-          <span key={s} className="text-[10px] px-4 py-2 bg-white text-[#4a4a4a] font-mono font-bold tracking-tight uppercase border border-[#e2e2d9] transition-all duration-500 group-hover:border-[#c5a059] group-hover:bg-[#f8f8f4] cursor-default">
+          <span key={s} className="text-[10px] px-4 py-2 bg-white text-[#4a4a4a] font-mono font-medium border border-[#e2e2d9] transition-all duration-500 group-hover:border-[#c5a059] group-hover:bg-[#f8f8f4] cursor-default">
             {s}
           </span>
         ))}
@@ -69,12 +69,12 @@ function JobCardComponent({
       <div className="flex justify-between items-center mt-auto pt-6 border-t border-[#e2e2d9]/50 relative z-10">
         <div className="flex gap-4 items-center">
           {job.seniority && (
-            <span className="text-[9px] text-[#666] font-mono font-bold uppercase tracking-[2px]">
+            <span className="text-xs text-[#888] font-sans font-medium">
               {job.seniority}
             </span>
           )}
           {job.work_style && job.work_style !== 'unspecified' && (
-            <span className="text-[9px] text-[#666] font-mono font-bold uppercase tracking-[2px]">
+            <span className="text-xs text-[#888] font-sans font-medium">
               {job.work_style}
             </span>
           )}

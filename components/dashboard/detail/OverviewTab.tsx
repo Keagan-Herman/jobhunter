@@ -19,19 +19,19 @@ export function OverviewTab({
             <div key={item.label} className="p-8 bg-white transition-all duration-500 tactile-pop relative group overflow-hidden hover:-translate-y-1">
               <div className="absolute top-0 left-0 w-full h-0.5 bg-[#e2e2d9] group-hover:bg-[#c5a059] transition-colors" />
               <div className="absolute top-4 right-4 text-[10px] font-mono text-[#e2e2d9] group-hover:text-[#c5a059] transition-colors">{item.icon}</div>
-              <div className="text-[10px] font-mono text-[#666] uppercase tracking-[2px] mb-4 font-bold">{item.label}</div>
+              <div className="text-xs font-sans text-[#666] font-medium mb-4">{item.label}</div>
               <div className={"text-[26px] font-mono font-bold tracking-tight mb-2 " + item.color}>{item.value}</div>
-              <div className="text-[9px] font-mono text-[#666] uppercase tracking-widest">{item.description}</div>
+              <div className="text-[11px] font-sans text-[#888]">{item.description}</div>
             </div>
           ))}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-6">
-            <h4 className="text-[11px] font-mono font-semibold text-[#666] tracking-[1px]">Matched Competencies</h4>
+            <h4 className="text-[13px] font-sans font-semibold text-[#555]">Matched Competencies</h4>
             <div className="flex flex-wrap gap-2.5 p-8 bg-white border border-[#e2e2d9] shadow-sm tactile-inset min-h-[120px]">
               {job.stack?.filter(s => userSkills.some(us => us.toLowerCase() === s.toLowerCase())).map((skill, idx) => (
-                <div key={`${skill}-${idx}`} className="text-[10px] px-4 py-2 font-mono font-bold uppercase tracking-wider border bg-[#2b6777]/5 border-[#2b6777] text-[#2b6777] flex items-center gap-3 transition-all hover:bg-white">
+                <div key={`${skill}-${idx}`} className="text-[10px] px-4 py-2 font-mono font-medium border bg-[#2b6777]/5 border-[#2b6777] text-[#2b6777] flex items-center gap-3 transition-all hover:bg-white">
                   <div className="w-1.5 h-1.5 bg-[#2b6777] rotate-45" />
                   {skill}
                 </div>
@@ -40,10 +40,10 @@ export function OverviewTab({
           </div>
 
           <div className="space-y-6">
-            <h4 className="text-[11px] font-mono font-semibold text-[#666] tracking-[1px]">Skill Gaps</h4>
+            <h4 className="text-[13px] font-sans font-semibold text-[#555]">Skill Gaps</h4>
             <div className="flex flex-wrap gap-2.5 p-8 bg-white border border-[#e2e2d9] shadow-sm min-h-[120px]">
               {job.stack?.filter(s => !userSkills.some(us => us.toLowerCase() === s.toLowerCase())).map((skill, idx) => (
-                <div key={`${skill}-${idx}`} className="text-[10px] px-4 py-2 font-mono font-bold uppercase tracking-wider border bg-[#f0f0eb] border-[#d1d1ca] text-[#666] transition-all hover:bg-[#f8f8f4]">
+                <div key={`${skill}-${idx}`} className="text-[10px] px-4 py-2 font-mono font-medium border bg-[#f0f0eb] border-[#d1d1ca] text-[#666] transition-all hover:bg-[#f8f8f4]">
                   {skill}
                 </div>
               ))}
@@ -66,7 +66,7 @@ export function OverviewTab({
       {job.score_reason && (
         <div className="p-12 bg-[#f5f0e8] border border-[#e2e2d9] border-t-2 border-t-[#c5a059] space-y-8 relative overflow-hidden tactile-pop">
           <div className="flex flex-wrap items-center justify-between gap-6 relative z-10">
-            <h4 className="text-[11px] font-mono font-semibold text-[#1a1a1a] tracking-[2px]">
+            <h4 className="text-sm font-sans font-semibold text-[#1a1a1a]">
               Evaluation Summary
             </h4>
             {job.score && (
