@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { StatsGrid } from '@/components/dashboard/StatsGrid'
 import { JobCard } from '@/components/dashboard/JobCard'
@@ -37,6 +37,12 @@ export default function DashboardPage() {
 
     const [listHeight, setListHeight] = useState(600)
     const [rowHeight, setRowHeight] = useState(240)
+
+    const [focusedJobIndex, setFocusedJobIndex] = useState(-1)
+    const focusedJobIndexRef = useRef(-1)
+    const filteredJobsRef = useRef<Job[]>([])
+    const selectedRef = useRef<Job | null>(null)
+    const searchInputRef = useRef<HTMLInputElement>(null)
 
     const router = useRouter()
 
@@ -82,6 +88,47 @@ export default function DashboardPage() {
         fetchProfile()
         fetchJobs()
     }, [fetchProfile, fetchJobs])
+
+    useEffect(() => {
+        setFocusedJobIndex(-1)
+        focusedJobIndexRef.current = -1
+    }, [activeTab, searchQuery])
+
+    useEffect(() => {
+        const onKeyDown = (e: KeyboardEvent) => {
+            const tag = (e.target as HTMLElement).tagName
+            if (tag === 'INPUT' || tag === 'TEXTAREA') return
+
+            const list = filteredJobsRef.current
+            const idx = focusedJobIndexRef.current
+
+            if (e.key === 'j' || e.key === 'ArrowDown') {
+                e.preventDefault()
+                const next = Math.min(idx + 1, list.length - 1)
+                focusedJobIndexRef.current = next
+                setFocusedJobIndex(next)
+            } else if (e.key === 'k' || e.key === 'ArrowUp') {
+                e.preventDefault()
+                const prev = Math.max(idx - 1, 0)
+                focusedJobIndexRef.current = prev
+                setFocusedJobIndex(prev)
+            } else if (e.key === 'Enter' && idx >= 0 && idx < list.length) {
+                e.preventDefault()
+                setSelected(list[idx])
+            } else if (e.key === 'Escape') {
+                if (selectedRef.current) {
+                    e.preventDefault()
+                    setSelected(null)
+                }
+            } else if (e.key === '/') {
+                e.preventDefault()
+                searchInputRef.current?.focus()
+            }
+        }
+        window.addEventListener('keydown', onKeyDown)
+        return () => window.removeEventListener('keydown', onKeyDown)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     const handleScan = async () => {
         setScanning(true)
@@ -263,13 +310,19 @@ export default function DashboardPage() {
         total: jobs.length
     }
 
+    // Keep refs in sync with latest render values so the keyboard handler (stable [] deps) stays current
+    filteredJobsRef.current = filteredJobs
+    selectedRef.current = selected
+    focusedJobIndexRef.current = focusedJobIndex
+
     return (
         <div className="min-h-screen bg-[#f8f8f4] text-[#1a1a1a] font-sans selection:bg-[#c5a05920] selection:text-[#1a1a1a]">
             {/* Background Grid & Organic Accents */}
             <div className="fixed inset-0 z-0 pointer-events-none grid-overlay opacity-30" />
             <div className="fixed inset-0 z-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 60% 50% at 100% 0%, rgba(197,160,89,0.06) 0%, transparent 70%), radial-gradient(ellipse 60% 50% at 0% 100%, rgba(43,103,119,0.06) 0%, transparent 70%)' }} />
 
-            <div className="relative z-10 max-w-7xl mx-auto px-6 py-12 md:px-8 space-y-12">
+            <div role="status" aria-live="polite" className="sr-only">{notification?.message}</div>
+        <div className="relative z-10 max-w-7xl mx-auto px-6 py-12 md:px-8 space-y-12">
                 <header className="flex flex-col xl:flex-row xl:items-center justify-between gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
                     <div className="flex flex-wrap items-center gap-6 min-h-[48px]">
                         <h1 className="font-syne text-4xl font-bold tracking-tight text-[#1a1a1a] flex items-center gap-1">
@@ -352,6 +405,7 @@ export default function DashboardPage() {
                             <div className="pb-4 w-full md:w-56">
                                 <div className="relative">
                                     <input
+                                        ref={searchInputRef}
                                         type="text"
                                         aria-label="Search jobs"
                                         placeholder="Search jobs..."
@@ -397,26 +451,37 @@ export default function DashboardPage() {
                                     )}
                                 </div>
                             ) : (
-                                <div className="flex-1">
-                                    <List
-                                        key={`${activeTab}-${filteredJobs.length}`}
-                                        rowCount={filteredJobs.length}
-                                        rowHeight={rowHeight}
-                                        className="scrollbar-hide"
-                                        style={{ height: listHeight, width: '100%' }}
-                                        rowProps={{}}
-                                        rowComponent={({ index, style }) => (
-                                            <div style={style}>
-                                                <JobCard
-                                                    job={filteredJobs[index]}
-                                                    isSelected={selected?.id === filteredJobs[index].id}
-                                                    index={index}
-                                                    onClick={() => setSelected(filteredJobs[index])}
-                                                />
-                                            </div>
-                                        )}
-                                    />
-                                </div>
+                                <>
+                                    <div className="flex-1">
+                                        <List
+                                            key={`${activeTab}-${filteredJobs.length}`}
+                                            rowCount={filteredJobs.length}
+                                            rowHeight={rowHeight}
+                                            className="scrollbar-hide"
+                                            style={{ height: listHeight, width: '100%' }}
+                                            rowProps={{}}
+                                            rowComponent={({ index, style }) => (
+                                                <div style={style}>
+                                                    <JobCard
+                                                        job={filteredJobs[index]}
+                                                        isSelected={selected?.id === filteredJobs[index].id}
+                                                        isFocused={focusedJobIndex === index}
+                                                        index={index}
+                                                        onClick={() => setSelected(filteredJobs[index])}
+                                                    />
+                                                </div>
+                                            )}
+                                        />
+                                    </div>
+                                    <div className="shrink-0 border-t border-[#e2e2d9] px-6 py-3 flex items-center gap-5 bg-[#f8f8f4]" aria-hidden="true">
+                                        {[['J/K', 'navigate'], ['↵', 'open'], ['/', 'search'], ['Esc', 'close']].map(([key, label]) => (
+                                            <span key={key} className="flex items-center gap-1.5 text-[10px] text-[#aaa] font-mono">
+                                                <kbd className="px-1.5 py-0.5 bg-white border border-[#e2e2d9] text-[10px] font-mono text-[#666]">{key}</kbd>
+                                                {label}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </>
                             )}
                         </div>
                     </div>
