@@ -291,7 +291,7 @@ export function DetailPanel({
         role="tabpanel"
         id={`tabpanel-${activeTab}`}
         aria-labelledby={`tab-${activeTab}`}
-        className="flex-1 overflow-y-auto p-8 bg-[#f8f8f4] scrollbar-hide"
+        className="flex-1 overflow-y-auto p-8 bg-surface-2 scrollbar-hide"
       >
         <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
         {activeTab === 'overview' && <OverviewTab job={job} userSkills={userSkills} />}
@@ -380,7 +380,7 @@ export function DetailPanel({
         role="dialog"
         aria-modal="true"
         aria-labelledby="detail-panel-title"
-        className="bg-[#f8f8f4] flex flex-col h-full overflow-hidden"
+        className="bg-surface-2 flex flex-col h-full overflow-hidden"
       >
         {panelContent}
       </div>

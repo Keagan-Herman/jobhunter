@@ -21,6 +21,16 @@
 }
 
 @layer utilities {
+  /* Semantic token utilities — respond to dark mode via :root var swaps */
+  .bg-surface-1 { background: var(--color-surface-1); }
+  .bg-surface-2 { background: var(--color-surface-2); }
+  .bg-surface-3 { background: var(--color-surface-3); }
+  .text-ink { color: var(--color-text-primary); }
+  .text-ink-secondary { color: var(--color-text-secondary); }
+  .text-ink-muted { color: var(--color-text-muted); }
+  .border-subtle { border-color: var(--color-border); }
+  .border-strong { border-color: var(--color-border-strong); }
+
   .bg-glass {
     background: rgba(248, 248, 244, 0.8);
     backdrop-filter: blur(8px);

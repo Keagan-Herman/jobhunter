@@ -316,7 +316,7 @@ export default function DashboardPage() {
     focusedJobIndexRef.current = focusedJobIndex
 
     return (
-        <div className="min-h-screen bg-[#f8f8f4] text-[#1a1a1a] font-sans selection:bg-[#c5a05920] selection:text-[#1a1a1a]">
+        <div className="min-h-screen bg-surface-2 text-ink font-sans selection:bg-[#c5a05920] selection:text-[#1a1a1a]">
             {/* Background Grid & Organic Accents */}
             <div className="fixed inset-0 z-0 pointer-events-none grid-overlay opacity-30" />
             <div className="fixed inset-0 z-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 60% 50% at 100% 0%, rgba(197,160,89,0.06) 0%, transparent 70%), radial-gradient(ellipse 60% 50% at 0% 100%, rgba(43,103,119,0.06) 0%, transparent 70%)' }} />
