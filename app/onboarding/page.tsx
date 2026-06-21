@@ -59,9 +59,18 @@ export default function OnboardingPage() {
       timers.push(setTimeout(() => setImportStep('Extracting data...'), 4500))
 
       const res = await fetch('/api/parse-cv', { method: 'POST', body: formData })
-      const data = await res.json()
+      let data: {
+        success?: boolean
+        error?: string
+        profile?: { full_name?: string; job_title?: string; company?: string; education?: string; skills?: string[]; experience?: string; projects?: string; search_terms?: string[] }
+      }
+      try {
+        data = await res.json()
+      } catch {
+        throw new Error('Upload failed — please try again.')
+      }
 
-      if (data.success) {
+      if (data.success && data.profile) {
         setImportStep('Finalizing configuration...')
         const p = data.profile
         if (p.full_name) setFullName(p.full_name)
