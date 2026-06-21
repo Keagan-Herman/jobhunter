@@ -6,6 +6,35 @@ import { TrackingTab } from './detail/TrackingTab'
 
 type Tab = 'overview' | 'letter' | 'tracking'
 
+function SalarySpectrum({ min, max, currency }: { min: number; max: number; currency: string }) {
+  const mid = (max + min) / 2
+  const spread = max - min
+  const spreadPercent = Math.min(60, Math.max(20, (spread / mid) * 100))
+  const leftOffset = (100 - spreadPercent) / 2
+
+  return (
+    <div className="w-full max-w-md space-y-3">
+      <div className="flex justify-between items-end">
+        <div className="flex flex-col">
+          <span className="text-[11px] font-sans font-medium text-[#666]">Entry Spectrum</span>
+          <span className="text-[16px] font-bold text-[#1a1a1a]">{currency}{min.toLocaleString()}</span>
+        </div>
+        <div className="flex flex-col items-end">
+          <span className="text-[11px] font-sans font-medium text-[#666]">Cap Projection</span>
+          <span className="text-[16px] font-bold text-[#1a1a1a]">{currency}{max.toLocaleString()}</span>
+        </div>
+      </div>
+      <div className="h-2 bg-[#f0f0eb] rounded-full overflow-hidden relative border border-[#e2e2d9]">
+        <div className="absolute inset-y-0 left-0 bg-[#c5a059]/10 w-full" />
+        <div
+          className="absolute inset-y-0 bg-[#c5a059] shadow-[0_0_10px_rgba(197,160,89,0.5)] transition-all duration-1000"
+          style={{ left: `${leftOffset}%`, width: `${spreadPercent}%` }}
+        />
+      </div>
+    </div>
+  )
+}
+
 export function DetailPanel({
   job,
   onClose,
@@ -58,35 +87,6 @@ export function DetailPanel({
     za: 'R', gb: '£', us: '$', au: '$', ca: '$', de: '€', nl: '€'
   }
   const currency = currencyMap[country] || 'R'
-
-  function SalarySpectrum({ min, max }: { min: number, max: number }) {
-    const mid = (max + min) / 2
-    const spread = max - min
-    const spreadPercent = Math.min(60, Math.max(20, (spread / mid) * 100))
-    const leftOffset = (100 - spreadPercent) / 2
-
-    return (
-      <div className="w-full max-w-md space-y-3">
-        <div className="flex justify-between items-end">
-          <div className="flex flex-col">
-            <span className="text-[11px] font-sans font-medium text-[#666]">Entry Spectrum</span>
-            <span className="text-[16px] font-bold text-[#1a1a1a]">{currency}{min.toLocaleString()}</span>
-          </div>
-          <div className="flex flex-col items-end">
-            <span className="text-[11px] font-sans font-medium text-[#666]">Cap Projection</span>
-            <span className="text-[16px] font-bold text-[#1a1a1a]">{currency}{max.toLocaleString()}</span>
-          </div>
-        </div>
-        <div className="h-2 bg-[#f0f0eb] rounded-full overflow-hidden relative border border-[#e2e2d9]">
-          <div className="absolute inset-y-0 left-0 bg-[#c5a059]/10 w-full" />
-          <div
-            className="absolute inset-y-0 bg-[#c5a059] shadow-[0_0_10px_rgba(197,160,89,0.5)] transition-all duration-1000"
-            style={{ left: `${leftOffset}%`, width: `${spreadPercent}%` }}
-          />
-        </div>
-      </div>
-    )
-  }
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(coverLetter)
@@ -244,7 +244,7 @@ export function DetailPanel({
 
         <div className="flex items-center justify-between gap-6 flex-wrap relative z-10">
             {job.salary_min && job.salary_max ? (
-              <SalarySpectrum min={job.salary_min} max={job.salary_max} />
+              <SalarySpectrum min={job.salary_min} max={job.salary_max} currency={currency} />
             ) : (job.salary_min || job.salary_max) && (
               <div className="text-[14px] font-bold text-[#2b6777] font-mono bg-[#2b6777]/5 border border-[#2b6777]/20 px-6 py-2.5 rounded-sm tracking-tight flex items-center gap-3">
                 <div className="w-2 h-2 bg-[#2b6777] animate-pulse" />

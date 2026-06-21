@@ -24,9 +24,9 @@ function JobCardComponent({
   return (
     <button
       type="button"
-      className={`w-full text-left p-10 border-b border-[#e2e2d9] transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-white group relative overflow-hidden
+      className={`w-full text-left p-10 border-b border-[#e2e2d9] transition-colors duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-white group relative overflow-hidden
         ${isSelected ? 'bg-[#f5f0e8] ring-1 ring-inset ring-[#c5a059]/40' : isFocused ? 'bg-[#faf5ec] ring-2 ring-inset ring-[#c5a059]/50' : 'bg-[#fbfbfa]'}
-        animate-in fade-in slide-in-from-bottom-4 fill-mode-forwards hover:shadow-xl hover:z-10
+        animate-in fade-in slide-in-from-bottom-4 fill-mode-forwards hover:z-10
         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#c5a059]/60`}
       style={{ animationDelay, opacity: 0 }}
       onClick={onClick}
