@@ -426,7 +426,7 @@ export default function DashboardPage() {
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-sm overflow-hidden h-[calc(100vh-380px)] flex flex-col relative tactile-pop">
+                        <div className="bg-white rounded-sm overflow-hidden h-[calc(100vh-380px)] min-h-[300px] max-h-[calc(100vh-8rem)] flex flex-col relative tactile-pop">
                             {loading ? (
                                 <div className="overflow-hidden flex-1">
                                     {Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)}
@@ -488,7 +488,7 @@ export default function DashboardPage() {
 
                     {/* Right column: detail panel sidebar (desktop only) */}
                     {selected && (
-                        <div className="hidden lg:flex lg:flex-1 lg:flex-col lg:sticky lg:top-4 lg:h-[calc(100vh-2rem)] lg:overflow-hidden lg:border-l lg:border-[#e2e2d9]">
+                        <div className="hidden lg:flex lg:flex-1 lg:flex-col lg:sticky lg:top-4 lg:h-[calc(100vh-2rem)] lg:min-h-[400px] lg:overflow-hidden lg:border-l lg:border-[#e2e2d9]">
                             <DetailPanel
                                 job={selected}
                                 mode="sidebar"
