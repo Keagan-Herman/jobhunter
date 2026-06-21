@@ -26,7 +26,7 @@ A local-first, single-user AI job search tool. Finds relevant listings, scores t
 **Prerequisites:** Node.js 20+, API keys for Groq, Adzuna, and JSearch.
 
 ```bash
-git clone https://github.com/your-username/jobhunter.git
+git clone https://github.com/Keagan-Herman/jobhunter.git
 cd jobhunter
 npm install
 ```
