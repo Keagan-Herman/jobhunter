@@ -124,6 +124,15 @@
   .slide-in-from-bottom-2 {
     animation-name: slide-in-from-bottom-subtle;
   }
+
+  @keyframes zoom-in-95 {
+    from { transform: scale(0.95); opacity: 0; }
+    to   { transform: scale(1);    opacity: 1; }
+  }
+
+  .zoom-in-95 {
+    animation-name: zoom-in-95;
+  }
 }
 
 :root {
