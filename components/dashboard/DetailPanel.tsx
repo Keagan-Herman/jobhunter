@@ -211,7 +211,7 @@ export function DetailPanel({
   const panelContent = (
     <>
       {/* Header */}
-      <div className="p-8 pb-6 shrink-0 relative overflow-hidden bg-white">
+      <div className="p-8 pb-6 shrink-0 relative overflow-hidden bg-surface-1">
         <div className="absolute top-0 left-0 w-full h-1 bg-klimt-gold opacity-30" />
 
         <div className="flex justify-between items-start mb-6 relative z-10">
@@ -220,7 +220,7 @@ export function DetailPanel({
               <div className="px-3 py-1 bg-[#1a1a1a] text-[#f8f8f4] text-[9px] font-mono font-bold uppercase tracking-[3px]">Listing Verified</div>
               {job.source && <div className="text-[9px] font-mono font-bold text-[#666] uppercase tracking-[3px]">Source: {job.source}</div>}
             </div>
-            <h3 id="detail-panel-title" className="font-syne font-bold text-[26px] lg:text-[32px] text-[#1a1a1a] mb-3 leading-[1.05] tracking-tight">{job.title}</h3>
+            <h3 id="detail-panel-title" className="font-syne font-bold text-[26px] lg:text-[32px] text-ink mb-3 leading-[1.05] tracking-tight">{job.title}</h3>
             <div className="text-[14px] font-sans font-medium text-[#4a4a4a] flex flex-wrap items-center gap-3">
                 <span className="hover:text-[#c5a059] transition-colors cursor-default">{job.company}</span>
                 <div className="w-1.5 h-1.5 bg-[#c5a059] rotate-45" />
@@ -266,7 +266,7 @@ export function DetailPanel({
       </div>
 
       {/* Tabs */}
-      <div role="tablist" aria-label="Job details sections" className="flex px-8 border-b border-[#e2e2d9] bg-[#f0f0eb] z-20 relative overflow-x-auto scrollbar-hide">
+      <div role="tablist" aria-label="Job details sections" className="flex px-8 border-b border-subtle bg-surface-3 z-20 relative overflow-x-auto scrollbar-hide">
         {(['overview', 'letter', 'tracking'] as const).map(tab => (
           <button
             key={tab}
@@ -335,7 +335,7 @@ export function DetailPanel({
       </div>
 
       {/* Actions Footer */}
-      <div className="px-8 py-5 border-t border-[#e2e2d9] flex flex-col sm:flex-row justify-center gap-4 shrink-0 bg-white z-20">
+      <div className="px-8 py-5 border-t border-subtle flex flex-col sm:flex-row justify-center gap-4 shrink-0 bg-surface-1 z-20">
         {job.status === 'pending' && (
           <>
             <button onClick={() => onStatusUpdate(job.id, 'applied')}

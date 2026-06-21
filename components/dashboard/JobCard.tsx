@@ -24,8 +24,8 @@ function JobCardComponent({
   return (
     <button
       type="button"
-      className={`w-full text-left p-10 border-b border-[#e2e2d9] transition-colors duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-white group relative overflow-hidden
-        ${isSelected ? 'bg-[#f5f0e8] ring-1 ring-inset ring-[#c5a059]/40' : isFocused ? 'bg-[#faf5ec] ring-2 ring-inset ring-[#c5a059]/50' : 'bg-[#fbfbfa]'}
+      className={`w-full text-left p-10 border-b border-subtle transition-colors duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-surface-1 group relative overflow-hidden
+        ${isSelected ? 'bg-[#f5f0e8] ring-1 ring-inset ring-[#c5a059]/40' : isFocused ? 'bg-[#faf5ec] ring-2 ring-inset ring-[#c5a059]/50' : 'bg-surface-2'}
         animate-in fade-in slide-in-from-bottom-4 fill-mode-forwards hover:z-10
         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#c5a059]/60`}
       style={{ animationDelay, opacity: 0 }}
@@ -43,13 +43,13 @@ function JobCardComponent({
 
       <div className="flex justify-between items-start mb-8 relative z-10">
         <div className="flex-1 mr-8">
-          <div className="font-syne font-bold text-[22px] text-[#1a1a1a] mb-3 group-hover:text-[#c5a059] transition-all duration-700 leading-[1.1] tracking-tight line-clamp-2">
+          <div className="font-syne font-bold text-[22px] text-ink mb-3 group-hover:text-[#c5a059] transition-colors duration-700 leading-[1.1] tracking-tight line-clamp-2">
             {job.title}
           </div>
           <div className="text-[13px] font-sans flex flex-wrap items-center gap-3 font-medium">
-            <span className="text-[#4a4a4a] group-hover:text-[#1a1a1a] transition-colors line-clamp-1">{job.company}</span>
+            <span className="text-ink-secondary group-hover:text-ink transition-colors line-clamp-1">{job.company}</span>
             <div className="w-1 h-1 bg-[#c5a059] rotate-45 shrink-0" aria-hidden="true" />
-            <span className="text-[#666] line-clamp-1">{job.location || 'Remote'}</span>
+            <span className="text-ink-muted line-clamp-1">{job.location || 'Remote'}</span>
           </div>
         </div>
         <div className="shrink-0 flex flex-col items-center gap-2 transition-all duration-700 group-hover:scale-110 group-hover:rotate-3" aria-hidden="true">
@@ -62,7 +62,7 @@ function JobCardComponent({
 
       <div className="flex gap-2.5 flex-wrap mb-8 relative z-10" aria-label={`Tech stack: ${(job.stack || []).slice(0, 5).join(', ')}`}>
         {(job.stack || []).slice(0, 5).map(s => (
-          <span key={s} className="text-[10px] px-4 py-2 bg-white text-[#4a4a4a] font-mono font-medium border border-[#e2e2d9] transition-all duration-500 group-hover:border-[#c5a059] group-hover:bg-[#f8f8f4] cursor-default">
+          <span key={s} className="text-[10px] px-4 py-2 bg-surface-1 text-ink-secondary font-mono font-medium border border-subtle transition-colors duration-500 group-hover:border-[#c5a059] group-hover:bg-surface-2 cursor-default">
             {s}
           </span>
         ))}
