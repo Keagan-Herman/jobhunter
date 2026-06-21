@@ -91,6 +91,11 @@
     to { transform: translateY(0); opacity: 1; }
   }
 
+  @keyframes slide-in-from-bottom-subtle {
+    from { transform: translateY(0.5rem); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
   .animate-in {
     animation-duration: 700ms;
     animation-fill-mode: forwards;
@@ -103,6 +108,11 @@
 
   .slide-in-from-bottom-4 {
     animation-name: slide-in-from-bottom;
+  }
+
+  /* Smaller slide for sub-content (tab panels, inner sections) */
+  .slide-in-from-bottom-2 {
+    animation-name: slide-in-from-bottom-subtle;
   }
 }
 
