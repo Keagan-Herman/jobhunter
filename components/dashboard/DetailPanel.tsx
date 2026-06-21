@@ -27,7 +27,7 @@ function SalarySpectrum({ min, max, currency }: { min: number; max: number; curr
       <div className="h-2 bg-[#f0f0eb] rounded-full overflow-hidden relative border border-[#e2e2d9]">
         <div className="absolute inset-y-0 left-0 bg-[#c5a059]/10 w-full" />
         <div
-          className="absolute inset-y-0 bg-[#c5a059] shadow-[0_0_10px_rgba(197,160,89,0.5)] transition-all duration-1000"
+          className="absolute inset-y-0 bg-[#c5a059] shadow-[0_0_10px_rgba(197,160,89,0.5)] transition-[left,width] duration-1000"
           style={{ left: `${leftOffset}%`, width: `${spreadPercent}%` }}
         />
       </div>

@@ -50,12 +50,12 @@ export function TrackingTab({
           <div className="space-y-3">
             <label htmlFor="tracking-contact-name" className="text-[10px] text-[#4a4a4a] font-mono uppercase font-bold tracking-[2px]">Contact Name</label>
             <input id="tracking-contact-name" value={contact_name} onChange={e => setContactName(e.target.value)} placeholder="Full name"
-              className="w-full bg-white border border-[#e2e2d9] p-4 text-[#1a1a1a] text-[14px] outline-none focus:border-[#c5a059] transition-all font-medium" />
+              className="w-full bg-white border border-[#e2e2d9] p-4 text-[#1a1a1a] text-[14px] outline-none focus:border-[#c5a059] transition-colors font-medium" />
           </div>
           <div className="space-y-3">
             <label htmlFor="tracking-contact-email" className="text-[10px] text-[#4a4a4a] font-mono uppercase font-bold tracking-[2px]">Contact Email</label>
             <input id="tracking-contact-email" value={contact_email} onChange={e => setContactEmail(e.target.value)} placeholder="email@example.com"
-              className="w-full bg-white border border-[#e2e2d9] p-4 text-[#1a1a1a] text-[14px] outline-none focus:border-[#c5a059] transition-all font-medium" />
+              className="w-full bg-white border border-[#e2e2d9] p-4 text-[#1a1a1a] text-[14px] outline-none focus:border-[#c5a059] transition-colors font-medium" />
           </div>
         </div>
       </div>
@@ -69,12 +69,12 @@ export function TrackingTab({
           <div className="space-y-3">
             <label htmlFor="tracking-interview-date" className="text-[10px] text-[#4a4a4a] font-mono uppercase font-bold tracking-[2px]">Interview Schedule</label>
             <input id="tracking-interview-date" type="datetime-local" value={interview_date} onChange={e => setInterviewDate(e.target.value)}
-              className="w-full bg-white border border-[#e2e2d9] p-4 text-[#1a1a1a] text-[14px] outline-none focus:border-[#c5a059] transition-all font-medium" />
+              className="w-full bg-white border border-[#e2e2d9] p-4 text-[#1a1a1a] text-[14px] outline-none focus:border-[#c5a059] transition-colors font-medium" />
           </div>
           <div className="space-y-3">
             <label htmlFor="tracking-follow-up" className="text-[10px] text-[#4a4a4a] font-mono uppercase font-bold tracking-[2px]">Follow Up</label>
             <input id="tracking-follow-up" type="datetime-local" value={follow_up_date} onChange={e => setFollowUpDate(e.target.value)}
-              className="w-full bg-white border border-[#e2e2d9] p-4 text-[#1a1a1a] text-[14px] outline-none focus:border-[#c5a059] transition-all font-medium" />
+              className="w-full bg-white border border-[#e2e2d9] p-4 text-[#1a1a1a] text-[14px] outline-none focus:border-[#c5a059] transition-colors font-medium" />
           </div>
         </div>
       </div>
@@ -117,7 +117,7 @@ export function TrackingTab({
         <textarea id="tracking-notes" value={notes} onChange={e => setNotes(e.target.value)}
           placeholder="Professional insights and observations..."
           rows={6}
-          className="w-full bg-white border border-[#e2e2d9] p-8 text-[#4a4a4a] text-[15px] outline-none focus:border-[#c5a059] resize-none transition-all leading-relaxed font-medium"
+          className="w-full bg-white border border-[#e2e2d9] p-8 text-[#4a4a4a] text-[15px] outline-none focus:border-[#c5a059] resize-none transition-colors leading-relaxed font-medium"
         />
       </div>
 

@@ -37,7 +37,7 @@ export function Notification({ message, type, onClose, duration = 5000 }: Notifi
     info: {
       bg: 'bg-[#c5a059]/5',
       border: 'border-[#c5a059]/20',
-      text: 'text-[#c5a059]',
+      text: 'text-[#8a6e30]',
       accent: 'bg-[#c5a059]'
     }
   }
@@ -45,7 +45,7 @@ export function Notification({ message, type, onClose, duration = 5000 }: Notifi
   const currentStyle = styles[type]
 
   return (
-    <div className={`fixed top-8 right-8 z-50 transition-all duration-500 transform ${isVisible ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0'}`}>
+    <div className={`fixed top-8 right-8 z-50 transition-[transform,opacity] duration-500 ${isVisible ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0'}`}>
       <div role={type === 'error' ? 'alert' : 'status'} aria-live={type === 'error' ? 'assertive' : 'polite'} className={`flex items-center gap-4 px-6 py-4 rounded-sm border ${currentStyle.bg} ${currentStyle.border}`}>
         <div className={`w-2 h-2 ${currentStyle.accent} animate-pulse`} />
         <span className={`text-[10px] font-mono font-bold uppercase tracking-[2px] ${currentStyle.text}`}>
@@ -57,7 +57,7 @@ export function Notification({ message, type, onClose, duration = 5000 }: Notifi
             setIsVisible(false)
             setTimeout(onClose, 500)
           }}
-          className={`ml-4 text-[12px] font-mono hover:scale-110 transition-transform ${currentStyle.text}`}
+          className={`ml-4 text-[12px] font-mono hover:scale-110 transition-transform focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current rounded-sm ${currentStyle.text}`}
         >
           ✕
         </button>

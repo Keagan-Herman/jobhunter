@@ -16,7 +16,7 @@ export function OverviewTab({
             { label: 'Environment', value: job.work_style || 'Remote', color: 'text-[#2b6777]', icon: 'W', description: 'Spatial Alignment' },
             { label: 'Compatibility', value: `${job.stack_overlap || 0}%`, color: 'text-[#8a6e30]', icon: 'C', description: 'Technical Overlap' }
           ].map(item => (
-            <div key={item.label} className="p-8 bg-white transition-all duration-500 tactile-pop relative group overflow-hidden hover:-translate-y-1">
+            <div key={item.label} className="p-8 bg-white transition-transform duration-500 tactile-pop relative group overflow-hidden hover:-translate-y-1">
               <div className="absolute top-0 left-0 w-full h-0.5 bg-[#e2e2d9] group-hover:bg-[#c5a059] transition-colors" />
               <div className="absolute top-4 right-4 text-[10px] font-mono text-[#e2e2d9] group-hover:text-[#c5a059] transition-colors">{item.icon}</div>
               <div className="text-xs font-sans text-[#666] font-medium mb-4">{item.label}</div>

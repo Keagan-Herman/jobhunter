@@ -85,7 +85,7 @@ export function SkipModal({
           value={reason}
           onChange={e => setReason(e.target.value)}
           placeholder="Or type your own reason..."
-          className="w-full bg-white border border-[#e2e2d9] p-3 text-[#1a1a1a] text-sm outline-none mb-6 focus:border-[#c5a059] transition-all placeholder:text-[#666]"
+          className="w-full bg-white border border-[#e2e2d9] p-3 text-[#1a1a1a] text-sm outline-none mb-6 focus:border-[#c5a059] transition-colors placeholder:text-[#666]"
         />
 
         <div className="flex gap-2.5">
