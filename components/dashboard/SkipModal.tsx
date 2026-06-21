@@ -55,7 +55,7 @@ export function SkipModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="skip-modal-title"
-        className="bg-white border border-[#e2e2d9] rounded-sm p-7 w-full max-w-md shadow-2xl animate-in zoom-in-95 duration-200"
+        className="bg-white rounded-sm p-7 w-full max-w-md shadow-2xl animate-in zoom-in-95 duration-200"
         onClick={e => e.stopPropagation()}
       >
         <h3 id="skip-modal-title" className="font-sans text-xl font-bold text-[#1a1a1a] mb-1.5">Why are you skipping?</h3>

@@ -475,8 +475,8 @@ export default function DashboardPage() {
                                     </div>
                                     <div className="shrink-0 border-t border-[#e2e2d9] px-6 py-3 flex items-center gap-5 bg-[#f8f8f4]" aria-hidden="true">
                                         {[['J/K', 'navigate'], ['↵', 'open'], ['/', 'search'], ['Esc', 'close']].map(([key, label]) => (
-                                            <span key={key} className="flex items-center gap-1.5 text-[10px] text-[#aaa] font-mono">
-                                                <kbd className="px-1.5 py-0.5 bg-white border border-[#e2e2d9] text-[10px] font-mono text-[#666]">{key}</kbd>
+                                            <span key={key} className="flex items-center gap-1.5 text-[10px] text-[#666] font-mono">
+                                                <kbd className="px-1.5 py-0.5 bg-white border border-[#e2e2d9] text-[10px] font-mono text-[#4a4a4a]">{key}</kbd>
                                                 {label}
                                             </span>
                                         ))}

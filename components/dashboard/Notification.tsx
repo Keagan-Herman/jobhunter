@@ -45,13 +45,14 @@ export function Notification({ message, type, onClose, duration = 5000 }: Notifi
   const currentStyle = styles[type]
 
   return (
-    <div className={`fixed top-8 right-8 z-[100] transition-all duration-500 transform ${isVisible ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0'}`}>
-      <div className={`flex items-center gap-4 px-6 py-4 rounded-sm border shadow-xl tactile-pop ${currentStyle.bg} ${currentStyle.border}`}>
+    <div className={`fixed top-8 right-8 z-50 transition-all duration-500 transform ${isVisible ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0'}`}>
+      <div className={`flex items-center gap-4 px-6 py-4 rounded-sm border ${currentStyle.bg} ${currentStyle.border}`}>
         <div className={`w-2 h-2 ${currentStyle.accent} animate-pulse`} />
         <span className={`text-[10px] font-mono font-bold uppercase tracking-[2px] ${currentStyle.text}`}>
           {message}
         </span>
         <button
+          aria-label="Dismiss notification"
           onClick={() => {
             setIsVisible(false)
             setTimeout(onClose, 500)

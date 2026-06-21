@@ -114,7 +114,7 @@
   --color-text-primary: #1a1a1a;
   --color-text-secondary: #4a4a4a;  /* 9.7:1 on #f8f8f4 */
   --color-text-muted: #666666;      /* 6.3:1 on #f8f8f4 */
-  --color-text-placeholder: #888888; /* 4.0:1 — use sparingly, only on white */
+  --color-text-placeholder: #888888; /* 3.3:1 on white — placeholder text only (WCAG exempt per 1.4.3), never for body copy */
 
   --color-surface-1: #ffffff;
   --color-surface-2: #f8f8f4;

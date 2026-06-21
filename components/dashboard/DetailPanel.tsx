@@ -69,11 +69,11 @@ export function DetailPanel({
       <div className="w-full max-w-md space-y-3">
         <div className="flex justify-between items-end">
           <div className="flex flex-col">
-            <span className="text-[11px] font-sans font-medium text-[#888]">Entry Spectrum</span>
+            <span className="text-[11px] font-sans font-medium text-[#666]">Entry Spectrum</span>
             <span className="text-[16px] font-bold text-[#1a1a1a]">{currency}{min.toLocaleString()}</span>
           </div>
           <div className="flex flex-col items-end">
-            <span className="text-[11px] font-sans font-medium text-[#888]">Cap Projection</span>
+            <span className="text-[11px] font-sans font-medium text-[#666]">Cap Projection</span>
             <span className="text-[16px] font-bold text-[#1a1a1a]">{currency}{max.toLocaleString()}</span>
           </div>
         </div>
@@ -238,7 +238,7 @@ export function DetailPanel({
                 {linkCopied ? 'Copied' : 'Copy Link'}
               </button>
             )}
-            <button onClick={onClose} className="text-[#666] hover:text-[#1a1a1a] transition-all duration-200 text-lg font-mono p-2.5 bg-[#f8f8f4] hover:bg-white rounded-sm border border-[#e2e2d9] hover:border-[#1a1a1a] active:scale-90">✕</button>
+            <button aria-label="Close" onClick={onClose} className="text-[#666] hover:text-[#1a1a1a] transition-all duration-200 text-lg font-mono p-2.5 bg-[#f8f8f4] hover:bg-white rounded-sm border border-[#e2e2d9] hover:border-[#1a1a1a] active:scale-90">✕</button>
           </div>
         </div>
 

@@ -21,7 +21,7 @@ export function OverviewTab({
               <div className="absolute top-4 right-4 text-[10px] font-mono text-[#e2e2d9] group-hover:text-[#c5a059] transition-colors">{item.icon}</div>
               <div className="text-xs font-sans text-[#666] font-medium mb-4">{item.label}</div>
               <div className={"text-[26px] font-mono font-bold tracking-tight mb-2 " + item.color}>{item.value}</div>
-              <div className="text-[11px] font-sans text-[#888]">{item.description}</div>
+              <div className="text-[11px] font-sans text-[#666]">{item.description}</div>
             </div>
           ))}
         </div>
