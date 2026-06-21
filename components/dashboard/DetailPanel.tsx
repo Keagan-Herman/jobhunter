@@ -266,12 +266,14 @@ export function DetailPanel({
       </div>
 
       {/* Tabs */}
-      <div role="tablist" className="flex px-8 border-b border-[#e2e2d9] bg-[#f0f0eb] z-20 relative overflow-x-auto scrollbar-hide">
+      <div role="tablist" aria-label="Job details sections" className="flex px-8 border-b border-[#e2e2d9] bg-[#f0f0eb] z-20 relative overflow-x-auto scrollbar-hide">
         {(['overview', 'letter', 'tracking'] as const).map(tab => (
           <button
             key={tab}
+            id={`tab-${tab}`}
             role="tab"
             aria-selected={activeTab === tab}
+            aria-controls={`tabpanel-${tab}`}
             onClick={() => setActiveTab(tab)}
             className={`px-6 py-4 font-sans text-[12px] font-medium tracking-[0.5px] uppercase transition-all duration-300 relative shrink-0
               ${activeTab === tab ? 'text-[#1a1a1a]' : 'text-[#666] hover:text-[#444]'}`}
@@ -285,7 +287,12 @@ export function DetailPanel({
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-8 bg-[#f8f8f4] scrollbar-hide">
+      <div
+        role="tabpanel"
+        id={`tabpanel-${activeTab}`}
+        aria-labelledby={`tab-${activeTab}`}
+        className="flex-1 overflow-y-auto p-8 bg-[#f8f8f4] scrollbar-hide"
+      >
         <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
         {activeTab === 'overview' && <OverviewTab job={job} userSkills={userSkills} />}
         {activeTab === 'letter' && (
