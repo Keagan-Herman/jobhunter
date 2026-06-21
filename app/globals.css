@@ -146,6 +146,29 @@
   --z-tooltip: 60;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #141412;
+    --foreground: #f0f0eb;
+
+    --color-text-primary: #f0f0eb;
+    --color-text-secondary: #c8c8c0;
+    --color-text-muted: #8a8a80;
+    --color-text-placeholder: #6a6a62;
+
+    --color-surface-1: #1e1e1a;
+    --color-surface-2: #141412;
+    --color-surface-3: #242420;
+    --color-border: #2e2e28;
+    --color-border-strong: #3a3a32;
+
+    --color-accent: #c5a059;
+    --color-accent-hover: #d4b06a;
+    --color-success: #3d8a9e;
+    --color-danger: #d4354d;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
