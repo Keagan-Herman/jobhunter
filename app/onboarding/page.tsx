@@ -237,7 +237,7 @@ export default function OnboardingPage() {
             <div className="space-y-5 sm:space-y-6 mb-8 sm:mb-12">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
                 <div className="space-y-1">
-                  <label className={labelClasses}>Full Name</label>
+                  <label className={labelClasses}>Full Name <span className="text-[#c5a059]">*</span></label>
                   <input className={inputClasses} value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Jane Doe" />
                 </div>
                 <div className="space-y-1">
@@ -256,7 +256,7 @@ export default function OnboardingPage() {
                 </div>
               </div>
               <div className="space-y-1">
-                <label className={labelClasses}>Skills & Competencies</label>
+                <label className={labelClasses}>Skills & Competencies <span className="text-[#c5a059]">*</span></label>
                 <div className="text-[9px] text-[#aaa] mb-1 font-mono uppercase">Comma separated</div>
                 <input className={inputClasses} value={skills} onChange={e => setSkills(e.target.value)} placeholder="e.g. Project Management, Python, Nursing, Excel" />
               </div>
@@ -285,6 +285,11 @@ export default function OnboardingPage() {
                 Continue
               </button>
             </div>
+            {(!fullName || !skills) && (
+              <p className="text-center text-[10px] text-[#aaa] font-mono mt-3">
+                Full Name and Skills are required to continue
+              </p>
+            )}
           </div>
         )}
 
@@ -300,7 +305,7 @@ export default function OnboardingPage() {
 
             <div className="space-y-6 sm:space-y-8 mb-8 sm:mb-12">
               <div className="space-y-1">
-                <label className={labelClasses}>Target Job Titles / Keywords</label>
+                <label className={labelClasses}>Target Job Titles / Keywords <span className="text-[#c5a059]">*</span></label>
                 <input
                   className={inputClasses}
                   value={searchTerms}
@@ -371,6 +376,11 @@ export default function OnboardingPage() {
                 {saving ? 'Saving...' : 'Launch Platform'}
               </button>
             </div>
+            {!searchTerms && !saving && (
+              <p className="text-center text-[10px] text-[#aaa] font-mono mt-3">
+                Enter at least one job title or keyword to continue
+              </p>
+            )}
           </div>
         )}
       </div>
