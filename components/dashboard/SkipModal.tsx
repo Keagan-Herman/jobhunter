@@ -68,7 +68,7 @@ export function SkipModal({
               type="button"
               onClick={() => setReason(r)}
               aria-pressed={reason === r}
-              className={`px-3 py-2 min-h-[36px] rounded-sm text-[11px] font-mono font-bold transition-all
+              className={`px-4 py-2.5 min-h-[44px] rounded-sm text-[11px] font-mono font-bold transition-all
                 ${reason === r
                   ? 'bg-[#2b6777]/5 border border-[#2b6777] text-[#2b6777]'
                   : 'bg-white border border-[#e2e2d9] text-[#4a4a4a] hover:border-[#c5a059] hover:text-[#1a1a1a]'
